@@ -102,3 +102,18 @@ Le CSV `sandboxed-containers-operator.v1.13.1` déclare `arch.amd64` et `arch.s3
 - **Nœud unique** : pas de tests de drain/migration multi-nœuds, pas de réseau inter-nœuds.
 - **`image-registry` dégradé** : pousser l'image d'outillage sur un registre externe (quay.io) ou réparer le registre interne (`oc patch configs.imageregistry.operator.openshift.io cluster --type merge -p '{"spec":{"managementState":"Managed","storage":{"emptyDir":{}}}}'`).
 - **podman machine** (4 vCPU / 3,7 Go) tourne en parallèle : l'arrêter pendant les mesures (`podman machine stop`) pour limiter le bruit.
+- **Console retirée pendant les campagnes** : le pod `downloads` de la console recopie ~3,1 Go de binaires `oc` dans un `emptyDir` à chaque redémarrage de conteneur, sans nettoyage. 18 redémarrages pendant la campagne du 2026-11-23 → 54 Go, disque plein, cluster non redémarrable. Console désactivée : `kubectl patch console.operator.openshift.io cluster --type merge -p '{"spec":{"managementState":"Removed"}}'` (rétablir avec `Managed`). Le precheck alerte au-delà de 70 % de disque.
+
+### 3.4 Kata upstream (kata-deploy) sur OpenShift : correctifs nécessaires
+
+Constatés sur ENV-A, intégrés à `./setup kata` :
+
+| Symptôme | Cause | Correctif |
+|---|---|---|
+| `spawn virtiofsd: Permission denied` | Le shim lance QEMU/virtiofsd en `container_kvm_t` ; kata-deploy installe ses binaires en `var_t` | Labels OSC posés via `kubectl debug node` : `qemu_exec_t`, `bin_t`, `usr_t` (retirés avant chaque mise à jour) |
+| `virtiofsd` : `CleanMount: Permission denied` | Bac à sable par namespaces refusé dans ce domaine SELinux | `virtiofsd --sandbox chroot` (drop-in) |
+| QEMU : `host-arm-cpu.pmu` introuvable | KVM imbriqué macOS sans PMU (CRC arm64 seulement) | `cpu_features = ""` |
+| Agent injoignable (vsock) | Invité plus lent à démarrer que 3 s (imbriqué) | `reconnect_timeout_ms = 60000` |
+| Pod Kata `hostNetwork` → nœud injoignable | Kata ne supporte pas `hostNetwork` ; rien ne le bloque à l'admission | FUN-30 en dry-run par défaut ; policy POL-18 |
+
+Les deux premiers points valent pour tout OpenShift en SELinux enforcing : argument pour OSC sur l'environnement de référence.

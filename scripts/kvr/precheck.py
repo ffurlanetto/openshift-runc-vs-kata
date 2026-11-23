@@ -198,6 +198,32 @@ class Precheck:
             self.add(KO, "nœuds", "état", p, hint)
         if nodes and not problems:
             self.add(OK, "nœuds", "état", "Ready, sans pression ressources, planifiables")
+        self.check_node_disk(nodes)
+
+    DISK_WARN = 0.70  # une campagne complète écrit des images, des logs et des emptyDir
+
+    def check_node_disk(self, nodes: list[dict]) -> None:
+        """Remplissage du disque des nœuds (statistiques kubelet via l'API, kubectl seul).
+        Sur ENV-A, un disque plein en cours de campagne a rendu le cluster non redémarrable."""
+        full, unknown = [], []
+        for n in nodes:
+            name = n["metadata"]["name"]
+            r = self.cluster.oc("get", "--raw", f"/api/v1/nodes/{name}/proxy/stats/summary", check=False)
+            try:
+                fs = json.loads(r.stdout)["node"]["fs"]
+                ratio = fs["usedBytes"] / fs["capacityBytes"]
+            except (ValueError, KeyError, TypeError, ZeroDivisionError):
+                unknown.append(name)
+                continue
+            if ratio >= self.DISK_WARN:
+                full.append(f"{name} {ratio:.0%} ({fs['availableBytes'] / 2**30:.0f} Gio libres)")
+        if full:
+            self.add(WARN, "nœuds", "disque", ", ".join(full),
+                     "libérer de l'espace avant une campagne complète (images, emptyDir) ou agrandir le disque")
+        elif unknown:
+            self.add(INFO, "nœuds", "disque", f"statistiques indisponibles : {', '.join(unknown)}")
+        else:
+            self.add(OK, "nœuds", "disque", f"< {self.DISK_WARN:.0%} sur {len(nodes)} nœud(s)")
 
     def check_runtimes(self) -> None:
         rc = self.target["runtimes"]["kata"]
