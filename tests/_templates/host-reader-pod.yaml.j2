@@ -1,0 +1,41 @@
+{#- Pod privilégié qui lit l'hôte (phases SCR, VOL) : simule un administrateur du nœud ou un pod compromis.
+    Lecture seule. Paramètres : name, rc ("runc" | nom | none = celle du run), node_name, host_pid (bool),
+    host_path (chemin hôte monté en lecture seule sur /host), image (clé de images, défaut ubi). -#}
+{%- set rc = rc | default(none) %}
+{%- set eff_rc = none if rc == "runc" else (rc or runtime_class) %}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ name }}
+  namespace: {{ namespace }}
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+{%- if eff_rc %}
+  runtimeClassName: {{ eff_rc }}
+{%- endif %}
+  nodeName: {{ node_name }}
+{%- if host_pid | default(false) %}
+  hostPID: true
+{%- endif %}
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: main
+      image: {{ images[image | default("ubi")] }}
+      imagePullPolicy: IfNotPresent
+      command: ["sleep", "infinity"]
+      resources:
+        requests: {cpu: 100m, memory: 128Mi}
+        limits: {cpu: "1", memory: 512Mi}
+      securityContext:
+        privileged: true
+        runAsUser: 0
+{%- if host_path | default(none) %}
+      volumeMounts:
+        - {name: host, mountPath: /host, readOnly: true}
+  volumes:
+    - name: host
+      hostPath: {path: {{ host_path }}, type: Directory}
+{%- endif %}

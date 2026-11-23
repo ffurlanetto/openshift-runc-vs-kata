@@ -1,0 +1,65 @@
+{#- PVC + pod restreint qui la monte sur /data (phase VOL). Identique pour runc et kata hormis runtimeClassName.
+    Paramètres : pvc (nom), create_pvc (bool), storage_class (vide = classe par défaut), size, access_mode,
+    name (pod), rc ("runc" | nom | none = celle du run), node_name. -#}
+{%- set rc = rc | default(none) %}
+{%- set eff_rc = none if rc == "runc" else (rc or runtime_class) %}
+{%- if create_pvc | default(true) %}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ pvc }}
+  namespace: {{ namespace }}
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+  accessModes: [{{ access_mode | default("ReadWriteOnce") }}]
+{%- if storage_class | default("") %}
+  storageClassName: {{ storage_class }}
+{%- endif %}
+  resources:
+    requests: {storage: {{ size | default("1Gi") }}}
+---
+{%- endif %}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ name }}
+  namespace: {{ namespace }}
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+{%- if eff_rc %}
+  runtimeClassName: {{ eff_rc }}
+{%- endif %}
+{%- if node_name | default(none) %}
+  nodeName: {{ node_name }}
+{%- elif node_selector %}
+  nodeSelector:
+{%- for k, v in node_selector.items() %}
+    {{ k }}: "{{ v }}"
+{%- endfor %}
+{%- endif %}
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: main
+      image: {{ images.ubi_minimal }}
+      imagePullPolicy: IfNotPresent
+      command: ["sleep", "infinity"]
+      resources:
+        requests: {cpu: 100m, memory: 128Mi}
+        limits: {cpu: "1", memory: 512Mi}
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+{%- if platform == "kubernetes" %}
+        runAsUser: 1001
+{%- endif %}
+        capabilities: {drop: ["ALL"]}
+        seccompProfile: {type: RuntimeDefault}
+      volumeMounts:
+        - {name: data, mountPath: /data}
+  volumes:
+    - name: data
+      persistentVolumeClaim: {claimName: {{ pvc }}}

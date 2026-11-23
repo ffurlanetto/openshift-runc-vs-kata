@@ -3,13 +3,20 @@
 Un test = un dossier `tests/<ID>/` (ID du plan, ex. `SEC-04`) contenant `test.py` et, si besoin, ses templates Jinja.
 Les templates partagés sont dans `tests/_templates/` :
 - `probe-pod.yaml.j2` : pod restreint qui dort ;
-- `policy-pod.yaml.j2` : pod « bonnes pratiques » avec écarts paramétrables, en Pod ou en Deployment.
+- `policy-pod.yaml.j2` : pod « bonnes pratiques » avec écarts paramétrables, en Pod ou en Deployment ;
+- `secret-pod.yaml.j2` : pod consommateur de secrets (volumes, `items`, projeté, `subPath`, env, token projeté) ;
+- `pvc-pod.yaml.j2` : PVC + pod restreint qui la monte sur `/data` ;
+- `host-reader-pod.yaml.j2` : pod privilégié en lecture seule sur l'hôte (vue du nœud, pod compromis) ;
+- `dind-pod.yaml.j2` : pod de CI avec moteur de build (variantes V1 à V5).
+
+Ces templates acceptent `rc` (`"runc"` ou une RuntimeClass) pour forcer le runtime d'un pod annexe
+(victime, vue du nœud), et `node_name` pour le placer sur le même nœud que le pod testé.
 
 ```python
 META = {
     "id": "SEC-04",            # = nom du dossier
-    "category": "SEC",         # phase : FUN PERF SEC POL OPS DIND AGT
-    "aspect": "SEC",           # FUN | PERF | SEC | OPS (obligatoire pour DIND/AGT)
+    "category": "SEC",         # phase : FUN PERF SEC POL OPS DIND AGT VOL SCR
+    "aspect": "SEC",           # FUN | PERF | SEC | OPS (obligatoire pour DIND/AGT/VOL/SCR)
     "priority": "P1",
     "title": "…",
     "runs": 1,                 # optionnel (défaut : campaign.yaml › defaults.runs)
