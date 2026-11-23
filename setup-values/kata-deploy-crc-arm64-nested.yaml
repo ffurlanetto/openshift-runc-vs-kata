@@ -1,0 +1,20 @@
+# Surcharges pour OpenShift Local (CRC) sur Mac Apple Silicon, virtualisation imbriquée (vfkit --nested).
+# Appliquées après kata-deploy.yaml (les dropIn remplacent ceux du fichier commun : virtiofsd est répété).
+#  - le KVM imbriqué de macOS n'expose pas la propriété PMU : « host-arm-cpu.pmu=off » fait échouer QEMU ;
+#  - le noyau invité démarre en plus de 3 s : délai de connexion à l'agent porté à 60 s.
+# Effet sur les mesures : démarrages plus lents qu'en bare metal ; PERF sur ENV-A indicatif uniquement.
+shims:
+  qemu:
+    dropIn: |
+      [hypervisor.qemu]
+      cpu_features = ""
+      virtio_fs_extra_args = ["--sandbox", "chroot", "--announce-submounts"]
+      [agent.kata]
+      dial_timeout = 60
+  qemu-runtime-rs:
+    dropIn: |
+      [hypervisor.qemu]
+      cpu_features = ""
+      virtio_fs_extra_args = ["--sandbox", "chroot", "-o", "announce_submounts"]
+      [agent.kata]
+      reconnect_timeout_ms = 60000

@@ -18,6 +18,8 @@ profiles:
     kata_version: "4.4.0 (kata-deploy, qemu-runtime-rs)"
     kata_runtime_class: kata
     node_selector: {}             # {} = n'importe quel nœud
+    kata_deploy_values:           # ./setup kata : valeurs ajoutées à charts.kata-deploy.values
+      - setup-values/kata-deploy-crc-arm64-nested.yaml
   # https://api.ocp-bench.example:6443:
   #   env_id: ENV-B
   #   description: OpenShift x86_64 bare metal, OpenShift Sandboxed Containers

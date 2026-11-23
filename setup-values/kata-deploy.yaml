@@ -1,12 +1,22 @@
-# Valeurs kata-deploy pour le banc (cluster de TEST). Chart et version : campaign.yaml › charts.kata-deploy
+# Valeurs kata-deploy communes (cluster de TEST). Chart et version : campaign.yaml › charts.kata-deploy
 # Hyperviseurs : qemu (runtime Go, RuntimeClass kata-qemu) et qemu-runtime-rs (runtime Rust, défaut de Kata 4).
 # RuntimeClass « kata » créée et pointée sur le shim par défaut, pour rester aligné avec OSC.
+#
+# SELinux (RHCOS, enforcing) : le shim lance virtiofsd et QEMU dans le domaine confiné container_kvm_t.
+#  - ./setup kata relabelle /var/opt/kata comme les paquets OSC (qemu_exec_t, bin_t, usr_t) ;
+#  - le bac à sable par namespaces de virtiofsd (montages) est refusé dans ce domaine : --sandbox chroot.
 shims:
   disableAll: true
   qemu:
     enabled: true
+    dropIn: |
+      [hypervisor.qemu]
+      virtio_fs_extra_args = ["--sandbox", "chroot", "--announce-submounts"]
   qemu-runtime-rs:
     enabled: true
+    dropIn: |
+      [hypervisor.qemu]
+      virtio_fs_extra_args = ["--sandbox", "chroot", "-o", "announce_submounts"]
 defaultShim:
   amd64: qemu-runtime-rs
   arm64: qemu-runtime-rs
@@ -15,6 +25,6 @@ runtimeClasses:
   createDefault: true
   defaultName: kata
   overheadEnabled: true
-# RHCOS est en SELinux enforcing : module de politique Kata pour les étapes d'installation.
+# Module SELinux des étapes d'installation de kata-deploy (pas des pods Kata eux-mêmes).
 selinux:
   enabled: true
