@@ -1,0 +1,81 @@
+procs=5
+block_devices=2
+dev_nodes=16
+mounts=28
+net_interfaces=2
+cpus=12
+mem_kib=24557648
+---
+## /sys/block
+loop0
+vda
+## /sys/class/net
+eth0
+lo
+## /dev
+core
+fd
+full
+mqueue
+null
+ptmx
+pts
+random
+shm
+stderr
+stdin
+stdout
+termination-log
+tty
+urandom
+zero
+## mounts
+overlay / overlay rw,context="system_u:object_r:container_file_t:s0:c0,c51",relatime,lowerdir=/var/lib/containers/storage/overlay/l/EBGX542LUG7S4OJD2K4AEFJETX,upperdir=/var/lib/containers/storage/overlay/76af8f48230d2b9c3968a95638f9197bc4a30a39aaef27c8a3d6871b3529a768/diff,workdir=/var/lib/containers/storage/overlay/76af8f48230d2b9c3968a95638f9197bc4a30a39aaef27c8a3d6871b3529a768/work,uuid=on,volatile 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev tmpfs rw,context="system_u:object_r:container_file_t:s0:c0,c51",nosuid,size=65536k,mode=755,inode64 0 0
+devpts /dev/pts devpts rw,context="system_u:object_r:container_file_t:s0:c0,c51",nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0
+mqueue /dev/mqueue mqueue rw,seclabel,nosuid,nodev,noexec,relatime 0 0
+sysfs /sys sysfs ro,seclabel,nosuid,nodev,noexec,relatime 0 0
+cgroup2 /sys/fs/cgroup cgroup2 ro,seclabel,nosuid,nodev,noexec,relatime,nosymfollow 0 0
+shm /dev/shm tmpfs rw,context="system_u:object_r:container_file_t:s0:c0,c51",relatime,size=65536k,inode64 0 0
+tmpfs /etc/resolv.conf tmpfs rw,seclabel,nosuid,nodev,noexec,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /etc/hostname tmpfs rw,seclabel,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /run/.containerenv tmpfs rw,seclabel,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /etc/passwd tmpfs rw,seclabel,nosuid,nodev,noexec,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+/dev/vda4 /etc/hosts xfs rw,seclabel,relatime,attr2,inode64,logbufs=8,logbsize=32k,prjquota 0 0
+/dev/vda4 /dev/termination-log xfs rw,seclabel,relatime,attr2,inode64,logbufs=8,logbsize=32k,prjquota 0 0
+tmpfs /run/secrets tmpfs rw,seclabel,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /proc/acpi tmpfs ro,seclabel,nosuid,nodev,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+devtmpfs /proc/interrupts devtmpfs ro,seclabel,nosuid,size=12236824k,nr_inodes=3059206,mode=755,inode64 0 0
+devtmpfs /proc/kcore devtmpfs ro,seclabel,nosuid,size=12236824k,nr_inodes=3059206,mode=755,inode64 0 0
+devtmpfs /proc/keys devtmpfs ro,seclabel,nosuid,size=12236824k,nr_inodes=3059206,mode=755,inode64 0 0
+tmpfs /proc/scsi tmpfs ro,seclabel,nosuid,nodev,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+devtmpfs /proc/timer_list devtmpfs ro,seclabel,nosuid,size=12236824k,nr_inodes=3059206,mode=755,inode64 0 0
+tmpfs /sys/firmware tmpfs ro,seclabel,nosuid,nodev,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+tmpfs /sys/fs/selinux tmpfs ro,seclabel,nosuid,nodev,size=4911532k,nr_inodes=819200,mode=755,inode64 0 0
+proc /proc/bus proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/fs proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/irq proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/sys proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/sysrq-trigger proc ro,nosuid,nodev,noexec,relatime 0 0
+## cpuinfo (extrait)
+processor	: 0
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 asimddp sha512 asimdfhm dit uscat ilrcpc flagm sb dcpodp flagm2 frint i8mm bf16 afp rpres ebf16
+CPU implementer	: 0x61
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0x000
+CPU revision	: 0
+
+processor	: 1
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 asimddp sha512 asimdfhm dit uscat ilrcpc flagm sb dcpodp flagm2 frint i8mm bf16 afp rpres ebf16
+CPU implementer	: 0x61
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0x000
+CPU revision	: 0
+
+processor	: 2
+BogoMIPS	: 48.00

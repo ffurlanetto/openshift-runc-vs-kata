@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-11",
+  "category": "POL",
+  "title": "Kyverno : privilégié seulement avec Kata",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T15:18:04Z",
+  "duration_s": 0.823,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "unprivileged_admitted",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "privileged_admitted",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "kata : pod privilégié ADMIS",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-11/kata/run-1/manifest-1-non-privilegie.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-11/kata/run-1/manifest-2-privilegie.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-11/kata/run-1/policy-privileged-requires-kata.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-11/kata/run-1/manifest-3-sonde-sans-kata.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-11/kata/run-1/admission.txt",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-11/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "23bc96457978a829a21611ef0e353d1954710edb951487fb265ae9e9e27cc3a8"
+}

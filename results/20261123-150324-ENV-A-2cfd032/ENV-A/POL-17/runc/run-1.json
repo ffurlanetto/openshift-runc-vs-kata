@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-17",
+  "category": "POL",
+  "title": "Privilèges effectifs d'un pod conforme",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T15:54:20Z",
+  "duration_s": 2.123,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "uid_non_root",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "no_new_privs",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "no_effective_caps",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "seccomp_filter",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "etc_read_only",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "{'uid': '1002300000', 'CapPrm': '0000000000000000', 'CapEff': '0000000000000000', 'NoNewPrivs': '1', 'Seccomp': '2', 'etc_writable': '0'} ; écarts : aucun",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/runc/run-1/manifest-1-policy-pod.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/runc/run-1/privileges.txt",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/runc/run-1/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "de2c5597f701660a9a44968bf0ff9f501c3eff6e21893176cf8f784657723f0e"
+}

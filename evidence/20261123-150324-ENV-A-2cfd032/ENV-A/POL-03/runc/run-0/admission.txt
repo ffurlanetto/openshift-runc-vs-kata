@@ -1,0 +1,11 @@
+## sans policy : conforme=True non-conforme=True
+
+
+## Enforce : conforme=True
+
+
+## Enforce : pod non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-6b1f04df" denied the request: Policy limit-max-resources failed: limits.memory au-delà du plafond autorisé
+
+## Enforce : Deployment non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-6b1f04df" denied the request: Policy limit-max-resources failed: limits.memory au-delà du plafond autorisé

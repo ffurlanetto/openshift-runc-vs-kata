@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                           MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged   Pod kvr-8ceb4-pol-04-runc-0/policy-probe: [validation] fail (blocked); privileged: true interdit
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged   Pod kvr-8ceb4-pol-04-runc-0/policy-probe: [validation] fail (blocked); privileged: true interdit
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged   Deployment kvr-8ceb4-pol-04-runc-0/policy-probe-deploy: [validation] fail (blocked); privileged: true interdit

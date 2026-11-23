@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-17",
+  "category": "POL",
+  "title": "Privilèges effectifs d'un pod conforme",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T15:50:19Z",
+  "duration_s": 240.841,
+  "status": "FAIL",
+  "metrics": [],
+  "observations": "ERREUR : OcError: kubectl wait pod/priv --for=condition=Ready --timeout=240s -n kvr-8ceb4-pol-17-kata-0 -> rc=1 : error: timed out waiting for the condition on pods/priv",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/kata/run-0/manifest-1-policy-pod.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/kata/run-0/traceback.txt",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/kata/run-0/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-17/kata/run-0/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "de2c5597f701660a9a44968bf0ff9f501c3eff6e21893176cf8f784657723f0e"
+}

@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "test_id": "FUN-17",
+  "category": "FUN",
+  "title": "OOM : dépassement de limits.memory",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T15:03:27Z",
+  "duration_s": 28.25,
+  "status": "PARTIAL",
+  "metrics": [
+    {
+      "name": "time_to_oom",
+      "value": 27570,
+      "unit": "ms",
+      "better": "lower"
+    }
+  ],
+  "observations": "limite 128Mi ; terminated reason=Error exitCode=137",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/FUN-17/kata/run-0/manifest-1-oom-pod.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/FUN-17/kata/run-0/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/FUN-17/kata/run-0/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "7197cd2b0af381bd9adf6f497b2f45d85bdc345b1691414bc39a58def00efad2"
+}

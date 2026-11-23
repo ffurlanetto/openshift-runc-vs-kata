@@ -35,7 +35,7 @@ containers:
 {%- if not v.get("no_resources") %}
     resources:
       requests: {cpu: 50m, memory: 32Mi}
-      limits: {cpu: {{ v.get("cpu_limit", "200m") }}, memory: {{ v.get("memory_limit", "64Mi") }}}
+      limits: {cpu: {{ v.get("cpu_limit", "200m") }}, memory: {{ v.get("memory_limit", "256Mi") }}}
 {%- endif %}
     securityContext:
       allowPrivilegeEscalation: {{ "true" if (v.get("privesc") or v.get("privileged")) else "false" }}

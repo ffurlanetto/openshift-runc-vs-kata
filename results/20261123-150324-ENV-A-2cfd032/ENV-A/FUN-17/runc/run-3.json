@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "test_id": "FUN-17",
+  "category": "FUN",
+  "title": "OOM : dépassement de limits.memory",
+  "runtime": "runc",
+  "run": 3,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T15:04:49Z",
+  "duration_s": 1.73,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "time_to_oom",
+      "value": 1339,
+      "unit": "ms",
+      "better": "lower"
+    }
+  ],
+  "observations": "limite 128Mi ; terminated reason=OOMKilled exitCode=137",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/FUN-17/runc/run-3/manifest-1-oom-pod.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/FUN-17/runc/run-3/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/FUN-17/runc/run-3/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "7197cd2b0af381bd9adf6f497b2f45d85bdc345b1691414bc39a58def00efad2"
+}

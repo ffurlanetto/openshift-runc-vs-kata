@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                          MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-host-path   Pod kvr-8ceb4-pol-08-kata-1/policy-probe: [validation] fail (blocked); volumes hostPath interdits
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-host-path   Pod kvr-8ceb4-pol-08-kata-1/policy-probe: [validation] fail (blocked); volumes hostPath interdits
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-host-path   Deployment kvr-8ceb4-pol-08-kata-1/policy-probe-deploy: [validation] fail (blocked); volumes hostPath interdits

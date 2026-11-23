@@ -1,0 +1,1235 @@
+{
+  "campaign_id": "20261123-150324-ENV-A-2cfd032",
+  "runner_version": "0.1.0",
+  "started_at": "2026-11-23T15:03:25Z",
+  "command": [
+    "scripts/campaign.py",
+    "run",
+    "--context",
+    "admin",
+    "--phases",
+    "FUN,PERF,SEC,POL",
+    "--yes"
+  ],
+  "target": {
+    "context": "admin",
+    "api_server": "https://api.crc.testing:6443",
+    "platform": "openshift",
+    "env_id": "ENV-A",
+    "description": "OpenShift Local (CRC) arm64, vfkit --nested, Kata via kata-deploy upstream",
+    "nested_virt": true,
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "node_selector": {},
+    "runtimes": {
+      "runc": null,
+      "kata": "kata"
+    },
+    "registry": {
+      "mirrors": [],
+      "pull_secret": null
+    }
+  },
+  "images_resolved": {
+    "ubi_minimal": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+    "ubi": "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd",
+    "ubi_minimal_tag": "registry.access.redhat.com/ubi9/ubi-minimal:latest"
+  },
+  "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+  "git_dirty": false,
+  "replay_of": null,
+  "config": {
+    "operator": "",
+    "phases": [
+      "FUN",
+      "PERF",
+      "SEC",
+      "POL",
+      "OPS",
+      "DIND",
+      "AGT"
+    ],
+    "registry": {
+      "mirrors": [],
+      "pull_secret": null
+    },
+    "images": {
+      "ubi_minimal": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+      "ubi": "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd",
+      "ubi_minimal_tag": "registry.access.redhat.com/ubi9/ubi-minimal:latest"
+    },
+    "unpinned_images_allowed": [
+      "ubi_minimal_tag"
+    ],
+    "charts": {
+      "kyverno": {
+        "ref": "oci://ghcr.io/kyverno/charts/kyverno",
+        "version": "3.10.0"
+      },
+      "kata-deploy": {
+        "ref": "oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy",
+        "version": "4.4.0",
+        "values": "setup-values/kata-deploy.yaml"
+      }
+    },
+    "defaults": {
+      "runs": 5,
+      "warmup": true,
+      "namespace_prefix": "kvr",
+      "cleanup_timeout_s": 300
+    },
+    "overrides": {
+      "PERF-01": {
+        "runs": 30
+      },
+      "FUN-17": {
+        "params": {
+          "memory_limit": "128Mi"
+        }
+      },
+      "POL-03": {
+        "params": {
+          "max_memory": "2Gi",
+          "max_cpu": "2"
+        }
+      }
+    }
+  },
+  "config_sha256": "b181ad9dcb0cacd3e1d9abd2da62207b16723615cab39cc0b421ec389b4bb2ea",
+  "plan": [
+    {
+      "test_id": "FUN-17",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "kata",
+      "run": 2
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "runc",
+      "run": 2
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "runc",
+      "run": 3
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "kata",
+      "run": 3
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "kata",
+      "run": 4
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "runc",
+      "run": 4
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "runc",
+      "run": 5
+    },
+    {
+      "test_id": "FUN-17",
+      "runtime": "kata",
+      "run": 5
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "kata",
+      "run": 2
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "runc",
+      "run": 2
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "runc",
+      "run": 3
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "kata",
+      "run": 3
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "kata",
+      "run": 4
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "runc",
+      "run": 4
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "runc",
+      "run": 5
+    },
+    {
+      "test_id": "FUN-30",
+      "runtime": "kata",
+      "run": 5
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 2
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 2
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 3
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 3
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 4
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 4
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 5
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 5
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 6
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 6
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 7
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 7
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 8
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 8
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 9
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 9
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 10
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 10
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 11
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 11
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 12
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 12
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 13
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 13
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 14
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 14
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 15
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 15
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 16
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 16
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 17
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 17
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 18
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 18
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 19
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 19
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 20
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 20
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 21
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 21
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 22
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 22
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 23
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 23
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 24
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 24
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 25
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 25
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 26
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 26
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 27
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 27
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 28
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 28
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 29
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 29
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "kata",
+      "run": 30
+    },
+    {
+      "test_id": "PERF-01",
+      "runtime": "runc",
+      "run": 30
+    },
+    {
+      "test_id": "POL-01",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-01",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-01",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-01",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-02",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-02",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-02",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-02",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-03",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-03",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-03",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-03",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-04",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-04",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-04",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-04",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-05",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-05",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-05",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-05",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-06",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-06",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-06",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-06",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-07",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-07",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-07",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-07",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-08",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-08",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-08",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-08",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-09",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-09",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-09",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-09",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-10",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-10",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-10",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-10",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-11",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-11",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-12",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-12",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-13",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-13",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-14",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-14",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "kata",
+      "run": 2
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "runc",
+      "run": 2
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "runc",
+      "run": 3
+    },
+    {
+      "test_id": "POL-15",
+      "runtime": "kata",
+      "run": 3
+    },
+    {
+      "test_id": "POL-16",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-16",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-16",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-16",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-17",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "POL-17",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "POL-17",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-17",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "POL-18",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "POL-18",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "kata",
+      "run": 2
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "runc",
+      "run": 2
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "runc",
+      "run": 3
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "kata",
+      "run": 3
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "kata",
+      "run": 4
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "runc",
+      "run": 4
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "runc",
+      "run": 5
+    },
+    {
+      "test_id": "SEC-01",
+      "runtime": "kata",
+      "run": 5
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "runc",
+      "run": 0
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "kata",
+      "run": 0
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "kata",
+      "run": 2
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "runc",
+      "run": 2
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "runc",
+      "run": 3
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "kata",
+      "run": 3
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "kata",
+      "run": 4
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "runc",
+      "run": 4
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "runc",
+      "run": 5
+    },
+    {
+      "test_id": "SEC-03",
+      "runtime": "kata",
+      "run": 5
+    }
+  ],
+  "fingerprint": {
+    "platform": "openshift",
+    "api_server": "https://api.crc.testing:6443",
+    "version": "OpenShift 4.22.1",
+    "nodes": [
+      {
+        "name": "crc",
+        "arch": "arm64",
+        "kernel": "5.14.0-687.13.1.el9_8.aarch64",
+        "os_image": "Red Hat Enterprise Linux CoreOS 9.8.20260605-0 (Plow)",
+        "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+        "kubelet": "v1.35.5",
+        "cpu": "12",
+        "memory": "24557648Ki"
+      }
+    ],
+    "runtime_classes": {
+      "kata": {
+        "handler": "kata-qemu-runtime-rs",
+        "overhead": {
+          "podFixed": {
+            "cpu": "250m",
+            "memory": "320Mi"
+          }
+        },
+        "scheduling": {
+          "nodeSelector": {
+            "kata-deploy.katacontainers.io/default": "true",
+            "katacontainers.io/kata-runtime": "true"
+          }
+        }
+      }
+    },
+    "kyverno": {
+      "flavor": "cel",
+      "api_version": "v1",
+      "version": "v1.20.0",
+      "namespace": "kyverno",
+      "enforce_cluster_policies": []
+    }
+  },
+  "precheck": {
+    "ok": true,
+    "kyverno": {
+      "flavor": "cel",
+      "api_version": "v1",
+      "version": "v1.20.0",
+      "namespace": "kyverno",
+      "enforce_cluster_policies": []
+    },
+    "images": {
+      "ubi_minimal": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+      "ubi": "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd",
+      "ubi_minimal_tag": "registry.access.redhat.com/ubi9/ubi-minimal:latest"
+    },
+    "checks": [
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "kubectl",
+        "detail": "v1.37.1",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "dépôt git",
+        "detail": "propre",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "images épinglées par digest",
+        "detail": "3 image(s)",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "cluster",
+        "name": "connexion API",
+        "detail": "https://api.crc.testing:6443",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "cluster",
+        "name": "plateforme",
+        "detail": "OpenShift 4.22.1",
+        "hint": ""
+      },
+      {
+        "level": "WARN",
+        "area": "cluster",
+        "name": "écart de version kubectl",
+        "detail": "client 1.37 / serveur 1.35",
+        "hint": "kubectl supporte ±1 version mineure : installer un client adapté"
+      },
+      {
+        "level": "OK",
+        "area": "droits",
+        "name": "RBAC / SCC",
+        "detail": "14 droits vérifiés",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "nœuds",
+        "name": "nœuds de bench",
+        "detail": "1 nœud(s), arch ['arm64'], sélecteur aucun",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "nœuds",
+        "name": "état",
+        "detail": "Ready, sans pression ressources, planifiables",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "nœuds",
+        "name": "disque",
+        "detail": "< 70% sur 1 nœud(s)",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "runtimes",
+        "name": "RuntimeClass kata",
+        "detail": "handler=kata-qemu-runtime-rs overhead={'cpu': '250m', 'memory': '320Mi'}",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "runtimes",
+        "name": "placement kata",
+        "detail": "nodeSelector={'kata-deploy.katacontainers.io/default': 'true', 'katacontainers.io/kata-runtime': 'true'}",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "registre",
+        "name": "réécriture miroir",
+        "detail": "aucune (pull direct, ou miroir géré par le cluster)",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "kyverno",
+        "name": "présence",
+        "detail": "version v1.20.0 (ns kyverno), API cel v1",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "kyverno",
+        "name": "policies cluster en Enforce",
+        "detail": "aucune",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "droits",
+        "name": "phase POL",
+        "detail": "OK",
+        "hint": "droits de création des policies Kyverno namespacées"
+      },
+      {
+        "level": "INFO",
+        "area": "phases",
+        "name": "sélection",
+        "detail": "FUN, PERF, SEC, POL",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "cluster",
+        "name": "Metrics API",
+        "detail": "disponible",
+        "hint": "nécessaire pour l'overhead (PERF/OPS). CRC : crc config set enable-cluster-monitoring true"
+      },
+      {
+        "level": "OK",
+        "area": "cluster",
+        "name": "APIServices indisponibles",
+        "detail": "aucune",
+        "hint": "une APIService en panne bloque la suppression des namespaces (Terminating) : réparer le service concerné"
+      },
+      {
+        "level": "WARN",
+        "area": "cluster",
+        "name": "namespaces résiduels",
+        "detail": "1 namespace(s) du banc",
+        "hint": "./run --cleanup"
+      },
+      {
+        "level": "OK",
+        "area": "admission",
+        "name": "pod restreint (FUN/PERF/SEC)",
+        "detail": "admis",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "admission",
+        "name": "pod bonnes pratiques (POL)",
+        "detail": "admis",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "admission",
+        "name": "pod privilégié (SEC/DIND/POL-11)",
+        "detail": "admis",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "ubi_minimal",
+        "detail": "tirée en 2s : registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a3",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "ubi",
+        "detail": "tirée en 2s : registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "smoke",
+        "name": "pod runc",
+        "detail": "Ready en 0.7s, noyau 5.14.0-687.13.1.el9_8.aarch64",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "smoke",
+        "name": "pod kata",
+        "detail": "Ready en 17.9s, noyau 6.18.62",
+        "hint": ""
+      }
+    ]
+  },
+  "allow_destructive": false,
+  "finished_at": "2026-11-23T16:03:15Z",
+  "summary": {
+    "PASS": 155,
+    "PARTIAL": 6,
+    "NOT_SUPPORTED": 6,
+    "FAIL": 9
+  }
+}

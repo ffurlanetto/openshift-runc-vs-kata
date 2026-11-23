@@ -1,0 +1,3 @@
+sans policy admis=True
+avec policy admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-398cb4f5" denied the request: Policy disallow-hostnetwork-kata failed: hostNetwork/hostPID/hostIPC interdits avec une RuntimeClass Kata (risque de perte du nœud)

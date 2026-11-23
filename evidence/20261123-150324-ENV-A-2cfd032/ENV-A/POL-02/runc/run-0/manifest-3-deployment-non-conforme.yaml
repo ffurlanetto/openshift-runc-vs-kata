@@ -1,0 +1,29 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: policy-probe-deploy
+  namespace: kvr-8ceb4-pol-02-runc-0
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: policy-probe}}
+  template:
+    metadata:
+      labels: {app: policy-probe}
+    spec:
+      
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 0
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: main
+          image: registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+          imagePullPolicy: IfNotPresent
+          command: ["sleep", "infinity"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]

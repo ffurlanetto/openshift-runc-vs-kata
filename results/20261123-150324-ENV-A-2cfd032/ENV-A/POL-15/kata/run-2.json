@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-15",
+  "category": "POL",
+  "title": "Dépassement de la limite CPU à l'exécution",
+  "runtime": "kata",
+  "run": 2,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T15:31:15Z",
+  "duration_s": 240.981,
+  "status": "FAIL",
+  "metrics": [],
+  "observations": "ERREUR : OcError: kubectl wait pod/cpu --for=condition=Ready --timeout=240s -n kvr-8ceb4-pol-15-kata-2 -> rc=1 : error: timed out waiting for the condition on pods/cpu",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-15/kata/run-2/manifest-1-policy-pod.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-15/kata/run-2/traceback.txt",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-15/kata/run-2/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-15/kata/run-2/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "1a1843aa2e1540b81874417af06a1235240347de69e2ead862493142d48f4dff"
+}

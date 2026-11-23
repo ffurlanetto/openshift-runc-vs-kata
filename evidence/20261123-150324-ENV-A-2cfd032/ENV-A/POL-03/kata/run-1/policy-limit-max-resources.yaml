@@ -1,0 +1,33 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: limit-max-resources
+  namespace: kvr-8ceb4-pol-03-kata-1
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Plafond des limites par conteneur"
+spec:
+  validationActions: ["Deny"]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+    - name: workload
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : [])"
+    - name: containers
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : []) + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])"
+  validations:
+    - message: "limits.memory au-delà du plafond autorisé"
+      expression: "variables.workload.all(c, !has(c.resources) || !has(c.resources.limits)\n  || !('memory' in c.resources.limits)\n  || !quantity(c.resources.limits['memory']).isGreaterThan(quantity('2Gi')))"
+    - message: "limits.cpu au-delà du plafond autorisé"
+      expression: "variables.workload.all(c, !has(c.resources) || !has(c.resources.limits)\n  || !('cpu' in c.resources.limits)\n  || !quantity(c.resources.limits['cpu']).isGreaterThan(quantity('2')))"

@@ -1,0 +1,5 @@
+LAST SEEN   TYPE     REASON      OBJECT      MESSAGE
+1s          Normal   Scheduled   pod/probe   Successfully assigned kvr-8ceb4-fun-30-runc-0/probe to crc
+1s          Normal   Pulled      pod/probe   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+1s          Normal   Created     pod/probe   Container created
+1s          Normal   Started     pod/probe   Container started

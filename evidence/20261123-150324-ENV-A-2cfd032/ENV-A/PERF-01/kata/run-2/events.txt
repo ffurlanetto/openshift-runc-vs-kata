@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON           OBJECT      MESSAGE
+19s         Normal   Scheduled        pod/probe   Successfully assigned kvr-8ceb4-perf-01-kata-2/probe to crc
+19s         Normal   AddedInterface   pod/probe   Add eth0 [10.217.0.111/23] from ovn-kubernetes
+1s          Normal   Pulled           pod/probe   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+0s          Normal   Created          pod/probe   Container created
+0s          Normal   Started          pod/probe   Container started

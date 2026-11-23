@@ -1,0 +1,11 @@
+## sans policy : conforme=True non-conforme=True
+
+
+## Enforce : conforme=True
+
+
+## Enforce : pod non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-d743fb75" denied the request: Policy require-requests-limits failed: chaque conteneur doit déclarer requests.cpu, requests.memory et limits.memory
+
+## Enforce : Deployment non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-d743fb75" denied the request: Policy require-requests-limits failed: chaque conteneur doit déclarer requests.cpu, requests.memory et limits.memory

@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-01",
+  "category": "SEC",
+  "title": "Identification du noyau vu par le pod",
+  "runtime": "runc",
+  "run": 4,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T16:00:15Z",
+  "duration_s": 1.358,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "kernel_shared_with_node",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "noyau pod=5.14.0-687.13.1.el9_8.aarch64 ; noyau nœud=5.14.0-687.13.1.el9_8.aarch64",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/SEC-01/runc/run-4/manifest-1-probe-pod.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/SEC-01/runc/run-4/proc_version.txt",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/SEC-01/runc/run-4/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/SEC-01/runc/run-4/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

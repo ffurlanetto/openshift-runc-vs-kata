@@ -1,0 +1,24 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: force-kata
+  namespace: kvr-8ceb4-pol-12-kata-1
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Injection de runtimeClassName Kata si absent"
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: runtime-class-absent
+      expression: "!has(object.spec.runtimeClassName)"
+  reinvocationPolicy: IfNeeded
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: 'Object{spec: Object.spec{runtimeClassName: "kata"}}'

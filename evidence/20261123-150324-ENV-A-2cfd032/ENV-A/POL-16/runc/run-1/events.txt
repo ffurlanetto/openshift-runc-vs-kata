@@ -1,0 +1,8 @@
+LAST SEEN   TYPE      REASON           OBJECT     MESSAGE
+74s         Normal    Scheduled        pod/disk   Successfully assigned kvr-8ceb4-pol-16-runc-1/disk to crc
+74s         Normal    AddedInterface   pod/disk   Add eth0 [10.217.0.185/23] from ovn-kubernetes
+74s         Normal    Pulled           pod/disk   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+73s         Normal    Created          pod/disk   Container created
+73s         Normal    Started          pod/disk   Container started
+6s          Warning   Evicted          pod/disk   Pod ephemeral local storage usage exceeds the total limit of containers 100Mi.
+6s          Normal    Killing          pod/disk   Stopping container main

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/Users/ffurlanetto/Sources/kata/scripts/kvr/runner.py", line 229, in execute_step
+    status = t.module.run(ctx)
+  File "/Users/ffurlanetto/Sources/kata/tests/POL-15/test.py", line 25, in run
+    ctx.wait("pod/cpu", timeout_s=240)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ffurlanetto/Sources/kata/scripts/kvr/context.py", line 103, in wait
+    self.cluster.oc("wait", ref, f"--for={condition}", f"--timeout={timeout_s}s",
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    "-n", self.namespace, timeout=timeout_s + 30)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ffurlanetto/Sources/kata/scripts/kvr/cluster.py", line 69, in oc
+    raise OcError(f"kubectl {' '.join(args)} -> rc={r.returncode} : {r.stderr.strip()}")
+kvr.cluster.OcError: kubectl wait pod/cpu --for=condition=Ready --timeout=240s -n kvr-8ceb4-pol-15-kata-3 -> rc=1 : error: timed out waiting for the condition on pods/cpu

@@ -1,0 +1,212 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "k8s.ovn.org/pod-networks": "{\"default\":{\"ip_addresses\":[\"10.217.0.98/23\"],\"mac_address\":\"0a:58:0a:d9:00:62\",\"gateway_ips\":[\"10.217.0.1\"],\"routes\":[{\"dest\":\"10.217.0.0/22\",\"nextHop\":\"10.217.0.1\"},{\"dest\":\"10.217.4.0/23\",\"nextHop\":\"10.217.0.1\"},{\"dest\":\"169.254.0.5/32\",\"nextHop\":\"10.217.0.1\"},{\"dest\":\"100.64.0.0/16\",\"nextHop\":\"10.217.0.1\"}],\"ip_address\":\"10.217.0.98/23\",\"gateway_ip\":\"10.217.0.1\",\"role\":\"primary\"}}",
+                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"ovn-kubernetes\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.217.0.98\"\n    ],\n    \"mac\": \"0a:58:0a:d9:00:62\",\n    \"default\": true,\n    \"dns\": {}\n}]",
+                    "openshift.io/scc": "restricted-v2",
+                    "seccomp.security.alpha.kubernetes.io/pod": "runtime/default",
+                    "security.openshift.io/validated-scc-subject-type": "user"
+                },
+                "creationTimestamp": "2026-11-23T15:04:47Z",
+                "generation": 1,
+                "name": "oom",
+                "namespace": "kvr-8ceb4-fun-17-runc-2",
+                "resourceVersion": "461094",
+                "uid": "fd3049c0-d882-44c4-aa8f-5d0dd5c08615"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "tail",
+                            "/dev/zero"
+                        ],
+                        "image": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "main",
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "runAsNonRoot": true,
+                            "runAsUser": 1000840000,
+                            "seccompProfile": {
+                                "type": "RuntimeDefault"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "imagePullSecrets": [
+                    {
+                        "name": "default-dockercfg-8m9rg"
+                    }
+                ],
+                "nodeName": "crc",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Never",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 1000840000,
+                    "seLinuxOptions": {
+                        "level": "s0:c29,c14"
+                    },
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 0,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoSchedule",
+                        "key": "node.kubernetes.io/memory-pressure",
+                        "operator": "Exists"
+                    }
+                ]
+            },
+            "status": {
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-23T15:04:48Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-23T15:04:47Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-23T15:04:47Z",
+                        "observedGeneration": 1,
+                        "reason": "PodFailed",
+                        "status": "False",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-23T15:04:47Z",
+                        "observedGeneration": 1,
+                        "reason": "PodFailed",
+                        "status": "False",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-11-23T15:04:47Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "100m",
+                            "memory": "128Mi"
+                        },
+                        "containerID": "cri-o://1f963b17391ac2af1562be5f1583fd4b59e7c485ea8aba644e9391c4d820e3ba",
+                        "image": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+                        "imageID": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+                        "lastState": {},
+                        "name": "main",
+                        "ready": false,
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "100m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": false,
+                        "state": {
+                            "terminated": {
+                                "containerID": "cri-o://1f963b17391ac2af1562be5f1583fd4b59e7c485ea8aba644e9391c4d820e3ba",
+                                "exitCode": 137,
+                                "finishedAt": "2026-11-23T15:04:47Z",
+                                "reason": "OOMKilled",
+                                "startedAt": "2026-11-23T15:04:47Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 0,
+                                "supplementalGroups": [
+                                    0,
+                                    1000840000
+                                ],
+                                "uid": 1000840000
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "192.168.126.11",
+                "hostIPs": [
+                    {
+                        "ip": "192.168.126.11"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Pending",
+                "podIP": "10.217.0.98",
+                "podIPs": [
+                    {
+                        "ip": "10.217.0.98"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "startTime": "2026-11-23T15:04:47Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

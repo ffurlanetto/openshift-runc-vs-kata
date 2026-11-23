@@ -1,0 +1,31 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: disallow-privilege-escalation
+  namespace: kvr-8ceb4-pol-05-runc-1
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Escalade de privilèges interdite"
+spec:
+  validationActions: ["Deny"]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+    - name: workload
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : [])"
+    - name: containers
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : []) + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])"
+  validations:
+    - message: "allowPrivilegeEscalation doit être false"
+      expression: "variables.containers.all(c, has(c.securityContext)\n  && has(c.securityContext.allowPrivilegeEscalation)\n  && c.securityContext.allowPrivilegeEscalation == false)"

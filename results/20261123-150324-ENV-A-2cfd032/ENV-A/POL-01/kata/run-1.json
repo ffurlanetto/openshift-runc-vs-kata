@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-01",
+  "category": "POL",
+  "title": "Kyverno : non-root obligatoire",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T15:17:27Z",
+  "duration_s": 0.922,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "violating_admitted_without_policy",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "policy_propagation",
+      "value": 77,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "compliant_admitted_enforce",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "violating_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "violating_deployment_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "Kyverno v1.20.0 (cel) ; Enforce : conforme admis, non conforme refusé, Deployment non conforme refusé",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-01/kata/run-1/manifest-1-conforme.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-01/kata/run-1/manifest-2-non-conforme.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-01/kata/run-1/manifest-3-deployment-non-conforme.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-01/kata/run-1/policy-require-run-as-nonroot.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-01/kata/run-1/admission.txt",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-01/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "0661ad9b970004dc909d9881f3e2fcd56c97bec3bce995e982863220e86437f9"
+}

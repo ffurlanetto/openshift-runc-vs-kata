@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "test_id": "PERF-01",
+  "category": "PERF",
+  "title": "Latence de démarrage d'un pod",
+  "runtime": "runc",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T15:06:22Z",
+  "duration_s": 1.256,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "pod_ready_latency",
+      "value": 843,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "pod_ready_latency_server",
+      "value": 1.0,
+      "unit": "s",
+      "better": "lower"
+    }
+  ],
+  "observations": "",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/PERF-01/runc/run-0/manifest-1-probe-pod.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/PERF-01/runc/run-0/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/PERF-01/runc/run-0/events.txt"
+  ],
+  "aspect": "PERF",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

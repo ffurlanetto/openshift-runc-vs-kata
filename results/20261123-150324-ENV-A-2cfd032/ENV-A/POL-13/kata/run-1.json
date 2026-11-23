@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-13",
+  "category": "POL",
+  "title": "Kyverno : mode Audit (admission + rapport)",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-150324-ENV-A-2cfd032",
+    "git_commit": "2cfd0327634cbce214df4cac35f46cc2e8dc160d",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T15:18:20Z",
+  "duration_s": 16.915,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "violating_admitted_audit",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "reported_in_policy_report",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "report_delay",
+      "value": 16.2,
+      "unit": "s",
+      "better": "lower"
+    }
+  ],
+  "observations": "Audit : pod non conforme admis=True, avertissement client=True, rapport=oui (policyreports.wgpolicyk8s.io)",
+  "evidence": [
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-13/kata/run-1/manifest-1-non-conforme.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-13/kata/run-1/policy-require-run-as-nonroot.yaml",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-13/kata/run-1/create.txt",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-13/kata/run-1/report-entry.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-13/kata/run-1/pods.json",
+    "evidence/20261123-150324-ENV-A-2cfd032/ENV-A/POL-13/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "7ce9474d9dcfc5a386c711d258debd72fcf270de21c13382eb7e6a149f41d479"
+}
