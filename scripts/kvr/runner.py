@@ -105,7 +105,7 @@ def git_state() -> dict:
     def g(*a):
         return subprocess.run(["git", *a], cwd=REPO_ROOT, capture_output=True, text=True).stdout.strip()
     return {"git_commit": g("rev-parse", "HEAD") or "unknown",
-            "git_dirty": bool(g("status", "--porcelain"))}
+            "git_dirty": bool(g("status", "--porcelain", "--", ".", ":!results", ":!evidence"))}
 
 
 def sha256_json(obj) -> str:

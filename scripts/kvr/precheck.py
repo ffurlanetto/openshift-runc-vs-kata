@@ -119,7 +119,7 @@ class Precheck:
                            capture_output=True, text=True)
         client = json.loads(r.stdout)["clientVersion"]["gitVersion"] if r.returncode == 0 else "?"
         self.add(OK, "local", "kubectl", client)
-        git = subprocess.run(["git", "status", "--porcelain"], cwd=self.repo_root, capture_output=True, text=True)
+        git = subprocess.run(["git", "status", "--porcelain", "--", ".", ":!results", ":!evidence"], cwd=self.repo_root, capture_output=True, text=True)
         if git.returncode != 0:
             self.add(WARN, "local", "dépôt git", "non disponible", "les résultats ne seront pas liés à un commit")
         elif git.stdout.strip():
