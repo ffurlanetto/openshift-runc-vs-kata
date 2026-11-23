@@ -18,7 +18,7 @@ Volets évalués : **fonctionnel, performance, sécurité, policies d'admission 
 | Banc automatisé (`./precheck`, `./run`, `./setup`) | ✅ 23 tests automatisés (FUN, PERF, SEC, POL) |
 | Environnement A (OpenShift Local arm64, nested virt) | ✅ Kata 4.4.0 + Kyverno 1.20.0 opérationnels |
 | Environnement B (OpenShift x86_64 bare metal + OSC) | ⏳ à provisionner |
-| Exécution des tests | ⏳ |
+| Exécution des tests | 🟡 ENV-A : 23 tests, voir [RESULTATS-ENV-A.md](RESULTATS-ENV-A.md) |
 | Rapport comité | ⏳ |
 
 ## Documents

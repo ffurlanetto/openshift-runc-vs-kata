@@ -241,7 +241,8 @@ class Campaign:
         except Exception as e:  # erreur d'infrastructure ou bug du test : visible, jamais silencieuse
             status = "FAIL"
             ctx.observe(f"ERREUR : {type(e).__name__}: {e}")
-            ctx.evidence("traceback.txt", traceback.format_exc())
+            ctx.evidence("traceback.txt", traceback.format_exc().replace(str(REPO_ROOT), "<repo>")
+                         .replace(str(Path.home()), "~"))
         finally:
             node_name = self._collect_and_cleanup(ctx)
         duration = round(time.perf_counter() - t0, 3)
