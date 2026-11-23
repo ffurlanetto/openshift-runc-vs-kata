@@ -1,0 +1,46 @@
+{#- Rendu kyverno.io/v1 Policy (Kyverno sans les policies CEL natives). Mêmes expressions via validate.cel. -#}
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: {{ id }}
+  namespace: {{ namespace }}
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: {{ p.title | tojson }}
+spec:
+{%- if kind == "validate" %}
+  validationFailureAction: {{ "Enforce" if "Deny" in actions else "Audit" }}
+  emitWarning: {{ "true" if "Warn" in actions else "false" }}
+  background: {{ "true" if "Audit" in actions else "false" }}
+  rules:
+    - name: {{ id }}
+      match:
+        any:
+          - resources:
+              kinds: ["Pod", "Pod/ephemeralcontainers"]
+              operations: ["CREATE", "UPDATE"]
+      validate:
+        cel:
+          variables:
+{%- for v in variables %}
+            - name: {{ v.name }}
+              expression: {{ v.expression | tojson }}
+{%- endfor %}
+          expressions:
+{%- for v in p.validations %}
+            - message: {{ v.message | tojson }}
+              expression: {{ v.expression | tojson }}
+{%- endfor %}
+{%- else %}
+  rules:
+    - name: {{ id }}
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              operations: ["CREATE"]
+      mutate:
+        patchStrategicMerge:
+          spec:
+            +(runtimeClassName): {{ p.runtime_class }}
+{%- endif %}

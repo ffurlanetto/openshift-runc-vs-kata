@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Version | 0.1 (brouillon pour revue) |
+| Version | 0.2 (brouillon pour revue) |
 | Date | 2026-11-23 |
 | Périmètre | OpenShift 4.22, runtime par défaut CRI-O/runc vs Kata Containers (OpenShift Sandboxed Containers ou kata-deploy upstream) |
 | Livrable final | Rapport comité au format défini dans `03-FORMAT-RAPPORT.md` |
@@ -51,7 +51,7 @@ Chaque résultat indique l'environnement. **Un chiffre de performance issu d'ENV
 - **Warm-up** : 1 run écarté. Images pré-tirées sur le nœud (`imagePullPolicy: IfNotPresent` + pré-pull) pour ne pas mesurer le pull.
 - **Bruit** : nœud dédié (taint/label `bench=true` sur ENV-B), podman machine et autres charges arrêtées sur ENV-A, alternance runc/kata (ABAB) pour neutraliser la dérive thermique.
 - **Écart significatif** : on qualifie une différence de « significative » si l'écart des médianes dépasse 5 % **et** que les intervalles [p5 ; p95] ne se recouvrent pas.
-- **Traçabilité** : chaque run produit un fichier `results/<ENV>/<ID>/<runtime>/run-<n>.json` (schéma dans `03-FORMAT-RAPPORT.md`).
+- **Traçabilité** : chaque run produit un fichier `results/<campagne>/<ENV>/<ID>/<runtime>/run-<n>.json` (schéma dans `03-FORMAT-RAPPORT.md`).
 
 ### 4.3 Statuts possibles d'un test
 `PASS` · `FAIL` · `PARTIAL` (fonctionne avec contournement) · `NOT_SUPPORTED` (limite connue du runtime) · `BLOCKED` (environnement) · `N/A`
@@ -60,13 +60,14 @@ Chaque résultat indique l'environnement. **Un chiffre de performance issu d'ENV
 - Image d'outillage `kata-bench` (UBI 9 + fio, iperf3, sysbench, stress-ng, netperf, redis, postgresql, amicontained, cdk, deepce), multi-arch amd64/arm64, construite avec podman.
 - Charge HTTP : `k6` / `hey` depuis le poste ou depuis un pod runc « client » fixe.
 - Collecte : `oc get pod -o json` (timestamps des conditions), Prometheus (`container_*`, `kata_*` via kata-monitor), `crictl stats` et `ps`/`smem` sur le nœud via `oc debug node`.
-- Sécurité : `kube-bench`, `kubescape`, `trivy`, `compliance-operator`, scénarios d'évasion manuels.
+- Sécurité : `kube-bench`, `kubescape`, `trivy`, `compliance-operator`, Kyverno, scénarios d'évasion manuels.
+- **Automatisation** : `./precheck` et `./run` (voir README). Prérequis poste : `kubectl`, `uv`, `git` ; `helm` pour `./setup`.
 
 ## 5. Phase 0 — Préparation (PREP)
 
 | ID | Action | Critère de sortie |
 |---|---|---|
-| PREP-01 | Outils locaux installés (`scripts/check-env.sh` sans bloquant) | Code retour 0 |
+| PREP-01 | `./precheck` sans bloquant sur la cible | Code retour 0 |
 | PREP-02 | `/dev/kvm` présent sur le(s) nœud(s) | `test -c /dev/kvm` |
 | PREP-03 | Installation Kata (ENV-A : `helm install kata-deploy` ; ENV-B : operator OSC + `KataConfig`) | RuntimeClass `kata` présente, nœud `Ready`, temps d'installation et nb de reboots notés |
 | PREP-04 | Smoke test : pod `runtimeClassName: kata`, `uname -r` ≠ noyau hôte | Noyau invité visible |
@@ -77,6 +78,8 @@ Chaque résultat indique l'environnement. **Un chiffre de performance issu d'ENV
 | PREP-08b | CI : controller Jenkins (Helm, plugin Kubernetes) et ARC (controller + runner scale set, GitHub App ou PAT) installés ; projets de référence P-JAVA / P-NODE disponibles ; registre de destination accessible | Un pipeline trivial passe en runc |
 | PREP-09 | Agent Sandbox installé (ENV-A : manifests upstream `kubernetes-sigs/agent-sandbox` ; ENV-B : `agent-sandbox-operator` Red Hat, canal *preview*), `SandboxTemplate` runc et kata | `Sandbox` `Ready` dans les deux runtimes |
 | PREP-10 | Backend LLM pour les agents : API distante (ex. Claude API) via proxy d'egress, **ou** modèle local (Ollama/llama.cpp sur le Mac, joignable via `host.crc.testing`) | Appel de complétion OK depuis un pod |
+| PREP-12 | Kyverno présent (existant sur le cluster, ou `./setup kyverno` sur un cluster de test) | Détecté par `./precheck --phases POL` |
+| PREP-13 | Site airgappé : images et charts disponibles dans le miroir (`./run --print-images`), règles de réécriture et secret de pull dans `campaign.yaml`, index PyPI miroir (`KVR_PYPI_INDEX`) | Contrôle « images » du precheck OK |
 | PREP-11 | Harnais « agent rejoué » : script déterministe qui rejoue une séquence d'appels d'outils (y compris malveillants) sans LLM, pour des tests de sécurité reproductibles | Séquence de référence exécutée en runc et kata |
 
 ## 6. Catalogue de tests
@@ -179,6 +182,43 @@ Tous les scénarios sont exécutés **uniquement sur les environnements de test*
 | OPS-09 | Support et cycle de vie : matrice de support Red Hat, architectures, versions, licences | Synthèse documentaire | — | P1 |
 | OPS-10 | Coût : surconsommation de ressources (PERF-04/05) traduite en nœuds supplémentaires | € / an estimé | B | P2 |
 
+### 6.8 Policies d'admission Kyverno (POL)
+
+**Enjeu** : les bonnes pratiques (non-root, requests/limits, pas de privilège, pas d'accès à l'hôte, images épinglées) sont normalement imposées par des policies d'admission. Il faut vérifier trois choses :
+- qu'elles s'appliquent **de la même façon** aux pods runc et Kata ;
+- qu'on peut s'en servir pour **forcer** Kata (mutation + validation) ;
+- si un pod peut **dépasser à l'exécution** ce que l'admission a validé (limites CPU, stockage, privilèges effectifs).
+
+**Mise en œuvre** :
+- Kyverno détecté automatiquement. Sur un cluster distant, **l'installation existante est utilisée telle quelle**.
+- Les policies du banc sont **namespacées** dans les namespaces de test, donc aucune modification des ClusterPolicies du cluster.
+- Catalogue unique `policies/kyverno/catalog.yaml`, rendu selon la version de Kyverno :
+  - `NamespacedValidatingPolicy` / `NamespacedMutatingPolicy` (CEL, Kyverno ≥ 1.14 environ) ;
+  - sinon `kyverno.io/v1 Policy` + `validate.cel`.
+- Tests d'admission par **création à blanc côté serveur** (`--dry-run=server`), qui traverse toute la chaîne d'admission sans créer de pod.
+
+| ID | Aspect | Test | Attendu runc | Attendu Kata | Env | Prio |
+|---|---|---|---|---|---|---|
+| POL-01 | SEC | Non-root obligatoire : pod conforme admis, pod root refusé, Deployment root refusé (autogen) | PASS | PASS | A | P1 |
+| POL-02 | SEC | Requests CPU/mémoire et limite mémoire obligatoires | PASS | PASS | A | P1 |
+| POL-03 | SEC | Plafond des limits (mémoire, CPU) | PASS | PASS | A | P2 |
+| POL-04 | SEC | Conteneurs privilégiés interdits | PASS | PASS | A | P1 |
+| POL-05 | SEC | Escalade de privilèges interdite | PASS | PASS | A | P1 |
+| POL-06 | SEC | Capabilities restreintes (drop ALL, ajout NET_BIND_SERVICE seulement) | PASS | PASS | A | P1 |
+| POL-07 | SEC | hostNetwork / hostPID / hostIPC interdits | PASS | PASS | A | P1 |
+| POL-08 | SEC | hostPath interdit | PASS | PASS | A | P1 |
+| POL-09 | SEC | seccomp RuntimeDefault/Localhost obligatoire | PASS | PASS | A | P2 |
+| POL-10 | SEC | Images par digest obligatoires | PASS | PASS | A | P2 |
+| POL-11 | SEC | **Pod privilégié autorisé seulement avec Kata** (cas CI/DIND) | Privilégié refusé | Privilégié admis | A | P1 |
+| POL-12 | SEC | **Forcer Kata** : mutation qui ajoute `runtimeClassName`, validation qui refuse tout autre runtime ; l'**overhead** de la RuntimeClass est-il appliqué après mutation ? | Muté vers Kata | Inchangé | A | P1 |
+| POL-13 | SEC | Mode **Audit** : pod non conforme admis, avertissement client, entrée dans le PolicyReport (délai mesuré) | PASS | PASS | A | P1 |
+| POL-14 | SEC | **Contournements** en Enforce : Job, CronJob, conteneur éphémère privilégié (`kubectl debug --profile=sysadmin`) | Tous refusés | Tous refusés | A | P1 |
+| POL-15 | FUN | **Dépassement CPU à l'exécution** : 4 threads actifs sous une limite de 500m, consommation réelle mesurée | ≤ limite | ≤ limite ? (cgroup de la VM, vCPU) | A/B | P1 |
+| POL-16 | FUN | **Dépassement ephemeral-storage** : écriture de 300 Mi sous une limite de 100 Mi, éviction attendue | Évincé | Évincé ? (écritures via la VM) | A | P1 |
+| POL-17 | SEC | **Privilèges effectifs** d'un pod conforme : UID ≠ 0, NoNewPrivs, CapEff = 0, seccomp actif, /etc en lecture seule | PASS | PASS (appliqués par l'agent Kata) | A | P1 |
+
+Le dépassement de la limite mémoire est couvert par FUN-17.
+
 ### 6.5 Limites (LIM) — inventaire consolidé
 
 Section alimentée par les statuts `NOT_SUPPORTED` / `PARTIAL` des catégories précédentes, à vérifier spécifiquement :
@@ -272,10 +312,10 @@ Note : la plupart des contrôles de sécurité AGT (egress, secrets, RBAC) **ne 
 
 | Domaine | Poids | Critères |
 |---|---|---|
-| Sécurité / isolation | 35 % | SEC P1 réussis, réduction de la surface d'attaque, angles morts de détection |
+| Sécurité / isolation | 35 % | SEC et POL P1 réussis, réduction de la surface d'attaque, angles morts de détection |
 | Compatibilité fonctionnelle | 25 % | % de tests FUN P1 en PASS, workloads de réf. OK sans modification |
 | Performance / coût | 20 % | Overhead de démarrage, mémoire, densité, I/O, réseau |
-| Exploitabilité | 15 % | Installation, upgrade, observabilité, debug |
+| Exploitabilité | 15 % | Installation, upgrade, observabilité, debug, compatibilité avec les policies d'admission (POL) |
 | Support / maturité | 5 % | Support éditeur, roadmap, communauté |
 
 Chaque domaine est noté de 1 à 5 pour chaque runtime (grille dans `03-FORMAT-RAPPORT.md` §5).
@@ -320,12 +360,14 @@ kata/
 ├── 03-FORMAT-RAPPORT.md
 ├── pyproject.toml      # dépendances Python (uv sync / uv run)
 ├── schemas/            # result.schema.json (format des résultats bruts)
-├── scripts/            # check-env.sh, run-test.sh, aggregate.py, render-report.py
+├── precheck, run, setup # points d'entrée (voir README)
+├── policies/kyverno/   # catalogue de policies Kyverno
+├── scripts/            # moteur kvr/, validate_results.py, (à venir) aggregate.py, render-report.py
 ├── images/kata-bench/  # Containerfile de l'image d'outillage
 ├── images/agent-sandbox/ # image de sandbox agent (shell, python, node, git, chromium, agent)
 ├── ci/                 # values Helm Jenkins/ARC, podTemplates, workflows, Jenkinsfiles de référence
 ├── harness/            # harnais « agent rejoué » + séquences d'appels d'outils (bénignes / malveillantes)
 ├── tests/<ID>/         # pod.tmpl.yaml, run.sh, README (procédure + critère)
-├── results/<ENV>/<ID>/<runtime>/run-<n>.json
+├── results/<campagne>/<ENV>/<ID>/<runtime>/run-<n>.json
 └── report/             # rapport généré (md, html, pdf) + graphiques
 ```

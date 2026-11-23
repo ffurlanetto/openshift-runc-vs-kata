@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Lance la campagne runc vs Kata (le precheck est exécuté automatiquement avant).
+#   ./run                                  # contexte choisi dans la liste, toutes les phases
+#   ./run --phases FUN,SEC,POL             # seulement certaines phases
+#   ./run --skip PERF,AGT                  # toutes sauf…
+#   ./run --tests PERF-01 --runs 10        # tests précis
+#   ./run --dry-run                        # affiche le plan
+#   ./run --print-images [--context X]     # images (après réécriture miroir) à mirrorer
+#   ./run --replay results/<campagne>/campaign.json [--strict]
+#   ./run --list | --cleanup | --help
+# Prérequis poste : bash, git, kubectl, uv. Site airgappé : voir scripts/env.sh (KVR_PYPI_INDEX).
+set -euo pipefail
+cd "$(dirname "$0")"
+source scripts/env.sh
+if [ "${1:-}" = "--list" ]; then
+  exec "${KVR_PY[@]}" scripts/campaign.py list
+fi
+exec "${KVR_PY[@]}" scripts/campaign.py run "$@"

@@ -31,6 +31,8 @@ def main() -> int:
     files = sorted(target.rglob("*.json")) if target.exists() else []
     errors = 0
     for f in files:
+        if f.name == "campaign.json":
+            continue
         try:
             doc = json.loads(f.read_text())
         except json.JSONDecodeError as e:
@@ -38,10 +40,10 @@ def main() -> int:
             errors += 1
             continue
         problems = sorted(validator.iter_errors(doc), key=lambda e: list(e.path))
-        # Cohérence chemin <-> contenu : results/<ENV>/<ID>/<runtime>/run-<n>.json
+        # Cohérence chemin <-> contenu : results/<campagne>/<ENV>/<ID>/<runtime>/run-<n>.json
         parts = f.relative_to(target).parts
-        if len(parts) == 4 and not problems:
-            env_id, test_id, runtime, _ = parts
+        if len(parts) >= 4 and not problems:
+            env_id, test_id, runtime, _ = parts[-4:]
             for field, expected, actual in (
                 ("env.id", env_id, doc["env"]["id"]),
                 ("test_id", test_id, doc["test_id"]),

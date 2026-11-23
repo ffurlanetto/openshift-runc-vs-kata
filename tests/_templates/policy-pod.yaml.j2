@@ -1,0 +1,81 @@
+{#- Pod « bonnes pratiques » ; chaque clé de `v` (violations) introduit un seul écart.
+    kind=Pod ou Deployment : même spec, pour tester les règles autogen des contrôleurs. -#}
+{%- set v = violations | default({}) -%}
+{%- macro pod_spec(indent) -%}
+{%- filter indent(indent, first=True) %}
+{%- if runtime_class and not v.get("no_runtime_class") %}
+runtimeClassName: {{ runtime_class }}
+{%- endif %}
+{%- if v.get("runtime_class_override") %}
+runtimeClassName: {{ v.runtime_class_override }}
+{%- endif %}
+{%- if v.get("host_network") %}
+hostNetwork: true
+{%- endif %}
+{%- if node_selector %}
+nodeSelector: {{ node_selector | tojson }}
+{%- endif %}
+restartPolicy: {{ "Always" if kind == "Deployment" else "Never" }}
+terminationGracePeriodSeconds: 0
+automountServiceAccountToken: false
+securityContext:
+  runAsNonRoot: {{ "false" if v.get("root") else "true" }}
+{%- if v.get("root") %}
+  runAsUser: 0
+{%- elif platform == "kubernetes" %}
+  runAsUser: 1001
+{%- endif %}
+  seccompProfile: {type: {{ "Unconfined" if v.get("no_seccomp") else "RuntimeDefault" }}}
+containers:
+  - name: main
+    image: {{ v.get("image") or images.ubi_minimal }}
+    imagePullPolicy: IfNotPresent
+    command: ["sleep", "infinity"]
+{%- if not v.get("no_resources") %}
+    resources:
+      requests: {cpu: 50m, memory: 32Mi}
+      limits: {cpu: {{ v.get("cpu_limit", "200m") }}, memory: {{ v.get("memory_limit", "64Mi") }}}
+{%- endif %}
+    securityContext:
+      allowPrivilegeEscalation: {{ "true" if (v.get("privesc") or v.get("privileged")) else "false" }}
+{%- if v.get("privileged") %}
+      privileged: true
+{%- endif %}
+      capabilities:
+        drop: ["ALL"]
+{%- if v.get("caps") %}
+        add: {{ v.caps | tojson }}
+{%- endif %}
+{%- if v.get("host_path") %}
+    volumeMounts:
+      - {name: host, mountPath: /host, readOnly: true}
+volumes:
+  - name: host
+    hostPath: {path: /etc, type: Directory}
+{%- endif %}
+{%- endfilter %}
+{%- endmacro -%}
+{%- if kind | default("Pod") == "Deployment" %}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ name | default("policy-probe") }}-deploy
+  namespace: {{ namespace }}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: {{ name | default("policy-probe") }}}}
+  template:
+    metadata:
+      labels: {app: {{ name | default("policy-probe") }}}
+    spec:
+{{ pod_spec(6) }}
+{%- else %}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ name | default("policy-probe") }}
+  namespace: {{ namespace }}
+  labels: {app.kubernetes.io/part-of: kvr}
+spec:
+{{ pod_spec(2) }}
+{%- endif %}

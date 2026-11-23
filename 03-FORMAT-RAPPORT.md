@@ -6,7 +6,7 @@ Trois niveaux :
 
 | Niveau | Fichier | Producteur | Lecteur |
 |---|---|---|---|
-| 1. Résultat brut d'un run | `results/<ENV>/<ID>/<runtime>/run-<n>.json` | Script de test | Machine (agrégation) |
+| 1. Résultat brut d'un run | `results/<campagne>/<ENV>/<ID>/<runtime>/run-<n>.json` (+ `campaign.json` par campagne) | `./run` | Machine (agrégation) |
 | 2. Fiche de test (synthèse runc vs kata) | `report/tests/<ID>.md` (générée) | `uv run scripts/aggregate.py` | Équipe technique |
 | 3. Rapport comité | `report/rapport-comite.md` → `.html` / `.pdf` (pandoc) | Générée + rédaction humaine | Comité |
 
@@ -29,6 +29,7 @@ Validé par `schemas/result.schema.json`. Exemple :
     "platform": "CRC 2.62.0 / OCP 4.22.1",
     "arch": "arm64",
     "node": "crc",
+    "context": "crc-admin",
     "nested_virt": true,
     "kata_version": "3.x (kata-deploy)",
     "hypervisor": "qemu",
@@ -43,7 +44,9 @@ Validé par `schemas/result.schema.json`. Exemple :
   "observations": "Noyau invité 6.12, aucun événement Warning.",
   "evidence": ["evidence/PERF-01/kata/run-3/pod.json", "evidence/PERF-01/kata/run-3/events.txt"],
   "manifest_sha256": "…",
-  "operator": "initiales"
+  "operator": "initiales",
+  "warmup": false,
+  "campaign": {"id": "20261124-101203-ENV-A-1fbd2ad", "git_commit": "…", "git_dirty": false, "replay_of": null}
 }
 ```
 
@@ -104,6 +107,7 @@ Pour les tests fonctionnels et sécurité, la fiche contient : statut runc, stat
 | Fonctionnel | 30 | | | | | |
 | Performance | 16 | | | | | |
 | Sécurité | 17 | | | | | |
+| Policies d'admission (Kyverno) | 17 | | | | | |
 | Exploitation | 10 | | | | | |
 | CI dans Kata (DIND) | 20 | | | | | |
 | Agents IA | 20 | | | | | |
@@ -119,6 +123,10 @@ Pour les tests fonctionnels et sécurité, la fiche contient : statut runc, stat
 | IOPS 4k randread PVC | | | | |
 | Latence HTTP p99 @ charge nominale | | | | |
 | Scénarios d'évasion réussis (sur N) | | | | |
+| Policies Kyverno appliquées à l'identique (sur 10) | | | | |
+| Contournements de policy admis (sur 3) | | | | |
+| Dépassement de limite CPU / ephemeral-storage à l'exécution | Oui/Non | Oui/Non | | |
+| Kata forçable par policy (mutation + overhead appliqué) | — | Oui/Partiel/Non | | |
 | Durée pipeline P-JAVA / P-NODE (Jenkins, GitHub) | | | | |
 | Étape `docker build` (froid / chaud) | | | | |
 | Job en file → runner prêt | | | | |

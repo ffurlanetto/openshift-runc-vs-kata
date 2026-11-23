@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: oom
+  namespace: {{ namespace }}
+spec:
+{%- if runtime_class %}
+  runtimeClassName: {{ runtime_class }}
+{%- endif %}
+{%- if node_selector %}
+  nodeSelector:
+{%- for k, v in node_selector.items() %}
+    {{ k }}: "{{ v }}"
+{%- endfor %}
+{%- endif %}
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: main
+      image: {{ images.ubi_minimal }}
+      imagePullPolicy: IfNotPresent
+      # `tail /dev/zero` accumule une « ligne » sans fin : consommation mémoire non bornée.
+      command: ["tail", "/dev/zero"]
+      resources:
+        requests: {cpu: 100m, memory: {{ params.memory_limit }}}
+        limits: {cpu: 500m, memory: {{ params.memory_limit }}}
+      securityContext:
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
+{%- if platform == "kubernetes" %}
+        runAsUser: 1001          # OpenShift attribue un UID via la SCC ; Kubernetes non
+{%- endif %}
+        capabilities: {drop: ["ALL"]}
+        seccompProfile: {type: RuntimeDefault}

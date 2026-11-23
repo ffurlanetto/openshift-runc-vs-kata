@@ -20,7 +20,7 @@
     },
     "test_id": {
       "type": "string",
-      "pattern": "^(PREP|FUN|PERF|SEC|OPS|LIM|DIND|AGT)-[0-9]{2}$"
+      "pattern": "^(PREP|FUN|PERF|SEC|POL|OPS|LIM|DIND|AGT)-[0-9]{2}$"
     },
     "category": {
       "enum": [
@@ -28,6 +28,7 @@
         "FUN",
         "PERF",
         "SEC",
+        "POL",
         "OPS",
         "LIM",
         "DIND",
@@ -56,11 +57,8 @@
       ],
       "properties": {
         "id": {
-          "enum": [
-            "ENV-A",
-            "ENV-B",
-            "ENV-C"
-          ]
+          "type": "string",
+          "pattern": "^ENV-[A-Z0-9]+$"
         },
         "platform": {
           "type": "string"
@@ -203,6 +201,36 @@
     },
     "project": {
       "type": "string"
+    },
+    "warmup": {
+      "type": "boolean",
+      "description": "run 0 de warm-up, exclu de l'agrégation"
+    },
+    "campaign": {
+      "type": "object",
+      "required": [
+        "id",
+        "git_commit",
+        "git_dirty"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "git_commit": {
+          "type": "string"
+        },
+        "git_dirty": {
+          "type": "boolean"
+        },
+        "replay_of": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
     }
   },
   "allOf": [

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Installe les composants du banc sur un cluster de TEST : ./setup kyverno [--context X]
+# Prérequis : kubectl, uv, git, helm. Charts épinglés dans campaign.yaml (miroir appliqué).
+set -euo pipefail
+cd "$(dirname "$0")"
+source scripts/env.sh
+command -v helm >/dev/null || { echo "✘ helm introuvable" >&2; exit 1; }
+exec "${KVR_PY[@]}" scripts/setup.py "$@"

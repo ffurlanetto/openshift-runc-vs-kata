@@ -1,6 +1,6 @@
 # 01 — Environnement de test : état des lieux, manques, installation
 
-> Audit réalisé le 2026-11-23 sur le poste de test. Relançable avec `scripts/check-env.sh`.
+> Audit réalisé le 2026-11-23 sur le poste de test. Relançable avec `./precheck`.
 
 ## 1. Synthèse
 
@@ -16,41 +16,42 @@
 | Metrics API (`oc adm top`) | ❌ indisponible (monitoring désactivé par défaut dans CRC) | Nécessaire pour les mesures d'overhead |
 | `agent-sandbox-operator` (Agent Sandbox : `Sandbox`, `SandboxTemplate`, `SandboxClaim`, `SandboxWarmPool`) | ⚠️ v0.9.0, canal **preview**, **amd64 uniquement** | Sur ENV-A : projet upstream `kubernetes-sigs/agent-sandbox` |
 | Backend LLM pour les tests d'agents | ❌ à choisir | API distante (clé + egress) ou modèle local sur le Mac (Ollama, via `host.crc.testing`) |
+| Disque de la VM CRC | ❌ **87 % utilisé (30/35 Go) → nœud en DiskPressure**, plus aucun pod planifiable | **Bloquant** : `crc config set disk-size 80` (à faire avec le redémarrage `--nested`) |
+| APIService `v1beta1.external.metrics.k8s.io` (KEDA) | ❌ indisponible (pods KEDA non planifiables) | Les namespaces supprimés restent en `Terminating` |
+| Kyverno | ❌ absent sur CRC | `./setup kyverno` (chart 3.10.0, Kyverno v1.20.0) |
 | Operators sécurité au catalogue | ✅ `compliance-operator`, `security-profiles-operator`, `file-integrity-operator` | Utilisables pour le volet sécurité |
 
-## 2. Outils sur le poste (macOS arm64)
+## 2. Prérequis du poste qui lance le banc
 
-| Outil | État | Usage dans la campagne | Installation |
-|---|---|---|---|
-| `crc` 2.62.0 | ✅ | Cluster | — |
-| `oc` 4.22.1 | ⚠️ présent dans `~/.crc/bin/oc/` mais pas dans le `PATH` | Toutes les opérations | `eval $(crc oc-env)` (à mettre dans `~/.zshrc`) |
-| `kubectl` 1.37.1 | ✅ | Alternative à `oc` | — |
-| `helm` 4.2.4 | ✅ | Installation `kata-deploy` (si arm64) | — |
-| `podman` 6.0.2 | ✅ | Build de l'image d'outillage de bench | — |
-| `jq` | ✅ | Parsing des résultats | — |
-| `git`, `go` | ✅ | Scripts | — |
-| `uv` 0.13.0 | ✅ | Gestion Python (venv + dépendances, Python récent indépendant du `python3` 3.9.6 système) | — |
-| `yq` | ❌ | Manipulation des manifestes YAML | `brew install yq` |
-| `k6` | ❌ | Charge HTTP / latence applicative | `brew install k6` |
-| `hey` | ❌ | Charge HTTP simple | `brew install hey` |
-| `trivy` | ❌ | Scan d'images / config | `brew install trivy` |
-| `kubescape` | ❌ | Posture sécurité (NSA/CIS) | `brew install kubescape` |
-| `pandoc` | ❌ | Export du rapport comité (PDF/DOCX) | `brew install pandoc` (+ `brew install --cask basictex` pour PDF) |
-| Python `pyyaml`, `pandas`, `matplotlib`, `jinja2`, `jsonschema` | ✅ (installé via `uv sync`) | Agrégation des résultats et graphiques | `uv sync` (déclarés dans `pyproject.toml`) |
-| `docker` | ❌ | Non nécessaire (podman suffit) | — |
+Le banc est portable : il pilote **n'importe quel cluster** OpenShift ou Kubernetes, local ou distant, uniquement via `kubectl`. Le contexte kube est choisi au lancement. `./precheck` vérifie tout ce qui suit.
 
-Outils **exécutés dans les pods** (pas d'installation locale nécessaire, ils seront embarqués dans une image d'outillage `kata-bench` construite avec podman) :
-`fio`, `iperf3`, `sysbench`, `stress-ng`, `netperf`, `redis-benchmark`, `pgbench`, `amicontained`, `cdk` (container escape toolkit), `deepce`.
-Outils **exécutés comme Job dans le cluster** : `kube-bench`, `kube-hunter`.
+| Outil | Requis pour | Statut | Installation (poste connecté) | Site airgappé |
+|---|---|---|---|---|
+| `kubectl` | tout (`oc` n'est **pas** nécessaire) | obligatoire | `brew install kubectl` | binaire depuis un dépôt generic Artifactory ; version ±1 mineure du cluster |
+| `uv` | Python + dépendances du banc | obligatoire | `brew install uv` | binaire depuis Artifactory ; `KVR_PYPI_INDEX` = index PyPI miroir ; Python ≥ 3.12 local (`UV_PYTHON`, `UV_PYTHON_DOWNLOADS=never`) ou `UV_PYTHON_INSTALL_MIRROR` |
+| `git` | traçabilité (commit de chaque campagne) | obligatoire | Xcode CLT / paquet système | paquet système |
+| `bash` | wrappers `./precheck`, `./run`, `./setup` | obligatoire | — | — |
+| `helm` | `./setup` (Kyverno, et plus tard Kata, Jenkins, ARC, Agent Sandbox) | phases POL/DIND/AGT, sur cluster de test | `brew install helm` | binaire + charts OCI via miroir (réécriture `registry.mirrors`) |
+| `pandoc` | export PDF/DOCX du rapport comité | optionnel | `brew install pandoc` | — |
 
-### Installation en une fois
+Plus besoin d'installer en local `jq`, `yq`, `k6`, `hey`, `trivy` ou `kubescape` : les outils de charge et de scan tournent **dans des pods**, à partir d'images épinglées et mirrorables.
 
-```bash
-brew install yq k6 hey trivy kubescape pandoc
-echo 'eval $(crc oc-env)' >> ~/.zshrc && eval $(crc oc-env)
-uv sync            # crée .venv (Python 3.12) avec les dépendances de pyproject.toml
-# exécution des scripts : uv run scripts/aggregate.py ...
-```
+État constaté sur le poste de test (2026-11-23) : `kubectl` 1.37.1, `uv` 0.13.0, `git`, `helm` 4.2.4 présents.
+Avertissement : `kubectl` 1.37 face à un serveur 1.35 dépasse l'écart supporté (±1). C'est fonctionnel pour le banc, mais il vaut mieux un client 1.35/1.36.
+
+### Images et outils sur site airgappé (miroir Artifactory)
+
+- **Images** : toutes déclarées et épinglées par digest dans `campaign.yaml › images`. `./run --print-images` donne la liste à mirrorer.
+- **Accès au miroir**, deux modes :
+  - le cluster gère le miroir (OpenShift `ImageDigestMirrorSet`, miroirs containerd) : rien à configurer ;
+  - réécriture par le banc : règles `registry.mirrors` (préfixe → préfixe), globales ou par profil de cluster.
+- **Digest** : il reste identique si le dépôt Artifactory est un *remote* (proxy) du registre d'origine, donc la reproductibilité est conservée.
+- **Secret de pull** : `registry.pull_secret`, copié depuis un namespace du cluster ou créé depuis un fichier `dockerconfigjson` local, puis attaché au ServiceAccount de chaque namespace de test.
+- **Charts Helm** : `campaign.yaml › charts`, même réécriture (dépôt OCI Artifactory).
+- **Dépendances Python** : `export KVR_PYPI_INDEX=https://artifactory…/api/pypi/<repo>/simple`. Les versions **et hashes** du `uv.lock` sont imposés.
+
+  Attention : `uv sync --frozen` ignore les miroirs et télécharge depuis les URL pypi.org du lockfile. Constat vérifié le 2026-11-23, d'où le passage par un export épinglé quand `KVR_PYPI_INDEX` est défini.
+- **Pré-vérification** : le precheck tire réellement chaque image via le miroir et signale `ErrImagePull` ou `ImagePullBackOff` avec la cause probable.
 
 ## 3. Points bloquants pour Kata et options
 

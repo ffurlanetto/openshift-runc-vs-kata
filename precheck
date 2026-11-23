@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Contrôle des prérequis du banc runc vs Kata.
+#   ./precheck                                   # choix interactif du contexte kube
+#   ./precheck --context crc-admin --phases FUN,SEC,POL
+#   ./precheck --help
+# Prérequis poste : bash, git, kubectl, uv. Site airgappé : voir scripts/env.sh (KVR_PYPI_INDEX).
+set -euo pipefail
+cd "$(dirname "$0")"
+source scripts/env.sh
+exec "${KVR_PY[@]}" scripts/campaign.py precheck "$@"

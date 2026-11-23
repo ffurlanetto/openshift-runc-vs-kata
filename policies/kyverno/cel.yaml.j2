@@ -1,0 +1,59 @@
+{#- Rendu CEL natif Kyverno (policies.kyverno.io). Variables : p, id, namespace, actions, api_version, variables -#}
+{%- if kind == "validate" %}
+apiVersion: policies.kyverno.io/{{ api_version }}
+kind: NamespacedValidatingPolicy
+metadata:
+  name: {{ id }}
+  namespace: {{ namespace }}
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: {{ p.title | tojson }}
+spec:
+  validationActions: {{ actions | tojson }}
+  evaluation:
+    background:
+      enabled: {{ "true" if "Audit" in actions else "false" }}
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+{%- for v in variables %}
+    - name: {{ v.name }}
+      expression: {{ v.expression | tojson }}
+{%- endfor %}
+  validations:
+{%- for v in p.validations %}
+    - message: {{ v.message | tojson }}
+      expression: {{ v.expression | tojson }}
+{%- endfor %}
+{%- else %}
+apiVersion: policies.kyverno.io/{{ api_version }}
+kind: NamespacedMutatingPolicy
+metadata:
+  name: {{ id }}
+  namespace: {{ namespace }}
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: {{ p.title | tojson }}
+spec:
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: runtime-class-absent
+      expression: "!has(object.spec.runtimeClassName)"
+  reinvocationPolicy: IfNeeded
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: 'Object{spec: Object.spec{runtimeClassName: "{{ p.runtime_class }}"}}'
+{%- endif %}

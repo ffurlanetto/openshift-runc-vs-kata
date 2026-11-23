@@ -1,0 +1,88 @@
+# Configuration de campagne runc vs Kata.
+# Tout ce qui influence un résultat est ici et sera copié dans results/<campagne>/campaign.json,
+# pour qu'un replay rejoue exactement la même chose (sur le même cluster ou un autre).
+#
+# Le cluster n'est PAS fixé ici : il est choisi au lancement parmi les contextes du kubeconfig
+# (./run et ./precheck listent les contextes, ou --context <nom>). Seul prérequis : kubectl.
+
+operator: ""                      # initiales de la personne qui lance la campagne (optionnel)
+
+# Profils optionnels par API server : réglages propres à un cluster connu.
+# Sans profil, la plateforme et la RuntimeClass Kata sont détectées automatiquement
+# et l'identifiant d'environnement est demandé au lancement (ou --env-id).
+profiles:
+  https://api.crc.testing:6443:
+    env_id: ENV-A
+    description: OpenShift Local (CRC) arm64, vfkit --nested, Kata via kata-deploy upstream
+    nested_virt: true
+    kata_version: ""              # à renseigner après installation
+    kata_runtime_class: kata
+    node_selector: {}             # {} = n'importe quel nœud
+  # https://api.ocp-bench.example:6443:
+  #   env_id: ENV-B
+  #   description: OpenShift x86_64 bare metal, OpenShift Sandboxed Containers
+  #   nested_virt: false
+  #   kata_version: "OSC 1.13.1"
+  #   kata_runtime_class: kata
+  #   node_selector: {kvr/bench: "true"}   # kubectl label node <nœud> kvr/bench=true
+  # https://k8s-bench.example:6443:
+  #   env_id: ENV-C
+  #   description: Kubernetes vanilla, Kata via kata-deploy
+  #   kata_runtime_class: kata-qemu        # kata-deploy crée kata-qemu, kata-clh…
+  #   node_selector: {kvr/bench: "true"}
+
+# Phases = catégories du plan de tests. Activables / désactivables au lancement.
+phases: [FUN, PERF, SEC, POL, OPS, DIND, AGT]
+
+# Registres : miroir (Artifactory…) et secret de pull. Réglage global, surchargeable par profil
+# (clé `registry` dans un profil). Laisser mirrors vide si le cluster gère déjà le miroir
+# (OpenShift ImageDigestMirrorSet, miroirs containerd).
+registry:
+  mirrors: []
+  #  - from: registry.access.redhat.com/
+  #    to: artifactory.example/redhat-remote/
+  #  - from: ghcr.io/
+  #    to: artifactory.example/ghcr-remote/
+  #  - from: docker.io/
+  #    to: artifactory.example/dockerhub-remote/
+  pull_secret: null
+  #  name: artifactory-pull
+  #  from_namespace: kvr-system                       # secret existant à copier, ou :
+  #  dockerconfigjson_file: ~/.docker/artifactory.json  # fichier local, jamais commité
+
+# Images épinglées par digest (index multi-arch amd64/arm64) : condition de la reproductibilité.
+# Lister TOUTES les images utilisées : c'est la liste à mirrorer (./run --print-images).
+images:
+  ubi_minimal: registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+  ubi: registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd
+  # Image volontairement référencée par tag : sert uniquement à POL-10 (refus des images non épinglées),
+  # jamais tirée (création à blanc).
+  ubi_minimal_tag: registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+# Images non épinglées autorisées (jamais tirées par le banc).
+unpinned_images_allowed: [ubi_minimal_tag]
+
+# Charts Helm des composants installés pendant la préparation (Kyverno, Kata, Jenkins, ARC…).
+# Même réécriture miroir que les images (dépôt OCI Artifactory).
+charts:
+  kyverno:
+    ref: oci://ghcr.io/kyverno/charts/kyverno
+    version: 3.10.0               # Kyverno v1.20.0
+
+defaults:
+  runs: 5                         # runs mesurés par runtime (hors warm-up)
+  warmup: true                    # run 0 = warm-up (pré-pull, caches), exclu de l'agrégation
+  namespace_prefix: kvr
+  cleanup_timeout_s: 300
+
+# Surcharges par test (runs, paramètres)
+overrides:
+  PERF-01:
+    runs: 30
+  FUN-17:
+    params:
+      memory_limit: 128Mi
+  POL-03:
+    params:
+      max_memory: 2Gi
+      max_cpu: "2"
