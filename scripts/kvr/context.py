@@ -41,6 +41,7 @@ class TestContext:
         self.kyverno: dict | None = None            # renseigné par le runner (détection)
         self.kata_runtime_class: str | None = None  # RuntimeClass Kata de la cible
         self.allow_destructive = False               # ./run --allow-destructive (clusters jetables)
+        self.variant: str | None = None              # variante du plan (ex. moteur de build DIND)
         self.metrics: list[dict] = []
         self.observations: list[str] = []
         self.evidence_files: list[str] = []

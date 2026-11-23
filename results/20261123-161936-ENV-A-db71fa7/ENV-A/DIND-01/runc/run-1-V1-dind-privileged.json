@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-01",
+  "category": "DIND",
+  "title": "Démarrage du moteur de build",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-161936-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T16:19:37Z",
+  "duration_s": 19.314,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "pod_ready",
+      "value": 1.6,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_after_pod",
+      "value": 17.0,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_total",
+      "value": 18.6,
+      "unit": "s",
+      "better": "lower"
+    }
+  ],
+  "observations": "V1-dind-privileged : moteur prêt en 18.6s ; storage_driver=overlayfs, cgroup_version=2, engine_version=29.10.0, security=[name=seccomp,profile=builtin name=cgroupns]",
+  "evidence": [
+    "evidence/20261123-161936-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V1-dind-privileged/manifest-1-dind-pod.yaml",
+    "evidence/20261123-161936-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V1-dind-privileged/engine-info.json",
+    "evidence/20261123-161936-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V1-dind-privileged/pods.json",
+    "evidence/20261123-161936-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V1-dind-privileged/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V1-dind-privileged",
+  "manifest_sha256": "d6dd2157cab25624fc1b32961aa49bce2457f373432ab600a0edaf559d6905ac"
+}

@@ -1,0 +1,117 @@
+{#- Pod de CI avec un moteur de build (phase DIND). Identique pour runc et kata hormis runtimeClassName.
+    variant : V1-dind-privileged | V2-dind-rootless | V3-buildah | V4-buildkit-rootless
+              | V5-dind-privileged-memstore (V1 avec /var/lib/docker en mémoire : contourne overlay sur virtio-fs)
+    Le contexte de build (Dockerfile multi-étapes + secret factice) est fourni par une ConfigMap. -#}
+{%- set v = variant.split("-")[0] %}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-context
+  namespace: {{ namespace }}
+data:
+  Dockerfile: |
+    ARG BASE
+    FROM ${BASE} AS build
+    ARG GREETING=default
+    RUN --mount=type=secret,id=token \
+        test -s /run/secrets/token \
+        && echo "greeting=${GREETING}" > /out.txt \
+        && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt \
+        && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+    FROM ${BASE}
+    COPY --from=build /out.txt /out.txt
+    CMD ["cat", "/out.txt"]
+  secret.txt: "jeton-factice-du-banc-kvr"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ci
+  namespace: {{ namespace }}
+  labels:
+    app.kubernetes.io/part-of: kvr
+{%- if v == "V3" %}
+  annotations:
+    io.kubernetes.cri-o.Devices: "/dev/fuse"   # buildah sans privilège (méthode Red Hat) : fuse-overlayfs
+{%- endif %}
+spec:
+{%- if runtime_class %}
+  runtimeClassName: {{ runtime_class }}
+{%- endif %}
+{%- if node_selector %}
+  nodeSelector:
+{%- for k, val in node_selector.items() %}
+    {{ k }}: "{{ val }}"
+{%- endfor %}
+{%- endif %}
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: engine
+{%- if v in ("V1", "V5") %}
+      image: {{ images.docker_dind }}
+      env:
+        - {name: DOCKER_TLS_CERTDIR, value: ""}
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - {name: engine-storage, mountPath: /var/lib/docker}
+        - {name: build-context, mountPath: /work}
+{%- elif v == "V2" %}
+      image: {{ images.docker_dind_rootless }}
+      env:
+        - {name: DOCKER_TLS_CERTDIR, value: ""}
+        - {name: DOCKER_HOST, value: "unix:///run/user/1000/docker.sock"}
+      securityContext:
+        privileged: true          # requis par dind-rootless (user namespaces imbriqués) ; démon non root
+        runAsUser: 1000
+        runAsGroup: 1000
+      volumeMounts:
+        - {name: engine-storage, mountPath: /home/rootless/.local/share}   # dockerd crée et possède docker/
+        - {name: build-context, mountPath: /work}
+{%- elif v == "V3" %}
+      image: {{ images.buildah }}
+      command: ["sleep", "infinity"]
+      env:
+        - {name: STORAGE_DRIVER, value: overlay}
+        - {name: BUILDAH_ISOLATION, value: chroot}
+      securityContext:                # buildah rootless : utilisateur build (subuid), newuidmap à file capabilities
+        privileged: false
+        runAsUser: 1000
+        runAsGroup: 1000
+        allowPrivilegeEscalation: true
+        capabilities: {add: ["SETUID", "SETGID"]}
+      volumeMounts:
+        - {name: engine-storage, mountPath: /home/build/.local/share/containers}
+        - {name: build-context, mountPath: /work}
+{%- elif v == "V4" %}
+      image: {{ images.buildkit_rootless }}
+      command: ["sleep", "infinity"]
+      env:
+        - {name: BUILDKITD_FLAGS, value: "--oci-worker-no-process-sandbox"}
+      securityContext:
+        privileged: false
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: {type: Unconfined}
+{%- if platform == "openshift" %}
+        seLinuxOptions: {type: spc_t}   # sinon montage devpts refusé dans le userns rootless (container_t)
+{%- endif %}
+      volumeMounts:
+        - {name: engine-storage, mountPath: /home/user/.local/share/buildkit}
+        - {name: build-context, mountPath: /work}
+{%- endif %}
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests: {cpu: 500m, memory: 512Mi}
+        limits: {cpu: "2", memory: 2Gi}
+  volumes:
+    - name: engine-storage
+{%- if v == "V5" %}
+      emptyDir: {medium: Memory, sizeLimit: 1Gi}   # compté dans la limite mémoire du pod (et de la VM Kata)
+{%- else %}
+      emptyDir: {}
+{%- endif %}
+    - name: build-context
+      configMap: {name: build-context}

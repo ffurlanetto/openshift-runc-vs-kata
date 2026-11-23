@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from kvr import kyverno  # noqa: E402
+from kvr import components, kyverno  # noqa: E402
 from kvr.registry import resolve_charts, resolve_images  # noqa: E402
 from kvr.runner import REPO_ROOT, load_config  # noqa: E402
 from kvr.target import build_target, choose_context, confirm  # noqa: E402
@@ -144,9 +144,16 @@ def setup_kata(config: dict, args) -> int:
         print("Retrait des labels SELinux posés par le banc (l'installeur doit pouvoir réécrire /opt/kata) :")
         if not relabel_nodes(cluster, ns, image, selector, apply=False):
             return 1
+    extra = []
+    if not cluster.is_openshift:
+        # Chemins containerd propres à la distribution (k3s, rke2, k0s, microk8s ; sinon k8s).
+        dist = components.distribution(cluster, cluster.nodes(selector or None))["distribution"]
+        k8s_dist = {"k3s": "k3s", "RKE2": "rke2", "k0s": "k0s", "MicroK8s": "microk8s"}.get(dist, "k8s")
+        print(f"  distribution détectée : {dist} → k8sDistribution={k8s_dist}")
+        extra = ["--set", f"k8sDistribution={k8s_dist}"]
     cmd = ["helm", "upgrade", "--install", "kata-deploy", chart["ref"], "--version", str(chart["version"]),
            "--kube-context", ctx_entry["name"], "--namespace", ns,
-           *[a for v in values for a in ("-f", str(REPO_ROOT / v))], "--wait", "--timeout", "30m"]
+           *[a for v in values for a in ("-f", str(REPO_ROOT / v))], *extra, "--wait", "--timeout", "30m"]
     print("→ " + " ".join(cmd))
     rc = subprocess.run(cmd).returncode
     if rc != 0:

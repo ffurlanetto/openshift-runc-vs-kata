@@ -168,7 +168,8 @@
         "V1-dind-privileged",
         "V2-dind-rootless",
         "V3-buildah",
-        "V4-buildkit-rootless"
+        "V4-buildkit-rootless",
+        "V5-dind-privileged-memstore"
       ]
     },
     "agent_mode": {

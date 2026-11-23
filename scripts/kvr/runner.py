@@ -18,7 +18,7 @@ from types import ModuleType
 import jsonschema
 import yaml
 
-from . import RUNNER_VERSION, kyverno, registry
+from . import RUNNER_VERSION, components, kyverno, registry
 from .cluster import Cluster, OcError
 from .context import Blocked, NotSupported, TestContext
 
@@ -91,9 +91,12 @@ def build_plan(selected: list[TestDef], config: dict, runtimes: list[str],
         ov = config.get("overrides", {}).get(t.id, {})
         runs = runs_override or ov.get("runs") or t.meta.get("runs") or config["defaults"]["runs"]
         first = 0 if (warmup and t.meta.get("warmup", True)) else 1
-        for run in range(first, runs + 1):
-            order = runtimes if run % 2 == 1 or run == 0 else list(reversed(runtimes))
-            plan += [{"test_id": t.id, "runtime": rt, "run": run} for rt in order]
+        # Variantes (ex. moteurs de build DIND V1..V4) : même alternance ABAB pour chacune.
+        for variant in ov.get("variants") or t.meta.get("variants") or [None]:
+            for run in range(first, runs + 1):
+                order = runtimes if run % 2 == 1 or run == 0 else list(reversed(runtimes))
+                plan += [{"test_id": t.id, "runtime": rt, "run": run, **({"variant": variant} if variant else {})}
+                         for rt in order]
     return plan
 
 
@@ -162,6 +165,7 @@ class Campaign:
         rcs = [rc for rc in self.runtimes.values() if rc]
         self.fingerprint = self.cluster.fingerprint(rcs, self.target.get("node_selector"))
         self.fingerprint["kyverno"] = kyverno.detect(self.cluster)
+        self.fingerprint["components"] = components.detect(self.cluster, self.target.get("node_selector"))
         self.nodes_by_name = {n["name"]: n for n in self.fingerprint["nodes"]}
         self.results_root.mkdir(parents=True, exist_ok=True)
         cfg = recorded_config(self.config)
@@ -191,7 +195,7 @@ class Campaign:
             for i, step in enumerate(self.plan, 1):
                 res = self.execute_step(step)
                 summary[res["status"]] = summary.get(res["status"], 0) + 1
-                tag = " (warm-up)" if step["run"] == 0 else ""
+                tag = (f" {step['variant']}" if step.get("variant") else "") + (" (warm-up)" if step["run"] == 0 else "")
                 log(f"[{i}/{len(self.plan)}] {step['test_id']:<8} {step['runtime']:<5} run {step['run']:>2}{tag} "
                     f"→ {res['status']:<13} {res['duration_s']:6.1f}s  {self._fmt(res)}")
         finally:
@@ -211,15 +215,19 @@ class Campaign:
         rc_name = self.runtimes[rt]
         ov = self.config.get("overrides", {}).get(t.id, {})
         params = {**t.meta.get("params", {}), **ov.get("params", {})}
-        ns = f"{self.config['defaults']['namespace_prefix']}-{self.ns_tag}-{t.id.lower()}-{rt}-{run}"
+        variant = step.get("variant")
+        vtag = f"-{variant.split('-')[0].lower()}" if variant else ""
+        vsuffix = f"-{variant}" if variant else ""
+        ns = f"{self.config['defaults']['namespace_prefix']}-{self.ns_tag}-{t.id.lower()}-{rt}{vtag}-{run}"
         ctx = TestContext(cluster=self.cluster, repo_root=REPO_ROOT, test_dir=t.dir, test_id=t.id,
                           runtime=rt, runtime_class=rc_name, namespace=ns, run=run,
                           images=self.images, params=params,
-                          evidence_dir=self.evidence_root / t.id / rt / f"run-{run}",
+                          evidence_dir=self.evidence_root / t.id / rt / f"run-{run}{vsuffix}",
                           node_selector=self.target.get("node_selector"))
         ctx.kyverno = self.fingerprint.get("kyverno")
         ctx.kata_runtime_class = self.runtimes.get("kata")
         ctx.allow_destructive = self.allow_destructive
+        ctx.variant = variant
         started, t0 = now_iso(), time.perf_counter()
         status, node_name = "FAIL", None
         try:
@@ -299,7 +307,14 @@ class Campaign:
             "container_runtime": node["container_runtime"],
         }
         if ctx.runtime_class:
-            env["kata_version"] = self.target.get("kata_version") or "inconnue"
+            kata_info = self.fingerprint.get("components", {}).get("kata")
+            kata_info = kata_info if isinstance(kata_info, dict) else {}
+            rc_detail = kata_info.get("runtime_classes", {}).get(ctx.runtime_class, {})
+            detected = kata_info.get("version", "inconnue")
+            env["kata_version"] = (f"{kata_info.get('install', 'inconnue')} {detected}"
+                                   if detected != "inconnue" else self.target.get("kata_version") or "inconnue")
+            env["kata_runtime_class"] = ctx.runtime_class
+            env["kata_shim"] = rc_detail.get("shim", "inconnu")
             if rc_info:
                 env["hypervisor"] = rc_info["handler"]
         res = {
@@ -322,6 +337,8 @@ class Campaign:
         for k in ("aspect", "variant", "ci_platform", "agent_mode"):
             if k in t.meta:
                 res[k] = t.meta[k]
+        if step.get("variant"):
+            res["variant"] = step["variant"]
         if ctx.manifest_sha256:
             res["manifest_sha256"] = ctx.manifest_sha256
         if self.config.get("operator"):
@@ -329,7 +346,8 @@ class Campaign:
         errors = [e.message for e in self.validator.iter_errors(res)]
         if errors:
             raise RuntimeError(f"résultat non conforme au schéma ({t.id}/{ctx.runtime}/{step['run']}) : {errors}")
-        out = self.results_root / env["id"] / t.id / ctx.runtime / f"run-{step['run']}.json"
+        vsuffix = f"-{step['variant']}" if step.get("variant") else ""
+        out = self.results_root / env["id"] / t.id / ctx.runtime / f"run-{step['run']}{vsuffix}.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(res, indent=2, ensure_ascii=False))
         return res

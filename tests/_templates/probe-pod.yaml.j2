@@ -22,7 +22,7 @@ spec:
 {%- endfor %}
 {%- endif %}
   restartPolicy: Never
-  terminationGracePeriodSeconds: 0
+  terminationGracePeriodSeconds: {{ grace | default(0) }}
   automountServiceAccountToken: false
   containers:
     - name: main

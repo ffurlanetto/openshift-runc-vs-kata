@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-01",
+  "category": "DIND",
+  "title": "Démarrage du moteur de build",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-164939-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T16:55:49Z",
+  "duration_s": 209.339,
+  "status": "NOT_SUPPORTED",
+  "metrics": [],
+  "observations": "NON SUPPORTÉ : moteur V2-dind-rootless indisponible après 180s : error: cannot exec into a container in a completed pod; current phase is Failed",
+  "evidence": [
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V2-dind-rootless/manifest-1-dind-pod.yaml",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V2-dind-rootless/engine-logs.txt",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V2-dind-rootless/pods.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V2-dind-rootless/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V2-dind-rootless",
+  "manifest_sha256": "ea523aa0bf108f8e8cb40e81e5888670489cf798f3b39f1038dd00d797dd578d"
+}

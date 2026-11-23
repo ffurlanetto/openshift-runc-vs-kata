@@ -57,6 +57,11 @@ registry:
 images:
   ubi_minimal: registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
   ubi: registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd
+  # Moteurs de build CI (phase DIND), index multi-arch épinglés le 2026-11-23
+  docker_dind: docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c            # docker:dind
+  docker_dind_rootless: docker.io/library/docker@sha256:5a703ad0d72cd5e4fb4beca8024d6eddef6d22a46ed1d9812bf3d24ff43ccbce   # docker:dind-rootless
+  buildah: quay.io/buildah/stable@sha256:7c4a2893a2ec7a8eecb37debacc0cd657f453cfdc3d4a36b0171f5f9ac6cf618                   # buildah/stable:latest
+  buildkit_rootless: docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be       # moby/buildkit:rootless
   # Image volontairement référencée par tag : sert uniquement à POL-10 (refus des images non épinglées),
   # jamais tirée (création à blanc).
   ubi_minimal_tag: registry.access.redhat.com/ubi9/ubi-minimal:latest

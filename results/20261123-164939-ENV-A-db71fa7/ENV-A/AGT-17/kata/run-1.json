@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "test_id": "AGT-17",
+  "category": "AGT",
+  "title": "Multiplication de processus (bornée)",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-164939-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T16:51:09Z",
+  "duration_s": 108.753,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "processes_reached",
+      "value": 336,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "pids_max_in_container",
+      "value": 336,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "kata : 336 processus atteints sur 6000 tentés ; pids.max vu dans le conteneur = 336 ; limite appliquée ; pod réactif après",
+  "evidence": [
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-17/kata/run-1/manifest-1-probe-pod.yaml",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-17/kata/run-1/pods.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-17/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "agent_mode": "replay",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

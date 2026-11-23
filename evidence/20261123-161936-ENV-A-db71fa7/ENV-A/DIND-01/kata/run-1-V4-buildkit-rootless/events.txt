@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON           OBJECT   MESSAGE
+3m38s       Normal   Scheduled        pod/ci   Successfully assigned kvr-62943-dind-01-kata-v4-1/ci to crc
+3m37s       Normal   AddedInterface   pod/ci   Add eth0 [10.217.0.250/23] from ovn-kubernetes
+3m5s        Normal   Pulled           pod/ci   Container image "docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be" already present on machine and can be accessed by the pod
+3m4s        Normal   Created          pod/ci   Container created
+3m4s        Normal   Started          pod/ci   Container started

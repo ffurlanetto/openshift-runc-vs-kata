@@ -123,7 +123,8 @@ def cmd_run(args) -> int:
 
     if args.dry_run:
         for s in plan:
-            print(f"{s['test_id']:<8} {s['runtime']:<5} run {s['run']}{' (warm-up)' if s['run'] == 0 else ''}")
+            print(f"{s['test_id']:<8} {s['runtime']:<5} run {s['run']}"
+                  f"{' ' + s['variant'] if s.get('variant') else ''}{' (warm-up)' if s['run'] == 0 else ''}")
         print(f"\n{len(plan)} exécutions, phases {phases}, runtimes {runtimes}")
         return 0
 

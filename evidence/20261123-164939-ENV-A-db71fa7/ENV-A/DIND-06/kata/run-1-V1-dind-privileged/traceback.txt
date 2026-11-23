@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "<repo>/scripts/kvr/runner.py", line 236, in execute_step
+    status = t.module.run(ctx)
+  File "<repo>/tests/DIND-06/test.py", line 31, in run
+    ctx.metric("nested_https_time", round(float(parts[1]) * 1000), "ms", "lower")
+                                          ~~~~~^^^^^^^^^^
+ValueError: could not convert string to float: 'to'

@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "test_id": "AGT-17",
+  "category": "AGT",
+  "title": "Multiplication de processus (bornée)",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-164939-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T16:51:05Z",
+  "duration_s": 4.178,
+  "status": "FAIL",
+  "metrics": [
+    {
+      "name": "processes_reached",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : 0 processus atteints sur 6000 tentés ; pids.max vu dans le conteneur = max ; limite NON appliquée ; pod réactif après",
+  "evidence": [
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-17/runc/run-1/manifest-1-probe-pod.yaml",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-17/runc/run-1/pods.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-17/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "agent_mode": "replay",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

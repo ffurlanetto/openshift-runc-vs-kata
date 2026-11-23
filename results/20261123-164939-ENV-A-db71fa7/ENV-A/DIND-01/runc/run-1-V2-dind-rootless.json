@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-01",
+  "category": "DIND",
+  "title": "Démarrage du moteur de build",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-164939-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T16:55:31Z",
+  "duration_s": 18.887,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "pod_ready",
+      "value": 1.0,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_after_pod",
+      "value": 16.9,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_total",
+      "value": 17.8,
+      "unit": "s",
+      "better": "lower"
+    }
+  ],
+  "observations": "V2-dind-rootless : moteur prêt en 17.8s ; storage_driver=overlayfs, cgroup_version=2, engine_version=29.10.0, security=[name=seccomp,profile=builtin name=rootless name=cgroupns]",
+  "evidence": [
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V2-dind-rootless/manifest-1-dind-pod.yaml",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V2-dind-rootless/engine-info.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V2-dind-rootless/pods.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/runc/run-1-V2-dind-rootless/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V2-dind-rootless",
+  "manifest_sha256": "ea523aa0bf108f8e8cb40e81e5888670489cf798f3b39f1038dd00d797dd578d"
+}

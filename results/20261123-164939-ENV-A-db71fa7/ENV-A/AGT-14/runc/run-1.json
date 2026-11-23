@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "test_id": "AGT-14",
+  "category": "AGT",
+  "title": "Accès à l'API Kubernetes et aux métadonnées",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-164939-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T16:50:38Z",
+  "duration_s": 2.262,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "sa_token_present",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "api_denied",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "metadata_unreachable",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "token SA présent=False ; API sans identité → HTTP 403 ; métadonnées → 000",
+  "evidence": [
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-14/runc/run-1/manifest-1-probe-pod.yaml",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-14/runc/run-1/pods.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/AGT-14/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "agent_mode": "replay",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

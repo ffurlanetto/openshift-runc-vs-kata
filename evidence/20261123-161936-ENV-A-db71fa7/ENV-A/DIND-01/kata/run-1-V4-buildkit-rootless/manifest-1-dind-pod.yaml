@@ -1,0 +1,56 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-context
+  namespace: kvr-62943-dind-01-kata-v4-1
+data:
+  Dockerfile: |
+    ARG BASE
+    FROM ${BASE} AS build
+    ARG GREETING=default
+    RUN --mount=type=secret,id=token \
+        test -s /run/secrets/token \
+        && echo "greeting=${GREETING}" > /out.txt \
+        && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt \
+        && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+    FROM ${BASE}
+    COPY --from=build /out.txt /out.txt
+    CMD ["cat", "/out.txt"]
+  secret.txt: "jeton-factice-du-banc-kvr"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ci
+  namespace: kvr-62943-dind-01-kata-v4-1
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+  runtimeClassName: kata
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: engine
+      image: docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be
+      command: ["sleep", "infinity"]
+      env:
+        - {name: BUILDKITD_FLAGS, value: "--oci-worker-no-process-sandbox"}
+      securityContext:
+        privileged: false
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile: {type: Unconfined}
+      volumeMounts:
+        - {name: engine-storage, mountPath: /home/user/.local/share/buildkit}
+        - {name: build-context, mountPath: /work}
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests: {cpu: 500m, memory: 512Mi}
+        limits: {cpu: "2", memory: 2Gi}
+  volumes:
+    - name: engine-storage
+      emptyDir: {}
+    - name: build-context
+      configMap: {name: build-context}

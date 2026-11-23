@@ -1,0 +1,44 @@
+$ buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=/work --local dockerfile=/work --opt build-arg:BASE=registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 --opt build-arg:GREETING=kvr --secret id=token,src=/work/secret.txt --output type=oci,dest=/tmp/demo.tar
+rc=1
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 880B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BASE} results in empty or invalid base image name (line 2)
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BASE} results in empty or invalid base image name (line 9)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+#2 DONE 0.8s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [build 1/2] FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+#4 resolve registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 done
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 0B / 38.70MB 0.2s
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 12.58MB / 38.70MB 0.3s
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 27.26MB / 38.70MB 0.5s
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 38.70MB / 38.70MB 0.6s done
+#4 extracting sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a
+#4 extracting sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 0.4s done
+#4 DONE 1.0s
+
+#5 [build 2/2] RUN --mount=type=secret,id=token     test -s /run/secrets/token     && echo "greeting=kvr" > /out.txt     && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt     && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+#5 0.032 runc run failed: unable to start container process: error during container init: error mounting "devpts" to rootfs at "/dev/pts": mount src=devpts, dst=/dev/pts, dstFd=/proc/thread-self/fd/12, flags=MS_NOSUID|MS_NOEXEC, data=newinstance,ptmxmode=0666,mode=0620,gid=5: permission denied
+#5 ERROR: process "/bin/sh -c test -s /run/secrets/token     && echo \"greeting=${GREETING}\" > /out.txt     && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt     && dd if=/dev/urandom of=/blob bs=1M count=20 status=none" did not complete successfully: exit code: 1
+------
+ > [build 2/2] RUN --mount=type=secret,id=token     test -s /run/secrets/token     && echo "greeting=kvr" > /out.txt     && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt     && dd if=/dev/urandom of=/blob bs=1M count=20 status=none:
+0.032 runc run failed: unable to start container process: error during container init: error mounting "devpts" to rootfs at "/dev/pts": mount src=devpts, dst=/dev/pts, dstFd=/proc/thread-self/fd/12, flags=MS_NOSUID|MS_NOEXEC, data=newinstance,ptmxmode=0666,mode=0620,gid=5: permission denied
+------
+Dockerfile:4
+--------------------
+   3 |     ARG GREETING=default
+   4 | >>> RUN --mount=type=secret,id=token \
+   5 | >>>     test -s /run/secrets/token \
+   6 | >>>     && echo "greeting=${GREETING}" > /out.txt \
+   7 | >>>     && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt \
+   8 | >>>     && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+   9 |     FROM ${BASE}
+--------------------
+error: failed to solve: process "/bin/sh -c test -s /run/secrets/token     && echo \"greeting=${GREETING}\" > /out.txt     && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt     && dd if=/dev/urandom of=/blob bs=1M count=20 status=none" did not complete successfully: exit code: 1
+command terminated with exit code 1

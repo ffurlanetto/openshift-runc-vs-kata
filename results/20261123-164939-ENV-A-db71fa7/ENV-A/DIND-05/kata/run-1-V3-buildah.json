@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-05",
+  "category": "DIND",
+  "title": "Build Dockerfile multi-étapes (build-arg, secret, cache)",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-164939-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T17:11:37Z",
+  "duration_s": 51.936,
+  "status": "FAIL",
+  "metrics": [],
+  "observations": "V3-buildah : build en échec : or setuid on /usr/bin/newuidmap: invalid argument\n2026/11/23 17:12:23 WARN Falling back to single mapping\nError: mounting an overlay over build context directory: creating overlay scaffolding for build context directory: exec /usr/bin/fuse-overlayfs: exit status 1\ncommand terminated with exit code 1",
+  "evidence": [
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-05/kata/run-1-V3-buildah/manifest-1-dind-pod.yaml",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-05/kata/run-1-V3-buildah/build-froid.txt",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-05/kata/run-1-V3-buildah/pods.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-05/kata/run-1-V3-buildah/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V3-buildah",
+  "manifest_sha256": "bbe81b832614bd420b89d83ba271b0e36500629d318f283fd2c05ae04dfee6da"
+}

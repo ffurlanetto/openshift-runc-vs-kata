@@ -13,7 +13,7 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from . import kyverno, registry
+from . import components, kyverno, registry
 from .cluster import Cluster, OcError
 from .context import TestContext
 
@@ -86,7 +86,7 @@ class Precheck:
         if not self._safe("droits", self.check_rbac):
             self.add(INFO, "cluster", "contrôles du cluster", "non lancés : droits insuffisants")
             return self._summary()
-        for area, check in (("nœuds", self.check_nodes), ("runtimes", self.check_runtimes),
+        for area, check in (("composants", self.check_components), ("nœuds", self.check_nodes), ("runtimes", self.check_runtimes),
                             ("registre", self.check_registry_config), ("kyverno", self.check_kyverno),
                             ("phases", self.check_phases), ("cluster", self.check_misc)):
             self._safe(area, check)
@@ -182,6 +182,20 @@ class Precheck:
             self.add(OK, "droits", "RBAC / SCC", f"{len(wanted)} droits vérifiés")
 
     # ------------------------------------------------------------------ nœuds et runtimes
+    def check_components(self) -> None:
+        """Pile détectée (distribution, CRI, CNI, Kata : installation, version, shim, hyperviseur).
+        Les constats d'une campagne ne valent que pour cette pile."""
+        self.components = components.detect(self.cluster, self.target.get("node_selector") or None)
+        for name, value in components.summary_lines(self.components):
+            self.add(INFO, "composants", name, value)
+        kata = self.components.get("kata")
+        if "kata" in self.runtimes and isinstance(kata, dict):
+            rc = self.target["runtimes"]["kata"]
+            d = kata.get("runtime_classes", {}).get(rc)
+            if d and "inconnu" in (d["shim"], d["hypervisor"]):
+                self.add(WARN, "composants", f"RuntimeClass {rc}", "shim ou hyperviseur non identifié",
+                         "renseigner kata_version dans le profil de campaign.yaml")
+
     def check_nodes(self) -> None:
         sel = self.target.get("node_selector") or None
         nodes = self.cluster.nodes(sel)

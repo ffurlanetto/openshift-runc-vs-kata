@@ -1,0 +1,8 @@
+rc=125
+montés=[]
+disques=
+machine-id du nœud trouvé : False
+: "overlay", target: "/tmp/containerd-mount3902727878", fstype: overlay, flags: 0, data: "workdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2/work,upperdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2/fs,lowerdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/1/fs,index=off", err: invalid argument
+
+Run 'docker run --help' for more information
+command terminated with exit code 125

@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-01",
+  "category": "DIND",
+  "title": "Démarrage du moteur de build",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-164939-ENV-A-db71fa7",
+    "git_commit": "db71fa710c03bc5a2a6aa3bb1366c822e6671712",
+    "git_dirty": true,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T16:59:21Z",
+  "duration_s": 43.299,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "pod_ready",
+      "value": 23.1,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_after_pod",
+      "value": 8.7,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_total",
+      "value": 31.8,
+      "unit": "s",
+      "better": "lower"
+    }
+  ],
+  "observations": "V3-buildah : moteur prêt en 31.8s ; engine_version=1.46.1, storage_driver=overlay",
+  "evidence": [
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V3-buildah/manifest-1-dind-pod.yaml",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V3-buildah/engine-info.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V3-buildah/pods.json",
+    "evidence/20261123-164939-ENV-A-db71fa7/ENV-A/DIND-01/kata/run-1-V3-buildah/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V3-buildah",
+  "manifest_sha256": "bbe81b832614bd420b89d83ba271b0e36500629d318f283fd2c05ae04dfee6da"
+}
