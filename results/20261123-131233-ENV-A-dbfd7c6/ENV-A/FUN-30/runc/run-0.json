@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "test_id": "FUN-30",
+  "category": "FUN",
+  "title": "hostNetwork",
+  "runtime": "runc",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-131233-ENV-A-dbfd7c6",
+    "git_commit": "dbfd7c6b7d1eef2e05efdb581672eb4a52ad62e0",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T13:15:20Z",
+  "duration_s": 1.717,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "node_ip_visible",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "IP du nœud ['192.168.126.11'] visibles dans le pod : ['192.168.126.11'] ; interfaces : ['0ac39fa4db021f0', '0ae29ce4b5b0228', '0d22ada620810d6', '0db8a569cea44ac', '0e09bb54ad226b6', '14851b0c4a06591', '15c56bdf3e29a1c', '15f4ac79247a0cc', '174eafaf6ce878e', '1a952786f08c265', '20c1549eda4cdec', '216ab03af790480', '2616a3d46d8cf72', '26894317fdb7efd', '2c5734b909f7e2b', '2e53283e64f8e0f', '37b6b00a4aafd9d', '38bb9b28c93de9b', '3a11f2c309d95c9', '3c34476c04053e4', '4838b0b2d91115f', '48526ec9dd0517b', '48ab381549bc059', '493cbccbb37f58c', '4b789884e68635d', '4ba8495a0d2edfc', '4ca512d1eb86f8d', '4cbdc4cd8bb24a3', '509661f8b8a0946', '55c5cb228d277d5', '57a02f4e03b9deb', '581dba0afa69614', '588e9c5cb4491ce', '5cc98aa5bf328c0', '5f72ad1bfb3587f', '60028e0789b716e', '63686b1c713708c', '65a0ec1923117b8', '69738ca85a3715d', '6c9cbfbd4ea7ace', '6dd89253a2bc90f', '6f69519d76cb3dd', '7237a8234a6a699', '7427114a521b392', '7867da5aacd9237', '7ea5106fa007f89', '83e3a20ba21ce9e', '84a04d7b25a876e', '8673a4154ce729e', '87be4f94645fb49', '8caf24490756db3', '8dbeb8ab5efd559', '94033cd5c9cf5bf', '9d6ed5ae0333008', 'a27187705f228cd', 'a7abdef3cbcf6e6', 'ab188a3ede5f36f', 'ac1e3e5e1c75836', 'b0feecacc929d2d', 'b68b0daf8346af3', 'baf5c2ef9a1ad5e', 'bddb91f2703f30e', 'br-ex', 'br-int', 'c4f2f84efec7422', 'c77e078523869b3', 'c91e8f0f8658e57', 'cc7869bfdab8c37', 'd383cb97c09f69c', 'de4faa632f3c6c7', 'e123ed6b4cbb548', 'e2958974e009c29', 'e4e3e9cbcf7ff5d', 'e5d1c2ceac22c6c', 'e648c576bf24c9d', 'e6c129e09b70b24', 'ecb78ebf2740dd5', 'enp0s1', 'eth10', 'f08b34c20041964', 'f0ceebdf584c94c', 'f1d0e6709931298', 'f1ffcfd614180ac', 'f25c15219b2ef79', 'f681aee3f58eb36', 'fa747d7ff82f10e', 'lo', 'ovn-k8s-mp0', 'ovs-system']",
+  "evidence": [
+    "evidence/20261123-131233-ENV-A-dbfd7c6/ENV-A/FUN-30/runc/run-0/manifest-1-probe-pod.yaml",
+    "evidence/20261123-131233-ENV-A-dbfd7c6/ENV-A/FUN-30/runc/run-0/fib_trie.txt",
+    "evidence/20261123-131233-ENV-A-dbfd7c6/ENV-A/FUN-30/runc/run-0/interfaces.txt",
+    "evidence/20261123-131233-ENV-A-dbfd7c6/ENV-A/FUN-30/runc/run-0/pods.json",
+    "evidence/20261123-131233-ENV-A-dbfd7c6/ENV-A/FUN-30/runc/run-0/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "e2b11259e661181415a1a17d402a7efb1e94b9249e4b0e2951cc8c0ac0eb794b"
+}

@@ -143,13 +143,16 @@ def cmd_run(args) -> int:
         if diffs and args.strict:
             raise SystemExit("--strict : rejeu refusé tant que des écarts existent")
         replay_of = {"campaign_id": old["campaign_id"], "diff": diffs}
+        if old.get("allow_destructive") and not args.allow_destructive:
+            log("⚠ campagne d'origine lancée avec --allow-destructive : ajouter l'option pour un rejeu identique")
 
     # ---- precheck (toujours)
     pc = Precheck(REPO_ROOT, config, cluster, target, phases, runtimes, smoke=not args.no_smoke)
     if not pc.run():
         raise SystemExit("\nPrécheck en échec : campagne non lancée.")
 
-    campaign = Campaign(config, cluster, target, plan, tests, args.allow_dirty, replay_of, pc.report())
+    campaign = Campaign(config, cluster, target, plan, tests, args.allow_dirty, replay_of, pc.report(),
+                        allow_destructive=args.allow_destructive)
     return campaign.execute()
 
 
@@ -181,6 +184,9 @@ def main() -> int:
     g.add_argument("--dry-run", action="store_true", help="affiche le plan sans rien exécuter")
     g.add_argument("--yes", "-y", action="store_true", help="pas de confirmation (CI, non interactif)")
     g.add_argument("--allow-dirty", action="store_true", help="autorise un arbre git modifié")
+    g.add_argument("--allow-destructive", action="store_true",
+                   help="exécute réellement les scénarios pouvant rendre un nœud indisponible "
+                        "(ex. FUN-30 en Kata) : clusters jetables uniquement")
     g = p.add_argument_group("rejeu et maintenance")
     g.add_argument("--replay", metavar="CAMPAIGN_JSON", help="rejoue à l'identique une campagne enregistrée")
     g.add_argument("--strict", action="store_true", help="avec --replay : refuse si code/environnement diffèrent")

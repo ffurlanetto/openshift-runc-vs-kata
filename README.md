@@ -13,10 +13,10 @@ Volets évalués : **fonctionnel, performance, sécurité, policies d'admission 
 
 | Phase | Statut |
 |---|---|
-| Plan de tests : 130 tests, dont 87 P1 | ✅ v0.2, en revue |
+| Plan de tests : 131 tests, dont 88 P1 | ✅ v0.2, en revue |
 | Format de rapport | ✅ v0.2 |
-| Banc automatisé (`./precheck`, `./run`, `./setup`) | ✅ 22 tests automatisés (FUN, PERF, SEC, POL) |
-| Environnement A (OpenShift Local arm64, nested virt) | 🟡 en préparation |
+| Banc automatisé (`./precheck`, `./run`, `./setup`) | ✅ 23 tests automatisés (FUN, PERF, SEC, POL) |
+| Environnement A (OpenShift Local arm64, nested virt) | ✅ Kata 4.4.0 + Kyverno 1.20.0 opérationnels |
 | Environnement B (OpenShift x86_64 bare metal + OSC) | ⏳ à provisionner |
 | Exécution des tests | ⏳ |
 | Rapport comité | ⏳ |
@@ -46,6 +46,7 @@ Prérequis du poste : `bash`, `git`, `kubectl`, `uv`, plus `helm` pour `./setup`
 ./run --replay results/<campagne>/campaign.json [--strict]   # rejeu à l'identique
 ./run --print-images                # images et charts à mirrorer (site airgappé)
 ./run --cleanup                     # supprime les namespaces du banc restants
+./run --allow-destructive           # exécute aussi les scénarios pouvant faire tomber un nœud (cluster jetable)
 ./setup kyverno                     # installe Kyverno sur un cluster de TEST (ne touche pas un Kyverno existant)
 ```
 

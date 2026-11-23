@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/ffurlanetto/Sources/kata/scripts/kvr/runner.py", line 224, in execute_step
+    self._create_namespace(ns)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^
+  File "/Users/ffurlanetto/Sources/kata/scripts/kvr/runner.py", line 247, in _create_namespace
+    self.cluster.oc("create", "ns", ns)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ffurlanetto/Sources/kata/scripts/kvr/cluster.py", line 69, in oc
+    raise OcError(f"kubectl {' '.join(args)} -> rc={r.returncode} : {r.stderr.strip()}")
+kvr.cluster.OcError: kubectl create ns kvr-1a0cc-fun-30-runc-3 -> rc=1 : Unable to connect to the server: net/http: TLS handshake timeout

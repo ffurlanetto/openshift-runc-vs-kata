@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "test_id": "FUN-30",
+  "category": "FUN",
+  "title": "hostNetwork",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-131233-ENV-A-dbfd7c6",
+    "git_commit": "dbfd7c6b7d1eef2e05efdb581672eb4a52ad62e0",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "crc-admin",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T13:15:21Z",
+  "duration_s": 201.529,
+  "status": "NOT_SUPPORTED",
+  "metrics": [],
+  "observations": "NON SUPPORTÉ : pod hostNetwork non Ready : kubectl get pod/probe -n kvr-1a0cc-fun-30-kata-0 -o json -> rc=1 : E1123 14:17:32.201958   53397 memcache.go:381] \"Couldn't get current server API group list\" err=\"Get \\\"https://api.crc.testing:6443/api?timeout=32s\\\": net/http: TLS handshake timeout\"\nE1123 14:17:42.207296   53397 memcache.go:381] \"Couldn't get current server API group list\" err=\"Get \\\"https://api.crc.testing:6443/api?timeout=32s\\\": net/http: TLS handshake timeout\"\nUnable to connect to the server: net/http: TLS handshake timeout",
+  "evidence": [
+    "evidence/20261123-131233-ENV-A-dbfd7c6/ENV-A/FUN-30/kata/run-0/manifest-1-probe-pod.yaml"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "e2b11259e661181415a1a17d402a7efb1e94b9249e4b0e2951cc8c0ac0eb794b"
+}

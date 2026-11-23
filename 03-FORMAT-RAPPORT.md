@@ -107,7 +107,7 @@ Pour les tests fonctionnels et sécurité, la fiche contient : statut runc, stat
 | Fonctionnel | 30 | | | | | |
 | Performance | 16 | | | | | |
 | Sécurité | 17 | | | | | |
-| Policies d'admission (Kyverno) | 17 | | | | | |
+| Policies d'admission (Kyverno) | 18 | | | | | |
 | Exploitation | 10 | | | | | |
 | CI dans Kata (DIND) | 20 | | | | | |
 | Agents IA | 20 | | | | | |

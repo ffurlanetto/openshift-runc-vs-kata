@@ -16,7 +16,7 @@
 | Metrics API (`oc adm top`) | ❌ indisponible (monitoring désactivé par défaut dans CRC) | Nécessaire pour les mesures d'overhead |
 | `agent-sandbox-operator` (Agent Sandbox : `Sandbox`, `SandboxTemplate`, `SandboxClaim`, `SandboxWarmPool`) | ⚠️ v0.9.0, canal **preview**, **amd64 uniquement** | Sur ENV-A : projet upstream `kubernetes-sigs/agent-sandbox` |
 | Backend LLM pour les tests d'agents | ❌ à choisir | API distante (clé + egress) ou modèle local sur le Mac (Ollama, via `host.crc.testing`) |
-| Disque de la VM CRC | ❌ **87 % utilisé (30/35 Go) → nœud en DiskPressure**, plus aucun pod planifiable | **Bloquant** : `crc config set disk-size 80` (à faire avec le redémarrage `--nested`) |
+| Disque de la VM CRC | ✅ 80 Go (54 % utilisés après redimensionnement ; DiskPressure résolu) | `crc config set disk-size 80` appliqué le 2026-11-23 |
 | APIService `v1beta1.external.metrics.k8s.io` (KEDA) | ❌ indisponible (pods KEDA non planifiables) | Les namespaces supprimés restent en `Terminating` |
 | Kyverno | ❌ absent sur CRC | `./setup kyverno` (chart 3.10.0, Kyverno v1.20.0) |
 | Operators sécurité au catalogue | ✅ `compliance-operator`, `security-profiles-operator`, `file-integrity-operator` | Utilisables pour le volet sécurité |

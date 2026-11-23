@@ -130,8 +130,10 @@ def log(msg: str) -> None:
 class Campaign:
     def __init__(self, config: dict, cluster: Cluster, target: dict, plan: list[dict],
                  tests: dict[str, TestDef], allow_dirty: bool = False,
-                 replay_of: dict | None = None, precheck: dict | None = None) -> None:
+                 replay_of: dict | None = None, precheck: dict | None = None,
+                 allow_destructive: bool = False) -> None:
         self.config = config
+        self.allow_destructive = allow_destructive
         self.cluster = cluster
         self.target = target
         self.runtimes = target["runtimes"]
@@ -177,6 +179,7 @@ class Campaign:
             "plan": self.plan,
             "fingerprint": self.fingerprint,
             "precheck": self.precheck,
+            "allow_destructive": self.allow_destructive,
         }
         manifest_path = self.results_root / "campaign.json"
         manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
@@ -216,6 +219,7 @@ class Campaign:
                           node_selector=self.target.get("node_selector"))
         ctx.kyverno = self.fingerprint.get("kyverno")
         ctx.kata_runtime_class = self.runtimes.get("kata")
+        ctx.allow_destructive = self.allow_destructive
         started, t0 = now_iso(), time.perf_counter()
         status, node_name = "FAIL", None
         try:

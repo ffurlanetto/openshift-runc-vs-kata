@@ -7,7 +7,9 @@ metadata:
   labels:
     app.kubernetes.io/part-of: kvr
 spec:
-{%- if runtime_class %}
+{%- if runtime_class_override | default(none) %}
+  runtimeClassName: {{ runtime_class_override }}
+{%- elif runtime_class %}
   runtimeClassName: {{ runtime_class }}
 {%- endif %}
 {%- if host_network | default(false) %}

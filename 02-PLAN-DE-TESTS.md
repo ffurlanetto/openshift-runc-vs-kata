@@ -120,7 +120,7 @@ Colonne **Prio** : P1 = obligatoire pour la décision, P2 = important, P3 = si l
 | FUN-27 | Drain / cordon / PodDisruptionBudget, reschedule sur un autre nœud | Identique | B | P2 |
 | FUN-28 | GPU / device plugin (si cas d'usage) | Limite attendue, nécessite configuration spécifique | B | P3 |
 | FUN-29 | Horloge / timezone / NTP dans le pod (dérive de l'horloge invitée) | Pas de dérive significative | A | P3 |
-| FUN-30 | `hostNetwork`, `hostPID`, `hostIPC` | Non supporté / sans effet attendu avec Kata | A | P1 |
+| FUN-30 | `hostNetwork`, `hostPID`, `hostIPC` | Non supporté avec Kata. **Constat ENV-A : le pod Kata en hostNetwork a rendu le nœud injoignable.** Par défaut, Kata n'est vérifié que par dry-run d'admission ; pod réel seulement avec `--allow-destructive` (cluster jetable) | A | P1 |
 
 ### 6.2 Performance (PERF) — « combien ça coûte ? »
 
@@ -216,6 +216,7 @@ Tous les scénarios sont exécutés **uniquement sur les environnements de test*
 | POL-15 | FUN | **Dépassement CPU à l'exécution** : 4 threads actifs sous une limite de 500m, consommation réelle mesurée | ≤ limite | ≤ limite ? (cgroup de la VM, vCPU) | A/B | P1 |
 | POL-16 | FUN | **Dépassement ephemeral-storage** : écriture de 300 Mi sous une limite de 100 Mi, éviction attendue | Évincé | Évincé ? (écritures via la VM) | A | P1 |
 | POL-17 | SEC | **Privilèges effectifs** d'un pod conforme : UID ≠ 0, NoNewPrivs, CapEff = 0, seccomp actif, /etc en lecture seule | PASS | PASS (appliqués par l'agent Kata) | A | P1 |
+| POL-18 | SEC | **Garde-fou hostNetwork** (issu de FUN-30) : policy `disallow-hostnetwork-kata` ; un pod `hostNetwork` reste admis en runc, est refusé avec une RuntimeClass Kata (dry-run uniquement) | Admis | Refusé | A | P1 |
 
 Le dépassement de la limite mémoire est couvert par FUN-17.
 

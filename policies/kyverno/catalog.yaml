@@ -131,6 +131,19 @@ policies:
             && c.securityContext.privileged == true)
           || (has(object.spec.runtimeClassName) && object.spec.runtimeClassName == '{{ kata_rc }}')
 
+  disallow-hostnetwork-kata:
+    title: Pas de hostNetwork / hostPID / hostIPC avec Kata
+    # Constat ENV-A (FUN-30) : un pod Kata en hostNetwork a rendu le nœud injoignable.
+    # Toutes les RuntimeClass dont le nom commence par « kata » sont visées (kata, kata-qemu…).
+    validations:
+      - message: "hostNetwork/hostPID/hostIPC interdits avec une RuntimeClass Kata (risque de perte du nœud)"
+        expression: >-
+          !(has(object.spec.runtimeClassName)
+            && (object.spec.runtimeClassName == '{{ kata_rc }}' || object.spec.runtimeClassName.startsWith('kata')))
+          || !((has(object.spec.hostNetwork) && object.spec.hostNetwork)
+               || (has(object.spec.hostPID) && object.spec.hostPID)
+               || (has(object.spec.hostIPC) && object.spec.hostIPC))
+
   require-kata:
     title: RuntimeClass Kata obligatoire dans le namespace
     validations:
