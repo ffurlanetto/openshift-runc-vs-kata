@@ -52,7 +52,7 @@ Validé par `schemas/result.schema.json`. Exemple :
 
 Règles :
 - `status` ∈ `PASS | FAIL | PARTIAL | NOT_SUPPORTED | BLOCKED | N/A`.
-- `aspect` ∈ `FUN | PERF | SEC | OPS`. Obligatoire pour les catégories transverses `DIND` et `AGT`, qui mélangent les trois aspects.
+- `aspect` ∈ `FUN | PERF | SEC | OPS`. Obligatoire pour les catégories transverses `DIND`, `AGT`, `VOL` et `SCR`, qui mélangent les trois aspects.
 - Pour `DIND` : champs `variant` (`V1-dind-privileged`, `V2-dind-rootless`, `V3-buildah`, `V4-buildkit-rootless`), `ci_platform` (`jenkins`, `github-arc-dind`, `github-arc-k8s`), `project` (`P-JAVA`, `P-NODE`…) et, pour la perf, une métrique par étape du pipeline (`stage_<nom>_duration`, en s).
 - Pour `AGT` : champ `agent_mode` (`llm` ou `replay`) ; en mode `llm`, ajouter `llm_model` et `tokens` (in/out) pour séparer le coût LLM du coût runtime.
 - Chaque métrique porte son **unité** et son sens (`better: lower|higher`).
@@ -169,7 +169,7 @@ Chaque ligne est **appuyée par au moins un ID de test** ; une affirmation non t
 | runc | … (IDs) | … (IDs) | … (IDs) | … |
 | Kata | … (IDs) | … (IDs) | … (IDs) | … |
 
-## 6 bis. Fiche de décision par cas d'usage (DIND, AGT)
+## 6 bis. Fiche de décision par cas d'usage (DIND, AGT, VOL, SCR)
 
 Une fiche par cas d'usage, une page maximum :
 
@@ -198,7 +198,7 @@ Règle : la fiche AGT distingue toujours **ce que Kata apporte** (évasion vers 
 2. Barres groupées des débits (CPU, mémoire, disque, réseau) normalisés runc = 100.
 3. Courbe densité : mémoire nœud consommée vs nombre de pods.
 4. Courbe latence HTTP p99 vs charge (VU).
-5. Matrice de chaleur des statuts FUN/SEC/DIND/AGT (lignes = tests, colonnes = runtime).
+5. Matrice de chaleur des statuts FUN/SEC/DIND/AGT/VOL/SCR (VOL : une ligne par backend ; SCR : une ligne par fournisseur) (lignes = tests, colonnes = runtime).
 6. Agents : barres empilées de la durée d'une tâche (temps LLM / temps outils / overhead sandbox), runc vs kata.
 7. CI : barres empilées de la durée du pipeline par étape (checkout, compilation, tests, `docker build`, push), runc vs kata, par plateforme (Jenkins / GitHub).
 8. Agents : latence de mise à disposition d'une sandbox (froid vs warm pool) et densité.

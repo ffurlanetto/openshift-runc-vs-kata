@@ -81,6 +81,8 @@ Chaque résultat indique l'environnement. **Un chiffre de performance issu d'ENV
 | PREP-12 | Kyverno présent (existant sur le cluster, ou `./setup kyverno` sur un cluster de test) | Détecté par `./precheck --phases POL` |
 | PREP-13 | Site airgappé : images et charts disponibles dans le miroir (`./run --print-images`), règles de réécriture et secret de pull dans `campaign.yaml`, index PyPI miroir (`KVR_PYPI_INDEX`) | Contrôle « images » du precheck OK |
 | PREP-11 | Harnais « agent rejoué » : script déterministe qui rejoue une séquence d'appels d'outils (y compris malveillants) sans LLM, pour des tests de sécurité reproductibles | Séquence de référence exécutée en runc et kata |
+| PREP-14 | Backends de stockage (VOL) déclarés dans `campaign.yaml` (`backends.storage`) : StorageClass local, NFS, CIFS, S3 CSI ; endpoint et bucket S3 ; identifiants par **référence** à des Secrets existants. ENV-A : serveurs NFS, Samba et MinIO + drivers CSI déployés par `./setup storage` (cluster de test seulement) | `./precheck --phases VOL` : chaque backend monté par un pod de test |
+| PREP-15 | Fournisseurs de secrets (SCR) déclarés dans `campaign.yaml` (`backends.secrets`) : Vault (adresse, CA, méthode d'auth, rôle, chemin de test), Conjur (URL, compte, authentificateur, *host*), Secrets Store CSI Driver, injector et opérateurs présents. ENV-A : Vault dev et Conjur OSS par `./setup secrets` | `./precheck --phases SCR` : lecture d'un secret de test par fournisseur |
 
 ## 6. Catalogue de tests
 
@@ -308,6 +310,80 @@ Note : la plupart des contrôles de sécurité AGT (egress, secrets, RBAC) **ne 
 | AGT-18 | SEC | Fuite entre sessions : une sandbox recyclée par le warm pool contient-elle des données d'un utilisateur précédent ? | Aucune donnée | Aucune donnée | A | P1 |
 | AGT-19 | SEC | Traçabilité : les commandes de l'agent sont-elles auditées (audit log API pour `exec`, logs de l'agent, détection runtime Falco/RHACS) ? | Visible | Angle mort probable côté nœud | A/B | P1 |
 | AGT-20 | SEC | Arrêt d'urgence : délai entre `delete sandbox` et l'arrêt effectif de tous les processus de l'agent, y compris ceux qui ignorent SIGTERM | Mesuré | Mesuré (arrêt de la VM) | A | P1 |
+
+### 6.9 Volumes et stockage (VOL)
+
+**Enjeu** : avec runc, un volume monté par le kubelet est visible tel quel dans le conteneur. Avec Kata, le volume est monté **sur le nœud**, puis transmis à la VM. Le transport dépend du mode du volume :
+- `Filesystem` : partage **virtio-fs**. Chaque accès traverse le démon `virtiofsd` ; la sémantique POSIX peut changer (verrous, xattr, inotify, mmap). ENV-A a déjà montré la perte des xattr (DIND) et l'échec d'overlay.
+- `Block` : périphérique **virtio-blk** branché à chaud dans la VM ; le système de fichiers est monté par le noyau invité.
+- Volumes montés **par le pod lui-même** (NFS, CIFS, FUSE) : le montage a lieu dans le noyau invité. Il faut les modules dans ce noyau et `/dev/fuse` dans la VM (constat ENV-A : non fourni par défaut).
+
+**Backends testés** :
+
+| Backend | Accès | ENV-A (CRC, banc) | Cluster distant |
+|---|---|---|---|
+| **local** | PV `local` / hostpath-provisioner (Filesystem) ; LVMS / TopoLVM (Block et Filesystem) | `kubevirt-hostpath-provisioner` de CRC ; LVMS si un disque est disponible | StorageClass locale existante |
+| **NFS** | CSI `csi-driver-nfs` (RWX) ; montage NFS dans le pod | Serveur NFS dans le cluster + CSI | Serveur NFS d'entreprise + StorageClass existante |
+| **CIFS / SMB** | CSI `csi-driver-smb` (RWX, identifiants dans un Secret) ; montage CIFS dans le pod | Serveur Samba dans le cluster + CSI | Partage SMB d'entreprise (AD) + StorageClass existante |
+| **S3** | (a) SDK / API, sans volume ; (b) CSI FUSE (Mountpoint for S3 CSI ou `csi-s3`), FUSE **sur le nœud** ; (c) FUSE **dans le pod** (`s3fs`, `rclone mount`) | MinIO dans le cluster | Endpoint S3 d'entreprise (ou ODF/NooBaa) |
+
+Les identifiants des backends ne sont **jamais** dans le dépôt. `campaign.yaml` ne référence que des Secrets existants (voir PREP-14).
+
+| ID | Aspect | Test | Attendu runc | Attendu Kata | Env | Prio |
+|---|---|---|---|---|---|---|
+| VOL-01 | FUN | **Matrice de base**, pour chaque backend et chaque mode d'accès : provisionnement, montage, écriture et relecture (somme de contrôle), redémarrage du pod puis relecture | OK | À vérifier par backend | A | P1 |
+| VOL-02 | FUN | **Droits** : `runAsUser` arbitraire (SCC `restricted-v2`), `fsGroup` + `fsGroupChangePolicy`, `root_squash` NFS, `uid`/`gid`/`file_mode` CIFS, contexte SELinux (`seLinuxMount`, `context=`) | OK | À vérifier (traduction des droits par virtio-fs) | A | P1 |
+| VOL-03 | FUN | **Partage RWX simultané** entre un pod runc et un pod Kata (NFS, CIFS, S3 CSI) : visibilité des écritures et délai, `inotify` sur des changements faits par l'autre pod | Visibles | Visibles ; `inotify` probablement aveugle aux écritures externes | A | P1 |
+| VOL-04 | FUN | **Verrous** entre deux pods : `flock`, `fcntl` (POSIX), verrous d'octets ; SQLite sur volume partagé | Conformes au backend | À vérifier (verrous traversant virtio-fs) | A | P1 |
+| VOL-05 | FUN | **Sémantique POSIX** sur chaque backend : `fsync`, `O_DIRECT`, `mmap` partagé, `rename` atomique, liens durs et symboliques, xattr, fichiers creux, noms longs ou non ASCII | Référence | Écarts listés | A | P1 |
+| VOL-06 | FUN | **Cycle de vie CSI** : extension en ligne, snapshot et clone (si le driver le permet), replanification sur un autre nœud, suppression du pod pendant des écritures | OK | À vérifier (extension visible dans la VM ?) | A/B | P2 |
+| VOL-07 | FUN | **Volume `Block`** (LVMS / TopoLVM, ou `local` en mode bloc) : `mkfs` et montage dans le pod, I/O directes | OK | Périphérique virtio-blk dans la VM | A | P2 |
+| VOL-08 | FUN | **Montage dans le pod**, sans CSI : `mount -t nfs`, `mount -t cifs`, `s3fs` / `rclone mount` (FUSE) ; privilèges nécessaires dans chaque runtime | Exige des privilèges sur le nœud | Modules NFS/CIFS du noyau invité ? `/dev/fuse` absent (constat ENV-A) | A | P2 |
+| VOL-09 | FUN | **S3 par API** (`aws s3`, `mc`) : envoi multipart d'un gros objet, CA d'entreprise, proxy ; référence indépendante du runtime | OK | Identique | A | P2 |
+| VOL-10 | PERF | **Débit et latence par backend** (`fio`) : séquentiel 1M, aléatoire 4k, latence p99 ; **métadonnées** (création, `stat`, suppression de 10 000 petits fichiers) ; `git clone` et `npm ci` sur le volume | Référence | Δ par backend (surcoût de virtio-fs) | A/B | P1 |
+| VOL-11 | PERF | **Démarrage** : délai jusqu'à Ready avec 0, 1 et 5 volumes de chaque type | Référence | Δ mesuré | A/B | P2 |
+| VOL-12 | SEC | **Visibilité des autres montages** depuis un pod compromis (privilégié) : autres PVC du nœud, répertoires du kubelet, montages NFS/CIFS d'autres pods | Tous accessibles | Seulement les volumes du pod (vérifier) | A | P1 |
+| VOL-13 | SEC | **Identifiants des backends** : CIFS (Secret du CSI), clés S3, Kerberos. Où se trouvent-ils (nœud, pod), qui peut les lire, présence dans `oc describe`, dans les événements et dans `/proc/mounts` | Selon le mode | Idem ; en montage dans le pod, les identifiants sont dans la VM | A | P1 |
+| VOL-14 | FUN | **Propagation de montage** (`mountPropagation: HostToContainer` / `Bidirectional`), utilisée par certains agents de stockage et de sécurité | OK | Limite attendue | A | P3 |
+| VOL-15 | OPS | **Perte du serveur** NFS / CIFS / S3 pendant des I/O (montage `hard`), puis retour : état du pod, suppression possible, impact sur la VM et sur le nœud, reprise | Processus bloqués (état D) | À mesurer (pod bloqué en `Terminating` ?) | A | P1 |
+
+Liens : FUN-02 à FUN-06 (volumes génériques), PERF-10 (I/O `emptyDir` et PVC). Les tests VOL les approfondissent par backend.
+
+### 6.10 Secrets (SCR)
+
+**Enjeu** : un secret natif monté en volume est stocké en **tmpfs sur le nœud**. Avec Kata, il est en plus **copié dans la VM** : l'agent Kata surveille ces montages et recopie les mises à jour. Cette copie a des limites (nombre et taille des fichiers, à vérifier selon la version) au-delà desquelles Kata revient à virtio-fs. Un gestionnaire externe (Vault, Conjur) ajoute ses propres chemins : sidecar qui écrit dans un `emptyDir`, driver CSI qui écrit **sur le nœud**, ou synchronisation vers un Secret natif. Le runtime peut changer leur comportement : propagation des rotations, mémoire de la VM consommée par le sidecar, `exec` dans le conteneur.
+
+**Kata ne protège pas les secrets contre l'administrateur du nœud** : ils restent lisibles dans le tmpfs du nœud et dans la mémoire de la VM. Seuls les *confidential containers* (VM chiffrées) changent ce point. Les tests le vérifient au lieu de le supposer.
+
+**Fournisseurs testés** :
+
+| Fournisseur | Modes d'intégration | Authentification de la charge | ENV-A (CRC, banc) | Cluster distant |
+|---|---|---|---|---|
+| **Secret Kubernetes natif** | variable d'environnement, volume, volume projeté, `subPath`, secret immuable | — | — | — |
+| **HashiCorp Vault** | Vault Agent Injector (init + sidecar) ; Vault CSI Provider (Secrets Store CSI Driver) ; Vault Secrets Operator ou External Secrets Operator (synchronisation vers un Secret natif) | méthode `kubernetes` (token de ServiceAccount) ou `jwt` | Vault en mode dev (Helm) + injector + CSI provider | Instance d'entreprise, *namespace* et rôle de test dédiés |
+| **CyberArk Conjur** | Secrets Provider for Kubernetes : init, sidecar, modes « K8s Secrets » et « Push to File » ; Conjur CSI Provider ; External Secrets Operator ; Secretless Broker (P3) | `authn-jwt` (token de ServiceAccount) ; `authn-k8s` (certificat **injecté dans le conteneur par `exec`**) | Conjur OSS (Helm), si les images existent en arm64 (sinon ENV-B seulement) | Conjur Enterprise ou Cloud, *host* et *policy* de test dédiés |
+
+Chaque test SCR-10 à SCR-18 (aspect OPS = robustesse en cas de panne) est exécuté **pour Vault et pour Conjur** (variantes du plan), et pour chaque mode d'intégration supporté.
+
+| ID | Aspect | Test | Attendu runc | Attendu Kata | Env | Prio |
+|---|---|---|---|---|---|---|
+| SCR-01 | FUN | **Secret natif, tous les modes** : variable d'environnement, volume, projeté, `subPath`, `items`, `optional`, immuable ; contenu binaire et taille proche de 1 MiB ; contenu identique octet par octet | OK | OK, à vérifier pour les gros secrets | A | P1 |
+| SCR-02 | FUN | **Rotation d'un secret natif** : délai de propagation dans le volume ; `subPath` et variables d'environnement non mis à jour (attendu dans les deux runtimes) ; secret avec beaucoup de clés ou volumineux (au-delà des limites de copie de l'agent Kata) | Délai du kubelet (≤ 1–2 min) | Délai du kubelet + copie de l'agent ; repli virtio-fs au-delà des limites | A | P1 |
+| SCR-03 | FUN | **Token de ServiceAccount projeté** : audience, `expirationSeconds: 600`, rotation du fichier, utilisation par Vault et Conjur (`jwt`) | Rotation OK | Rotation propagée dans la VM ? | A | P1 |
+| SCR-04 | SEC | **Où vit le secret** : tmpfs du nœud, mémoire de la VM, variables d'environnement visibles dans `/proc/<pid>/environ` depuis le nœud ; lisibilité par un administrateur du nœud | Lisible depuis le nœud | **Lisible aussi** (tmpfs du nœud, mémoire de QEMU) : Kata ne protège pas contre le nœud | A | P1 |
+| SCR-05 | SEC | **Collecte depuis un pod privilégié** du même nœud : lecture des secrets des autres pods (`/var/lib/kubelet/pods/*/volumes/kubernetes.io~secret`, `~csi`). Matrice attaquant runc / Kata × victime runc / Kata | Attaquant runc : tous lus | Attaquant Kata : aucun (frontière VM). Victime Kata attaquée depuis runc : lue | A | P1 |
+| SCR-06 | SEC | **Exposition dans le pod** : un conteneur applicatif peut-il lire le token du sidecar (Vault Agent, Conjur) ; `shareProcessNamespace` ; fuite dans les logs, dans `oc describe` et dans les événements | Selon la configuration | Identique | A | P2 |
+| SCR-10 | FUN | **Injection par sidecar / init** : Vault Agent Injector (annotations, template) ; Conjur Secrets Provider en init et en sidecar (Push to File). Le webhook mute le pod Kata ; le fichier est rendu dans un `emptyDir` en mémoire | OK | OK attendu ; **mémoire de la VM** à prévoir pour le sidecar (constat ENV-A n° 2) | A | P1 |
+| SCR-11 | FUN | **Secrets Store CSI Driver** (Vault CSI Provider, Conjur CSI Provider) : montage, synchronisation optionnelle vers un Secret natif, **rotation** (`enableSecretRotation`) : propagation jusqu'au processus | OK | Écriture sur le nœud, puis virtio-fs : propagation à mesurer | A | P1 |
+| SCR-12 | FUN | **Synchronisation vers un Secret natif** : Vault Secrets Operator, External Secrets Operator, Conjur « K8s Secrets » ; redémarrage automatique du Deployment lors d'une rotation | OK | Identique (retour au cas natif SCR-02) | A | P2 |
+| SCR-13 | FUN | **Authentification de la charge** : Vault `kubernetes` et `jwt` ; Conjur `authn-jwt` et **`authn-k8s`**, dont le certificat est injecté par `exec` dans le conteneur (chemin `exec` différent avec Kata) | OK | `authn-k8s` à vérifier en priorité | A | P1 |
+| SCR-14 | FUN | **Rotation et secrets dynamiques** : secret KV modifié, identifiants de base de données dynamiques (Vault) ou rotation de mot de passe (Conjur), sur plus de 2 TTL ; renouvellement des baux | Valeur à jour dans le délai configuré | Idem, délai mesuré | A | P1 |
+| SCR-15 | PERF | **Coût au démarrage** : délai jusqu'à Ready en natif, avec injector, avec CSI et avec synchronisation ; latence d'obtention du secret ; mémoire ajoutée par le sidecar | Référence | Δ mesuré (sidecar = mémoire de VM en plus) | A/B | P1 |
+| SCR-16 | SEC | **Moindre privilège** : un pod du rôle A ne lit pas les chemins du rôle B ; un ServiceAccount volé dans un autre namespace est refusé ; journal d'audit Vault / Conjur rattaché à l'identité du pod | Refusé, audité | Identique | A | P1 |
+| SCR-17 | SEC | **Rémanence** : après suppression du pod, le secret reste-t-il sur le nœud (tmpfs, cache CSI, `emptyDir`) ou dans la mémoire libérée ? | Nettoyé | Nettoyé (arrêt de la VM) | A | P2 |
+| SCR-18 | OPS | **Indisponibilité** du fournisseur (Vault scellé ou arrêté, Conjur arrêté) au démarrage du pod et pendant son exécution : blocage de l'init, dernière valeur conservée par le sidecar, reprise | Comportement documenté | Identique attendu | A | P1 |
+
+Liens : FUN-04 (mise à jour à chaud des ConfigMap et Secret), SEC-12 (isolation des secrets entre pods), AGT-13 (clé d'API de l'agent), DIND-16 (secrets de CI).
 
 ## 7. Critères d'évaluation et pondération (proposition à valider par le comité)
 

@@ -13,7 +13,7 @@ Volets évalués : **fonctionnel, performance, sécurité, policies d'admission 
 
 | Phase | Statut |
 |---|---|
-| Plan de tests : 131 tests, dont 88 P1 | ✅ v0.2, en revue |
+| Plan de tests : 161 tests, dont 109 P1 (VOL et SCR ajoutés) | ✅ v0.2, en revue |
 | Format de rapport | ✅ v0.2 |
 | Banc automatisé (`./precheck`, `./run`, `./setup`) | ✅ 23 tests automatisés (FUN, PERF, SEC, POL) |
 | Environnement A (OpenShift Local arm64, nested virt) | ✅ Kata 4.4.0 + Kyverno 1.20.0 opérationnels |
@@ -37,7 +37,7 @@ Prérequis du poste : `bash`, `git`, `kubectl`, `uv`, plus `helm` pour `./setup`
 ```bash
 ./precheck                          # choisir le contexte kube dans la liste, puis contrôle de tous les prérequis
 ./run                               # precheck + campagne complète (confirmation de la cible demandée)
-./run --phases FUN,SEC,POL          # seulement certaines phases (FUN PERF SEC POL OPS DIND AGT)
+./run --phases FUN,SEC,POL          # seulement certaines phases (FUN PERF SEC POL OPS DIND AGT VOL SCR)
 ./run --skip PERF                   # toutes les phases sauf…
 ./run --tests PERF-01 --runs 10     # tests précis
 ./run --priority P1 --runtimes runc # sous-ensemble

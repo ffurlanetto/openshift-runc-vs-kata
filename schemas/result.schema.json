@@ -20,7 +20,7 @@
     },
     "test_id": {
       "type": "string",
-      "pattern": "^(PREP|FUN|PERF|SEC|POL|OPS|LIM|DIND|AGT)-[0-9]{2}$"
+      "pattern": "^(PREP|FUN|PERF|SEC|POL|OPS|LIM|DIND|AGT|VOL|SCR)-[0-9]{2}$"
     },
     "category": {
       "enum": [
@@ -32,7 +32,9 @@
         "OPS",
         "LIM",
         "DIND",
-        "AGT"
+        "AGT",
+        "VOL",
+        "SCR"
       ]
     },
     "title": {

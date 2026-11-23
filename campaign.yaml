@@ -27,6 +27,20 @@ profiles:
   #   kata_version: "OSC 1.13.1"
   #   kata_runtime_class: kata
   #   node_selector: {kvr/bench: "true"}   # kubectl label node <nœud> kvr/bench=true
+  #   backends:                            # phases VOL et SCR (PREP-14/15). Aucun identifiant ici :
+  #     storage:                           # seulement des références à des Secrets existants.
+  #       local: {storage_class: lvms-vg1, block: true}
+  #       nfs:   {storage_class: nfs-csi, server: nfs.example, export: /exports/kvr}   # server/export : montage dans le pod (VOL-08)
+  #       cifs:  {storage_class: smb-csi, share: //smb.example/kvr, credentials: {namespace: kvr-secrets, secret: smb-creds}}
+  #       s3:    {storage_class: s3-csi, endpoint: https://s3.example, bucket: kvr-bench, ca_configmap: null,
+  #               credentials: {namespace: kvr-secrets, secret: s3-creds}}             # clés AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
+  #     secrets:
+  #       vault:  {address: https://vault.example:8200, ca_configmap: null, namespace: kvr, auth: kubernetes,
+  #                auth_mount: kubernetes-kvr, role: kvr-bench, kv_path: kvr/data/bench,
+  #                modes: [injector, csi, vso]}                                         # modes réellement installés
+  #       conjur: {url: https://conjur.example, account: org, authenticator: authn-jwt/kvr,
+  #                host_id: host/kvr/bench, variable: kvr/bench/password,
+  #                modes: [secrets-provider-init, secrets-provider-sidecar, csi]}
   # https://k8s-bench.example:6443:
   #   env_id: ENV-C
   #   description: Kubernetes vanilla, Kata via kata-deploy
@@ -34,7 +48,7 @@ profiles:
   #   node_selector: {kvr/bench: "true"}
 
 # Phases = catégories du plan de tests. Activables / désactivables au lancement.
-phases: [FUN, PERF, SEC, POL, OPS, DIND, AGT]
+phases: [FUN, PERF, SEC, POL, OPS, DIND, AGT, VOL, SCR]
 
 # Registres : miroir (Artifactory…) et secret de pull. Réglage global, surchargeable par profil
 # (clé `registry` dans un profil). Laisser mirrors vide si le cluster gère déjà le miroir
