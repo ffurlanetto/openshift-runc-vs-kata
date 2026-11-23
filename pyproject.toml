@@ -1,0 +1,15 @@
+[project]
+name = "kata-vs-runc-bench"
+version = "0.1.0"
+description = "Agrégation des résultats et génération du rapport comité runc vs Kata"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=6",
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+    "jinja2>=3.1",
+    "jsonschema>=4.23",
+]
+
+[tool.uv]
+package = false

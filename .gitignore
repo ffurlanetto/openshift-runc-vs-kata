@@ -1,0 +1,30 @@
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+
+# OS / éditeurs
+.DS_Store
+.idea/
+.vscode/
+
+# Secrets et accès cluster : ne jamais commiter
+kubeconfig*
+*.kubeconfig
+*kubeadmin-password*
+*.pem
+*.key
+id_*
+.env
+.env.*
+secrets/
+*-secret.yaml
+*pull-secret*
+
+# Artefacts volumineux (à publier en pièce jointe de release)
+*.tar
+*.tar.gz
+*.tgz
+must-gather*/
+report/*.pdf
+report/*.docx

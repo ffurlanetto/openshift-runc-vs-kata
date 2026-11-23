@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kata-vs-runc/result.schema.json",
+  "title": "Résultat brut d'un run de test runc vs Kata",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "test_id",
+    "category",
+    "runtime",
+    "run",
+    "env",
+    "started_at",
+    "status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "test_id": {
+      "type": "string",
+      "pattern": "^(PREP|FUN|PERF|SEC|OPS|LIM|DIND|AGT)-[0-9]{2}$"
+    },
+    "category": {
+      "enum": [
+        "PREP",
+        "FUN",
+        "PERF",
+        "SEC",
+        "OPS",
+        "LIM",
+        "DIND",
+        "AGT"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "runtime": {
+      "enum": [
+        "runc",
+        "kata"
+      ]
+    },
+    "run": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "env": {
+      "type": "object",
+      "required": [
+        "id",
+        "platform",
+        "arch"
+      ],
+      "properties": {
+        "id": {
+          "enum": [
+            "ENV-A",
+            "ENV-B",
+            "ENV-C"
+          ]
+        },
+        "platform": {
+          "type": "string"
+        },
+        "arch": {
+          "enum": [
+            "amd64",
+            "arm64",
+            "s390x"
+          ]
+        },
+        "node": {
+          "type": "string"
+        },
+        "nested_virt": {
+          "type": "boolean"
+        },
+        "kata_version": {
+          "type": "string"
+        },
+        "hypervisor": {
+          "type": "string"
+        },
+        "crio_version": {
+          "type": "string"
+        }
+      }
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_s": {
+      "type": "number",
+      "minimum": 0
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "PARTIAL",
+        "NOT_SUPPORTED",
+        "BLOCKED",
+        "N/A"
+      ]
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "value",
+          "unit",
+          "better"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "better": {
+            "enum": [
+              "lower",
+              "higher"
+            ]
+          }
+        }
+      }
+    },
+    "observations": {
+      "type": "string"
+    },
+    "workaround": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "operator": {
+      "type": "string"
+    },
+    "aspect": {
+      "enum": [
+        "FUN",
+        "PERF",
+        "SEC",
+        "OPS"
+      ]
+    },
+    "variant": {
+      "enum": [
+        "V1-dind-privileged",
+        "V2-dind-rootless",
+        "V3-buildah",
+        "V4-buildkit-rootless"
+      ]
+    },
+    "agent_mode": {
+      "enum": [
+        "llm",
+        "replay"
+      ]
+    },
+    "llm_model": {
+      "type": "string"
+    },
+    "tokens": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "type": "integer"
+        },
+        "output": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ci_platform": {
+      "enum": [
+        "jenkins",
+        "github-arc-dind",
+        "github-arc-k8s"
+      ]
+    },
+    "project": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "enum": [
+              "DIND",
+              "AGT"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "aspect"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "const": "DIND"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "variant"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "category": {
+            "const": "AGT"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "agent_mode"
+        ]
+      }
+    }
+  ]
+}

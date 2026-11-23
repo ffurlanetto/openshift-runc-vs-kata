@@ -1,0 +1,26 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  results:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Valider les résultats bruts
+        run: uv run scripts/validate_results.py
+      - name: Fichiers trop volumineux dans evidence/
+        run: |
+          big=$(find evidence -type f -size +5M 2>/dev/null || true)
+          if [ -n "$big" ]; then echo "Fichiers > 5 Mo :"; echo "$big"; exit 1; fi
+      - name: Recherche de secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
