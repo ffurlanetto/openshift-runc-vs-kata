@@ -5,6 +5,8 @@ un trou de MTU). Relevé des MTU : interface du pod (OVN-K) vs bridge Docker int
 URL surchargeable (site airgappé) : campaign.yaml › overrides.DIND-06.params.url
 """
 
+import re
+
 from kvr import dind
 
 META = {"id": "DIND-06", "category": "DIND", "aspect": "FUN", "priority": "P1",
@@ -23,13 +25,19 @@ def run(ctx):
     rc, out, err = dind.sh(ctx, f"docker run --rm {base} curl -sS -o /dev/null --max-time 60 "
                                 f"-w '%{{http_code}} %{{time_total}}' {url} 2>&1", timeout_s=300)
     ctx.evidence("nested-curl.txt", f"rc={rc}\n{out}{err}")
-    last = (out.strip().splitlines() or [""])[-1]
-    parts = last.split()
-    code = parts[0] if parts else "000"
-    reachable = code not in ("", "000")
+    # Sortie curl attendue en dernière ligne : "<code http> <secondes>". Toute autre forme = le conteneur
+    # imbriqué n'a pas démarré (ex. overlay refusé) : on rapporte l'erreur Docker, pas un faux code HTTP.
+    lines = [l.strip() for l in (out + err).strip().splitlines() if l.strip()]
+    m = next((re.fullmatch(r"(\d{3}) ([\d.]+)", l) for l in reversed(lines) if re.fullmatch(r"\d{3} [\d.]+", l)), None)
+    reachable = bool(m) and m.group(1) != "000"
+    started = m is not None
     ctx.metric("nested_https_ok", int(reachable), "bool", "higher")
-    if reachable and len(parts) > 1:
-        ctx.metric("nested_https_time", round(float(parts[1]) * 1000), "ms", "lower")
-    ctx.observe(f"{ctx.variant} : MTU pod={pod_mtu.strip()} bridge docker={bridge_mtu.strip() or '1500 (défaut)'} ; "
-                f"HTTPS depuis un conteneur imbriqué : {'OK' if reachable else 'ÉCHEC'} ({last[:120]})")
+    if reachable:
+        ctx.metric("nested_https_time", round(float(m.group(2)) * 1000), "ms", "lower")
+    if started:
+        detail = f"HTTPS depuis un conteneur imbriqué : {'OK' if reachable else 'ÉCHEC'} (code {m.group(1)})"
+    else:
+        cause = next((l for l in lines if "Error response from daemon" in l or l.startswith("docker:")), lines[-1] if lines else "?")
+        detail = f"conteneur imbriqué NON démarré (rc={rc}) : {cause[:220]}"
+    ctx.observe(f"{ctx.variant} : MTU pod={pod_mtu.strip()} bridge docker={bridge_mtu.strip() or '1500 (défaut)'} ; {detail}")
     return "PASS" if reachable else "FAIL"
