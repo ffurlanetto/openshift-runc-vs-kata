@@ -1,0 +1,20 @@
+# Valeurs kata-deploy pour le banc (cluster de TEST). Chart et version : campaign.yaml › charts.kata-deploy
+# Hyperviseurs : qemu (runtime Go, RuntimeClass kata-qemu) et qemu-runtime-rs (runtime Rust, défaut de Kata 4).
+# RuntimeClass « kata » créée et pointée sur le shim par défaut, pour rester aligné avec OSC.
+shims:
+  disableAll: true
+  qemu:
+    enabled: true
+  qemu-runtime-rs:
+    enabled: true
+defaultShim:
+  amd64: qemu-runtime-rs
+  arm64: qemu-runtime-rs
+runtimeClasses:
+  enabled: true
+  createDefault: true
+  defaultName: kata
+  overheadEnabled: true
+# RHCOS est en SELinux enforcing : module de politique Kata pour les étapes d'installation.
+selinux:
+  enabled: true

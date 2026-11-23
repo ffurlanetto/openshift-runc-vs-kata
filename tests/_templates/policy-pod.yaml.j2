@@ -1,6 +1,7 @@
 {#- Pod « bonnes pratiques » ; chaque clé de `v` (violations) introduit un seul écart.
     kind=Pod ou Deployment : même spec, pour tester les règles autogen des contrôleurs. -#}
 {%- set v = violations | default({}) -%}
+{%- set kind = kind | default("Pod") -%}
 {%- macro pod_spec(indent) -%}
 {%- filter indent(indent, first=True) %}
 {%- if runtime_class and not v.get("no_runtime_class") %}
@@ -55,7 +56,7 @@ volumes:
 {%- endif %}
 {%- endfilter %}
 {%- endmacro -%}
-{%- if kind | default("Pod") == "Deployment" %}
+{%- if kind == "Deployment" %}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
