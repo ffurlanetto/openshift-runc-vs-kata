@@ -65,12 +65,19 @@ def run(ctx):
     rc, out, err = escape.run_sh(ctx, "nodecheck", NODE_PREP, tok, timeout_s=60)
     assert "PREP ok" in out, f"préparation côté nœud en échec : {err[-200:]}"
     shared = [{"path": f"/var/tmp/kvr-sec05-{tok}", "mount": "/shared", "ro": False}]
-    pod_out = {}
+    pod_out, start_notes = {}, {}
     root_out, root_note, node_out = "", "", ""
     try:
+        start_notes = {}
         for variant, se in (("defaut", None), ("spc", "spc_t")):
-            escape.deploy(ctx, f"hp-{variant}", run_as_user=0, allow_pe=False, node_name=node, se_type=se,
-                          host_paths=shared)
+            try:
+                escape.deploy(ctx, f"hp-{variant}", run_as_user=0, allow_pe=False, node_name=node, se_type=se,
+                              timeout_s=150, host_paths=shared)
+            except Exception as e:  # ex. Kata + SELinux par défaut : création du conteneur refusée (EACCES)
+                start_notes[variant] = "pod non démarré"
+                pod_out[variant] = ""
+                ctx.evidence(f"start-{variant}.txt", str(e)[-1500:])
+                continue
             rc, pod_out[variant], err = escape.run_sh(ctx, f"hp-{variant}", POD_SIDE, tok, variant, timeout_s=120)
         try:
             escape.deploy(ctx, "hostroot", run_as_user=0, allow_pe=False, node_name=node, se_type="spc_t",
@@ -96,11 +103,15 @@ def run(ctx):
     ctx.metric("hostpath_read", int(read), "bool", "lower")
     ctx.metric("hostpath_write_seen_on_node", int(seen), "bool", "lower")
     ctx.metric("hostpath_access_default_selinux", int(d_read and d_write and d_seen), "bool", "lower")
+    ctx.metric("hostpath_default_selinux_pod_started", int("defaut" not in start_notes), "bool", "lower")
     ctx.metric("node_sensitive_files_readable", len(readable), "count", "lower")
     ctx.observe(f"{ctx.runtime} : hostPath avec spc_t : lu={'oui' if read else 'non'}, écriture vue par le nœud="
-                f"{'oui' if seen else 'non'} (propriétaire côté nœud {kv(node_out, 'OWNER_spc')}) ; avec le SELinux "
-                f"par défaut ({kv(pod_out.get('defaut', ''), 'LABEL')}) : lu={'oui' if d_read else 'non'}, "
-                f"écrit={'oui' if d_write else 'non'} ; type de montage {kv(pod_out.get('spc', ''), 'FSTYPE')} ; "
+                f"{'oui' if seen else 'non'} (propriétaire côté nœud {kv(node_out, 'OWNER_spc')}"
+                f"{', ' + start_notes['spc'] if 'spc' in start_notes else ''}) ; avec le SELinux "
+                f"par défaut ({kv(pod_out.get('defaut', ''), 'LABEL')}) : "
+                + (f"{start_notes['defaut']} ; " if 'defaut' in start_notes else
+                   f"lu={'oui' if d_read else 'non'}, écrit={'oui' if d_write else 'non'} ; ")
+                + f"type de montage {kv(pod_out.get('spc', ''), 'FSTYPE')} ; "
                 + (root_note or f"racine du nœud en lecture seule : fichiers sensibles lisibles {readable or 'aucun'}, "
                                 f"écriture refusée={'oui' if kv(root_out, 'ROOTWRITE') == 'non' else 'NON'}")
                 + f" ; résidus : {left}")
