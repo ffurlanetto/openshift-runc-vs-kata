@@ -15,7 +15,8 @@ import base64
 from kvr import dind
 from kvr.context import NotSupported
 
-META = {"id": "DIND-14", "category": "DIND", "aspect": "SEC", "priority": "P1",
+META = {"intrusive": "conteneur privilégié imbriqué qui monte le disque système du nœud (lecture seule, superbloc partagé)",
+        "id": "DIND-14", "category": "DIND", "aspect": "SEC", "priority": "P1",
         "title": "Étape malveillante : accès au disque du nœud", "variants": ["V1-dind-privileged", "V5-dind-privileged-memstore"], "runs": 1,
         "warmup": False}
 

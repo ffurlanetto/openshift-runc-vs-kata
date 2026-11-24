@@ -172,6 +172,7 @@ class TestContext:
             name = name if name.endswith(".json") else name + ".json"
         elif "." not in name:
             name += ".yaml" if name.startswith("manifest") else ".txt"
+        anon = getattr(self, "anonymizer", None)
         path = self.evidence_dir / name
-        path.write_text(content)
+        path.write_text(anon.text(content) if anon else content)
         self.evidence_files.append(str(path.relative_to(self.repo_root)))

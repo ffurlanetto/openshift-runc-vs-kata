@@ -13,7 +13,8 @@ progression reste lisible par un second exec.
 
 import time
 
-META = {"id": "AGT-17", "category": "AGT", "aspect": "SEC", "priority": "P1", "agent_mode": "replay",
+META = {"intrusive": "création en masse de processus (bornée à 6000 et 90 s) : technique de déni de service",
+        "id": "AGT-17", "category": "AGT", "aspect": "SEC", "priority": "P1", "agent_mode": "replay",
         "title": "Multiplication de processus (bornée)", "runs": 1, "warmup": False, "params": {"target": 6000}}
 
 PROGRESS = "/tmp/kvr-agt17"

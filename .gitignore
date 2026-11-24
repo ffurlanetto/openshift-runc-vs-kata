@@ -28,3 +28,4 @@ secrets/
 must-gather*/
 report/*.pdf
 report/*.docx
+.kvr-private/

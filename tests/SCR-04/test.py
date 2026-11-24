@@ -17,7 +17,8 @@ import secrets as pysecrets
 
 from kvr import secrets
 
-META = {"id": "SCR-04", "category": "SCR", "aspect": "SEC", "priority": "P1",
+META = {"intrusive": "pod privilégié hostPID qui lit l'environnement et la mémoire de processus du nœud (pods de test uniquement)",
+        "id": "SCR-04", "category": "SCR", "aspect": "SEC", "priority": "P1",
         "title": "Secret lisible par l'administrateur du nœud ?", "runs": 2, "warmup": False,
         "params": {"max_scan_mib": 4096}}
 

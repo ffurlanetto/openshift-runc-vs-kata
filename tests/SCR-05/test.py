@@ -15,7 +15,8 @@ import secrets as pysecrets
 from kvr import secrets
 from kvr.context import Blocked
 
-META = {"id": "SCR-05", "category": "SCR", "aspect": "SEC", "priority": "P1",
+META = {"intrusive": "pod avec hostPath sur le répertoire du kubelet : recherche des secrets d'autres pods (pods de test uniquement)",
+        "id": "SCR-05", "category": "SCR", "aspect": "SEC", "priority": "P1",
         "title": "Pod compromis : collecte des secrets des autres pods du nœud", "runs": 2, "warmup": False}
 
 

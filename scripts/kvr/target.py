@@ -103,6 +103,8 @@ def build_target(config: dict, ctx_entry: dict, *, env_id: str | None = None,
         "env_id": env_id,
         "description": profile.get("description") or prev.get("description", ""),
         "nested_virt": bool(profile.get("nested_virt", prev.get("nested_virt", False))),
+        # Anonymisation des sorties : toujours active, sauf profil explicitement marqué (cluster jetable)
+        "anonymize": bool(profile.get("anonymize", prev.get("anonymize", True))),
         "kata_version": profile.get("kata_version") or prev.get("kata_version", ""),
         "node_selector": (node_selector if node_selector is not None
                           else profile.get("node_selector", prev.get("node_selector", {}))),

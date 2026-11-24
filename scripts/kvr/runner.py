@@ -7,6 +7,7 @@ import datetime as dt
 import hashlib
 import importlib.util
 import json
+import shutil
 import subprocess
 import sys
 import time
@@ -18,7 +19,7 @@ from types import ModuleType
 import jsonschema
 import yaml
 
-from . import RUNNER_VERSION, components, kyverno, registry
+from . import RUNNER_VERSION, anonymize, components, kyverno, registry
 from .cluster import Cluster, OcError
 from .context import Blocked, NotSupported, TestContext
 
@@ -134,8 +135,15 @@ class Campaign:
     def __init__(self, config: dict, cluster: Cluster, target: dict, plan: list[dict],
                  tests: dict[str, TestDef], allow_dirty: bool = False,
                  replay_of: dict | None = None, precheck: dict | None = None,
-                 allow_destructive: bool = False) -> None:
+                 allow_destructive: bool = False, safe_mode: bool = True,
+                 excluded_intrusive: list[str] | None = None) -> None:
         self.config = config
+        self.safe_mode = safe_mode
+        self.excluded_intrusive = excluded_intrusive or []
+        # Anonymisation de tout ce qui est écrit (dépôt public). Désactivable seulement par profil
+        # (`anonymize: false`), pour un cluster jetable dont les noms ne révèlent rien.
+        self.anon = anonymize.Anonymizer(REPO_ROOT / ".kvr-private" / "anonymization-map.json",
+                                         enabled=target.get("anonymize", True))
         self.allow_destructive = allow_destructive
         self.cluster = cluster
         self.target = target
@@ -167,6 +175,7 @@ class Campaign:
         self.fingerprint["kyverno"] = kyverno.detect(self.cluster)
         self.fingerprint["components"] = components.detect(self.cluster, self.target.get("node_selector"))
         self.nodes_by_name = {n["name"]: n for n in self.fingerprint["nodes"]}
+        self.anon.learn_target(self.target, self.fingerprint)
         self.results_root.mkdir(parents=True, exist_ok=True)
         cfg = recorded_config(self.config)
         manifest = {
@@ -184,16 +193,19 @@ class Campaign:
             "fingerprint": self.fingerprint,
             "precheck": self.precheck,
             "allow_destructive": self.allow_destructive,
+            "safe_mode": self.safe_mode,
+            "excluded_intrusive": self.excluded_intrusive,
+            "anonymized": self.anon.enabled,
         }
         manifest_path = self.results_root / "campaign.json"
-        manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
+        self._write_manifest(manifest_path, manifest)
         log(f"\nCampagne {self.id} sur {self.target['context']} ({self.fingerprint['version']}, "
             f"{self.fingerprint['api_server']}) : {len(self.plan)} exécutions")
 
         summary: dict[str, int] = {}
         try:
             for i, step in enumerate(self.plan, 1):
-                res = self.execute_step(step)
+                res = self.execute_step_guarded(step)
                 summary[res["status"]] = summary.get(res["status"], 0) + 1
                 tag = (f" {step['variant']}" if step.get("variant") else "") + (" (warm-up)" if step["run"] == 0 else "")
                 log(f"[{i}/{len(self.plan)}] {step['test_id']:<8} {step['runtime']:<5} run {step['run']:>2}{tag} "
@@ -201,9 +213,62 @@ class Campaign:
         finally:
             manifest["finished_at"] = now_iso()
             manifest["summary"] = summary
-            manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
+            manifest["host_suspensions"] = self.suspensions
+            manifest["public_check"] = self._public_check()
+            self._write_manifest(manifest_path, manifest)
+            self.anon.save()
         log(f"Résumé : {summary}\nRésultats : {self.results_root.relative_to(REPO_ROOT)}")
+        if manifest["public_check"]["leaks"]:
+            log(f"⚠ contrôle de publication : {len(manifest['public_check']['leaks'])} donnée(s) d'infrastructure "
+                "possiblement non anonymisée(s) : uv run scripts/check_public.py " + str(self.results_root.relative_to(REPO_ROOT)))
         return 1 if summary.get("FAIL") else 0
+
+    def _write_manifest(self, path: Path, manifest: dict) -> None:
+        public = self.anon.obj(manifest)
+        # La commande peut contenir le nom du contexte ou un chemin local
+        public["command"] = [self.anon.text(a).replace(str(Path.home()), "~") for a in manifest["command"]]
+        path.write_text(json.dumps(public, indent=2, ensure_ascii=False))
+
+    def _public_check(self) -> dict:
+        leaks = []
+        for root in (self.results_root, self.evidence_root.parent):
+            for f in sorted(root.rglob("*")) if root.exists() else []:
+                if f.is_file() and f.stat().st_size < 20_000_000:
+                    for leak in anonymize.find_leaks(f.read_text(errors="replace"), self.anon.map if self.anon.enabled else None):
+                        leaks.append(f"{f.relative_to(REPO_ROOT)} : {leak}")
+        return {"leaks": leaks[:200], "count": len(leaks)}
+
+    # Veille de l'hôte (portable capot fermé, VM suspendue) : un run qui la traverse est invalide
+    # (VM figée en plein test, délais faussés). Détection : écart entre horloge murale et horloge
+    # monotone (qui ne compte pas la veille sur macOS). Le run est rejoué, au plus MAX_SUSPEND_RETRIES fois.
+    SUSPEND_THRESHOLD_S = 30
+    MAX_SUSPEND_RETRIES = 3
+
+    def execute_step_guarded(self, step: dict) -> dict:
+        if not hasattr(self, "suspensions"):
+            self.suspensions = []
+        for attempt in range(self.MAX_SUSPEND_RETRIES + 1):
+            wall0, mono0 = time.time(), time.monotonic()
+            res = self.execute_step(step)
+            suspended = (time.time() - wall0) - (time.monotonic() - mono0)
+            if suspended < self.SUSPEND_THRESHOLD_S:
+                return res
+            self.suspensions.append({**step, "suspended_s": round(suspended), "attempt": attempt})
+            log(f"⚠ hôte en veille pendant {step['test_id']} {step['runtime']} run {step['run']} "
+                f"({suspended:.0f} s) : run invalide, rejoué")
+            if attempt == self.MAX_SUSPEND_RETRIES:
+                res["observations"] += f" | ⚠ hôte en veille pendant le run ({suspended:.0f} s) : mesure non fiable"
+                self._rewrite_result(step, res)
+                return res
+            ev = self.evidence_root / step["test_id"] / step["runtime"] / (
+                f"run-{step['run']}" + (f"-{step['variant']}" if step.get("variant") else ""))
+            shutil.rmtree(ev, ignore_errors=True)
+        return res
+
+    def _rewrite_result(self, step: dict, res: dict) -> None:
+        vsuffix = f"-{step['variant']}" if step.get("variant") else ""
+        out = self.results_root / res["env"]["id"] / step["test_id"] / step["runtime"] / f"run-{step['run']}{vsuffix}.json"
+        out.write_text(json.dumps(res, indent=2, ensure_ascii=False))
 
     @staticmethod
     def _fmt(res: dict) -> str:
@@ -227,6 +292,7 @@ class Campaign:
         ctx.kyverno = self.fingerprint.get("kyverno")
         ctx.kata_runtime_class = self.runtimes.get("kata")
         ctx.allow_destructive = self.allow_destructive
+        ctx.anonymizer = self.anon
         ctx.variant = variant
         started, t0 = now_iso(), time.perf_counter()
         status, node_name = "FAIL", None
@@ -299,10 +365,10 @@ class Campaign:
         rc_info = self.fingerprint["runtime_classes"].get(ctx.runtime_class or "")
         env = {
             "id": self.target["env_id"],
-            "context": self.target["context"],
+            "context": self.anon.text(self.target["context"]),
             "platform": self.fingerprint["version"],
             "arch": node["arch"],
-            "node": node["name"],
+            "node": self.anon.text(node["name"]),
             "nested_virt": bool(self.target.get("nested_virt")),
             "container_runtime": node["container_runtime"],
         }
@@ -331,7 +397,7 @@ class Campaign:
             "duration_s": duration,
             "status": status,
             "metrics": ctx.metrics,
-            "observations": " | ".join(ctx.observations),
+            "observations": self.anon.text(" | ".join(ctx.observations)),
             "evidence": ctx.evidence_files,
         }
         for k in ("aspect", "variant", "ci_platform", "agent_mode"):

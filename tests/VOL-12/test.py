@@ -14,7 +14,8 @@ import secrets as pysecrets
 
 from kvr import storage
 
-META = {"id": "VOL-12", "category": "VOL", "aspect": "SEC", "priority": "P1",
+META = {"intrusive": "pod privilégié qui monte les disques bloc du nœud en lecture seule",
+        "id": "VOL-12", "category": "VOL", "aspect": "SEC", "priority": "P1",
         "title": "Pod compromis : accès aux volumes des autres pods", "runs": 2, "warmup": False,
         "params": {"storage_class": ""}}
 

@@ -33,8 +33,10 @@ Tu es chargé de rejouer, sur un cluster distant, la campagne de comparaison **r
 - **Ne jamais utiliser `--allow-destructive`** (FUN-30 en pod réel peut rendre un nœud injoignable : constaté sur ENV-A).
 - **Aucun secret** dans le dépôt, les résultats ou le rapport : kubeconfig, tokens, mots de passe, `dockerconfigjson`, URL internes non anonymisées. Relire `results/` et `evidence/` avant tout commit.
 - Ne pas lancer de campagne sur un arbre git modifié (`--allow-dirty` interdit pour des résultats publiés).
-- **Le dépôt est public** : tout ce qui est poussé (résultats, preuves, rapport, site GitHub Pages) est lisible par tous. Aucun nom d'hôte, IP, URL ou nom interne : anonymiser avant commit.
-- **Tests à pod privilégié** : DIND-14, SCR-04, SCR-05 et VOL-12 lancent des pods privilégiés qui montent en lecture seule les disques du nœud ou le répertoire du kubelet (seuls les objets des pods de test sont lus, par UID ; aucune valeur de secret n'est écrite dans les preuves). Ne les lancer qu'avec l'**accord écrit** de l'exploitant du cluster ; sinon les exclure (`--skip` / sélection `--tests`) et le noter comme « non exécuté faute d'accord ».
+- **Mode sûr (défaut) : ne jamais passer `--non-safe`** sans accord écrit de l'exploitant du cluster **et** du SOC, avec une fenêtre déclarée (noms des namespaces `kvr-*`, horaires). Les tests intrusifs (`META.intrusive` : AGT-17, DIND-14, SCR-04, SCR-05, VOL-12) reproduisent des techniques d'attaque et déclenchent les outils de détection. En mode sûr ils sont exclus et listés au lancement : les noter « non exécutés, mode sûr ».
+- **Le dépôt GitHub est public. Les résultats de ce cluster n'y sont PAS poussés** : les pousser sur le dépôt interne `<url du dépôt interne>` (remote `interne`). Seul le rapport final, relu et anonymisé, pourra être proposé sur le dépôt public, après accord.
+- **Anonymisation** : automatique dans le banc (IP, MAC, noms DNS internes, nœuds, contexte, API server, miroirs) ; table de correspondance locale dans `.kvr-private/` (ignorée par git, **ne jamais la copier ni la commiter**). Avant **chaque** commit : `uv run scripts/check_public.py` (ou en hook pre-commit, voir l'en-tête du script) ; s'il signale une fuite, ne pas commiter.
+- Poste de pilotage : il doit rester éveillé pendant toute la campagne (le precheck alerte sur macOS). Un run traversé par une veille est détecté et rejoué automatiquement, mais la campagne s'allonge.
 - Si `./precheck` signale un bloquant, **s'arrêter et rapporter** : pas de contournement improvisé.
 
 ## Étapes
@@ -146,7 +148,7 @@ Pour chacun : résultat sur ta cible, pile exacte, preuve, et si l'écart avec E
 
 ## Livrables
 
-1. Les campagnes commitées (`results/`, `evidence/` anonymisés) et le profil dans `campaign.yaml`, sur une branche `env-b` (ou `env-c`), via une pull request.
+1. Les campagnes commitées (`results/`, `evidence/`, anonymisés et contrôlés par `check_public.py`) et le profil dans `campaign.yaml`, sur une branche `env-b` (ou `env-c`) **du dépôt interne**.
 2. `RESULTATS-ENV-B.md` (ou `ENV-C`) sur le modèle de `RESULTATS-ENV-A.md`, avec en tête la **pile exacte** (section 3) et pour chaque constat : statut, preuve (chemin du fichier), catégorie de cause, niveau de confiance (vérifié / à confirmer).
 3. Le tableau de la section 6 rempli.
 4. Le site généré (`docs-env-b/`) : ne **pas** activer GitHub Pages depuis la branche sans accord ; le site de `main` sera fusionné après relecture.

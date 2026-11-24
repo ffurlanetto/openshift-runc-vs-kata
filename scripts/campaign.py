@@ -51,6 +51,41 @@ def resolve_phases(config: dict, phases: str | None, skip: str | None) -> list[s
     return [p for p in known if p in selected and p not in excluded]
 
 
+def apply_safe_mode(selected: list, explicit: list[str] | None, non_safe: bool) -> tuple[list, list[str]]:
+    """Mode sûr (défaut) : les tests marqués `intrusive` dans leur META sont retirés du plan.
+    Les demander explicitement (--tests) sans --non-safe est une erreur, pas un retrait silencieux."""
+    if non_safe:
+        return selected, []
+    intrusive = [t for t in selected if t.meta.get("intrusive")]
+    asked = [t.id for t in intrusive if explicit and t.id in explicit]
+    if asked:
+        raise SystemExit(f"tests intrusifs demandés en mode sûr : {', '.join(asked)}\n"
+                         + "\n".join(f"  {t.id} : {t.meta['intrusive']}" for t in intrusive if t.id in asked)
+                         + "\najouter --non-safe (accord écrit de l'exploitant et du SOC requis hors cluster jetable)")
+    if intrusive:
+        log("Mode sûr : tests intrusifs exclus (--non-safe pour les inclure) :")
+        for t in intrusive:
+            log(f"  - {t.id} : {t.meta['intrusive']}")
+    return [t for t in selected if not t.meta.get("intrusive")], [t.id for t in intrusive]
+
+
+def confirm_non_safe(tests: dict, plan: list[dict], yes: bool) -> None:
+    ids = sorted({s["test_id"] for s in plan if tests[s["test_id"]].meta.get("intrusive")})
+    if not ids:
+        return
+    log("\n⚠ MODE NON SÛR : tests intrusifs inclus. Ils reproduisent des techniques d'attaque et peuvent "
+        "déclencher les outils de détection (SOC, EDR, Falco…) :")
+    for i in ids:
+        log(f"  - {i} : {tests[i].meta['intrusive']}")
+    if yes:
+        return
+    if not sys.stdin.isatty():
+        raise SystemExit("mode non interactif : --non-safe exige aussi --yes")
+    answer = input("Accord de l'exploitant et du SOC obtenu ? Taper « intrusif » pour continuer : ").strip().lower()
+    if answer != "intrusif":
+        raise SystemExit("annulé")
+
+
 def runtimes_of(value: str) -> list[str]:
     rts = [r.strip().lower() for r in value.split(",") if r.strip()]
     if set(rts) - {"runc", "kata"}:
@@ -111,11 +146,20 @@ def cmd_run(args) -> int:
         if unknown:
             raise SystemExit(f"tests du plan absents du dépôt : {sorted(unknown)}")
         runtimes = sorted({s["runtime"] for s in plan})
+        if not args.non_safe:
+            excluded = sorted({s["test_id"] for s in plan if tests[s["test_id"]].meta.get("intrusive")})
+            plan = [s for s in plan if s["test_id"] not in excluded]
+            if excluded:
+                log(f"⚠ rejeu en mode sûr : tests intrusifs retirés du plan ({', '.join(excluded)}) ; "
+                    "--non-safe pour un rejeu identique")
+        else:
+            excluded = []
     else:
         phases = resolve_phases(config, args.phases, args.skip)
         runtimes = runtimes_of(args.runtimes)
         selected = [t for t in select_tests(tests, csv(args.tests), None, args.priority)
                     if t.meta["category"] in phases]
+        selected, excluded = apply_safe_mode(selected, csv(args.tests), args.non_safe)
         if not selected:
             raise SystemExit(f"aucun test automatisé pour phases={phases} tests={args.tests} "
                              f"priorité={args.priority} (voir ./run --list)")
@@ -134,6 +178,8 @@ def cmd_run(args) -> int:
                                    node_selector=parse_selector(args.node_selector),
                                    previous=old["target"] if old else None)
     confirm(target, cluster.platform_version(), args.yes)
+    if args.non_safe:
+        confirm_non_safe(tests, plan, args.yes)
 
     replay_of = None
     if old:
@@ -153,7 +199,8 @@ def cmd_run(args) -> int:
         raise SystemExit("\nPrécheck en échec : campagne non lancée.")
 
     campaign = Campaign(config, cluster, target, plan, tests, args.allow_dirty, replay_of, pc.report(),
-                        allow_destructive=args.allow_destructive)
+                        allow_destructive=args.allow_destructive, safe_mode=not args.non_safe,
+                        excluded_intrusive=excluded)
     return campaign.execute()
 
 
@@ -185,6 +232,9 @@ def main() -> int:
     g.add_argument("--dry-run", action="store_true", help="affiche le plan sans rien exécuter")
     g.add_argument("--yes", "-y", action="store_true", help="pas de confirmation (CI, non interactif)")
     g.add_argument("--allow-dirty", action="store_true", help="autorise un arbre git modifié")
+    g.add_argument("--non-safe", action="store_true",
+                   help="inclut les tests intrusifs (pods privilégiés lisant le nœud, abus de ressources) : "
+                        "exclus par défaut ; accord de l'exploitant et du SOC requis hors cluster jetable")
     g.add_argument("--allow-destructive", action="store_true",
                    help="exécute réellement les scénarios pouvant rendre un nœud indisponible "
                         "(ex. FUN-30 en Kata) : clusters jetables uniquement")

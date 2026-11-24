@@ -9,6 +9,7 @@ import re
 import secrets
 import shutil
 import subprocess
+import sys
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -81,6 +82,7 @@ class Precheck:
     def run(self) -> bool:
         print("\nPrécheck")
         self._safe("local", self.check_local)
+        self._safe("local", self.check_host_sleep)
         if not self._safe("cluster", self.check_access):
             return self._summary()
         if not self._safe("droits", self.check_rbac):
@@ -114,6 +116,21 @@ class Precheck:
         return self.ok
 
     # ------------------------------------------------------------------ local
+    def check_host_sleep(self) -> None:
+        """Poste macOS : une mise en veille (capot fermé, même sous caffeinate) suspend la VM du cluster local
+        et le poste de pilotage. Constaté sur ENV-A : 9 h de veille, runs invalides. Le runner détecte
+        et rejoue les runs touchés, mais la campagne s'allonge d'autant."""
+        if sys.platform != "darwin":
+            return
+        out = subprocess.run(["pmset", "-g"], capture_output=True, text=True).stdout
+        disabled = any(l.split()[:2] == ["SleepDisabled", "1"] for l in out.splitlines())
+        if disabled:
+            self.add(OK, "local", "veille du Mac", "désactivée (pmset disablesleep)")
+        else:
+            self.add(WARN, "local", "veille du Mac", "possible (capot fermé : même caffeinate ne l'empêche pas)",
+                     "pendant la campagne : sudo pmset -a disablesleep 1 (rétablir ensuite : sudo pmset -a disablesleep 0), "
+                     "ou garder le capot ouvert sur secteur")
+
     def check_local(self) -> None:
         r = subprocess.run([self.cluster.kubectl, "version", "--client", "-o", "json"],
                            capture_output=True, text=True)
