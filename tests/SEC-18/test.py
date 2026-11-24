@@ -29,7 +29,8 @@ VICTIM = r"""
 echo "kvr-file-$KVR_TOKEN" > /tmp/kvr-file-$KVR_TOKEN
 export KVR_MEM="kvr-mem-$KVR_TOKEN"
 ( while :; do echo "kvr-net-$KVR_TOKEN" > /dev/udp/192.0.2.10/9999 2>/dev/null; sleep 1; done ) &
-exec -a "kvr-proc-$KVR_TOKEN" sleep infinity
+# sleep de l'image ubi est un lanceur coreutils qui se ré-exécute et perd argv[0] : on marque un bash
+exec -a "kvr-proc-$KVR_TOKEN" bash -c 'while :; do sleep 3600; done'
 """
 
 PEER = r"""
