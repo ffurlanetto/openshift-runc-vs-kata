@@ -149,6 +149,8 @@ Colonne **Prio** : P1 = obligatoire pour la décision, P2 = important, P3 = si l
 
 Tous les scénarios sont exécutés **uniquement sur les environnements de test**, dans le cadre de cette campagne.
 
+Principes de protection contre l'évasion couverts : noyau dédié (SEC-01), visibilité du nœud (SEC-03), évasion d'un pod privilégié (SEC-04), `hostPath` (SEC-05), surface noyau (SEC-08), modification du noyau du nœud (SEC-09), ressources (SEC-10, AGT-17), isolation entre pods (SEC-18), escalade de privilèges (SEC-19), lecture par l'administrateur du nœud (SCR-04). Les tests qui réalisent une évasion réelle ou lisent le nœud (SEC-04, 05, 09, et le volet nœud de SEC-18) ne s'exécutent qu'avec `./run --non-safe`. Les canaux auxiliaires (Spectre et apparentés) sont hors périmètre.
+
 | ID | Scénario | Attendu runc | Attendu Kata | Env | Prio |
 |---|---|---|---|---|---|
 | SEC-01 | Identification du noyau : `uname -a`, `/proc/version`, `dmesg` | Noyau de l'hôte | Noyau invité dédié | A | P1 |
@@ -168,6 +170,8 @@ Tous les scénarios sont exécutés **uniquement sur les environnements de test*
 | SEC-15 | Conformité : `compliance-operator` (profil CIS OCP), `kube-bench`, `kubescape` avant / après installation Kata | Baseline | Pas de régression | A/B | P2 |
 | SEC-16 | Scan des composants ajoutés (images operator / kata-deploy, QEMU, noyau invité) : `trivy`, CVE connues, fréquence de patch | — | Nouvelle surface à maintenir | A | P2 |
 | SEC-17 | Revue du modèle de menace : qui peut choisir `runtimeClassName` ? Imposer Kata par namespace (admission policy / Kyverno / ValidatingAdmissionPolicy) | — | Politique d'imposition testée | A | P1 |
+| SEC-18 | **Isolation entre pods** : une victime porte des marqueurs (processus, mémoire, fichier, paquet réseau). Observateurs : voisin runc, voisin du même runtime, et (mode non sûr) administrateur du nœud (`hostPID`, `hostNetwork`, racine en lecture) | Voisins : rien. Nœud : tout | Voisins : rien. Nœud : processus invisible (seul QEMU), mais **mémoire, fichiers, réseau atteignables** (Kata ne protège pas le pod du nœud ; rôle de CoCo) | A/B | P1 |
+| SEC-19 | **Escalade de privilèges dans le pod** : `no_new_privs`, capacités effectives, binaire setuid-root lancé par un non-root avec `allowPrivilegeEscalation` false / true, capacités utilisables en root, user namespaces | Garde-fous appliqués | Identiques à runc (root du pod = root de la VM, pas du nœud) | A/B | P1 |
 
 ### 6.4 Exploitation (OPS) — « peut-on le faire tourner au quotidien ? »
 

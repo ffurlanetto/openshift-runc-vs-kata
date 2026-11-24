@@ -293,6 +293,7 @@ class Campaign:
         ctx.kata_runtime_class = self.runtimes.get("kata")
         ctx.allow_destructive = self.allow_destructive
         ctx.anonymizer = self.anon
+        ctx.safe_mode = self.safe_mode
         ctx.variant = variant
         started, t0 = now_iso(), time.perf_counter()
         status, node_name = "FAIL", None

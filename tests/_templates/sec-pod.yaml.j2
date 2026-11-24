@@ -1,0 +1,85 @@
+{#- Pod des tests d'isolation (SEC-04/05/08/09/18/19) : chaque réglage de sécurité est explicite.
+    Paramètres :
+      name ; rc : "runc" | nom de RuntimeClass | none (= celle du run) ; node_name (optionnel)
+      image : clé de images (défaut ubi) ; command : script sh (défaut : sleep infinity)
+      privileged (bool) ; run_as_user (int | none) ; allow_pe (bool | none) ; drop_all (bool) ; caps_add (liste)
+      seccomp : "RuntimeDefault" | "Unconfined" | none ; host_pid / host_network (bool)
+      host_paths : [{path, mount, ro (bool), type}] ; env : [{name, value}] ; memory (défaut 256Mi) -#}
+{%- set rc = rc | default(none) %}
+{%- set eff_rc = none if rc == "runc" else (rc or runtime_class) %}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ name }}
+  namespace: {{ namespace }}
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+{%- if eff_rc %}
+  runtimeClassName: {{ eff_rc }}
+{%- endif %}
+{%- if node_name | default(none) %}
+  nodeName: {{ node_name }}
+{%- elif node_selector %}
+  nodeSelector:
+{%- for k, v in node_selector.items() %}
+    {{ k }}: "{{ v }}"
+{%- endfor %}
+{%- endif %}
+{%- if host_pid | default(false) %}
+  hostPID: true
+{%- endif %}
+{%- if host_network | default(false) %}
+  hostNetwork: true
+{%- endif %}
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: main
+      image: {{ images[image | default("ubi")] }}
+      imagePullPolicy: IfNotPresent
+      command: ["bash", "-c", {{ (command | default("exec sleep infinity")) | tojson }}]
+{%- if env | default([]) %}
+      env:
+{%- for e in env %}
+        - {name: {{ e.name }}, value: {{ e.value | string | tojson }}}
+{%- endfor %}
+{%- endif %}
+      resources:
+        requests: {cpu: 100m, memory: 64Mi}
+        limits: {cpu: "1", memory: {{ memory | default("256Mi") }}}
+      securityContext:
+{%- if privileged | default(false) %}
+        privileged: true
+{%- endif %}
+{%- if run_as_user | default(none) is not none %}
+        runAsUser: {{ run_as_user }}
+        runAsNonRoot: {{ "true" if run_as_user != 0 else "false" }}
+{%- endif %}
+{%- if allow_pe | default(none) is not none %}
+        allowPrivilegeEscalation: {{ "true" if allow_pe else "false" }}
+{%- endif %}
+{%- if drop_all | default(false) or caps_add | default([]) %}
+        capabilities:
+{%- if drop_all | default(false) %}
+          drop: ["ALL"]
+{%- endif %}
+{%- if caps_add | default([]) %}
+          add: {{ caps_add | tojson }}
+{%- endif %}
+{%- endif %}
+{%- if seccomp | default(none) %}
+        seccompProfile: {type: {{ seccomp }}}
+{%- endif %}
+{%- if host_paths | default([]) %}
+      volumeMounts:
+{%- for h in host_paths %}
+        - {name: host{{ loop.index }}, mountPath: {{ h.mount }}, readOnly: {{ "true" if h.ro | default(true) else "false" }}}
+{%- endfor %}
+  volumes:
+{%- for h in host_paths %}
+    - name: host{{ loop.index }}
+      hostPath: {path: {{ h.path }}, type: {{ h.type | default("Directory") }}}
+{%- endfor %}
+{%- endif %}
