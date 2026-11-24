@@ -31,8 +31,16 @@ PUBLIC_SUFFIXES = (
     "pypi.org", "pythonhosted.org", "fedoraproject.org", "centos.org", "ubuntu.com", "debian.org",
     "alpinelinux.org", "example.com", "example.org", "example.invalid", "cluster.example", "cluster.local",
     "crc.testing", "nip.io", "hashicorp.com", "cyberark.com", "conjur.org", "min.io", "amazonaws.com",
-    "anthropic.com", "claude.com", "jenkins.io", "kvr.local",
+    "anthropic.com", "claude.com", "jenkins.io", "kvr.local", "wgpolicyk8s.io", "mobyproject.org", "containerd.io",
 )
+
+# Dernier label d'un vrai nom d'hôte : TLD publics courants et suffixes d'intranet. Un candidat qui se termine
+# autrement (object.spec.volumes, self.cluster.oc…) est un chemin de champ ou de code, pas un hôte.
+HOST_TLDS = {
+    "com", "net", "org", "io", "dev", "app", "cloud", "info", "biz", "eu", "fr", "de", "uk", "be", "ch", "lu", "nl",
+    "es", "it", "pt", "at", "ie", "pl", "se", "no", "dk", "fi", "us", "ca", "jp", "in", "au", "br", "gov", "edu",
+    "local", "lan", "corp", "internal", "intra", "intranet", "home", "localdomain", "priv", "private", "testing",
+}
 KEEP_IPS = {"0.0.0.0", "127.0.0.1", "255.255.255.255"}
 DOC_NET4 = ipaddress.ip_network("192.0.2.0/24")
 
@@ -50,7 +58,10 @@ FILE_EXT = {"json", "yaml", "yml", "py", "md", "txt", "sh", "j2", "html", "log",
 def _not_a_host(cand: str) -> bool:
     """Noms de fichiers (result.schema.json) et chemins de champs (RuntimeClass.overhead.podFixed) : pas des hôtes.
     Les vrais noms du cluster, eux, sont couverts par la table exacte (learn_target), majuscules comprises."""
-    return cand.rsplit(".", 1)[-1].lower() in FILE_EXT or cand != cand.lower()
+    labels = cand.lower().split(".")
+    return (labels[-1] in FILE_EXT or cand != cand.lower()
+            or labels[-1] not in HOST_TLDS           # chemin de champ / attribut de code
+            or labels[0] in HOST_TLDS)               # identifiant en DNS inversé (io.containerd.*, org.mobyproject.*)
 
 
 def _public(host: str) -> bool:
@@ -80,6 +91,8 @@ class Anonymizer:
     # ---- table de correspondance
     def _pseudo(self, kind: str, value: str, prefix: str) -> str:
         table = self.map.setdefault(kind, {})
+        if value in table.values() or re.fullmatch(r"(contexte|noeud|miroir|hote|personne|mac)-\d+", value):
+            return value  # déjà un pseudonyme (données relues après anonymisation) : ne pas le réanonymiser
         if value not in table:
             n = 1 + sum(1 for v in table.values() if v.startswith(prefix))
             table[value] = f"{prefix}{n}"
@@ -159,6 +172,7 @@ class Anonymizer:
         s = RE_IPV4.sub(ip4, s)
         s = RE_IPV6.sub(ip6, s)
         s = RE_EMAIL.sub(lambda m: m.group(0) if m.group(0).endswith(("@127.0.0.1", "@localhost"))
+                         or _public(m.group(0).rsplit("@", 1)[1])  # ex. signature de build Red Hat (redhat.com)
                          else self._pseudo("email", m.group(0), "personne-") + "@example.invalid", s)
         s = RE_FQDN.sub(host, s)
         return s
@@ -196,7 +210,7 @@ def find_leaks(text: str, known: dict | None = None) -> list[str]:
         if not v.lower().startswith("02:00:5e"):
             leaks.append(f"MAC {v}")
     for v in RE_EMAIL.findall(text):
-        if not v.endswith(("@example.invalid", "@127.0.0.1", "@localhost")):
+        if not v.endswith(("@example.invalid", "@127.0.0.1", "@localhost")) and not _public(v.rsplit("@", 1)[1]):
             leaks.append(f"e-mail {v}")
     for v in RE_FQDN.findall(text):
         if not _public(v) and not _not_a_host(v):
