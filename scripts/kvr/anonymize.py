@@ -43,6 +43,16 @@ RE_EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 RE_FQDN = re.compile(r"(?<![\w.@/-])((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.){2,}[a-z]{2,24})(?![\w-])", re.I)
 
 
+FILE_EXT = {"json", "yaml", "yml", "py", "md", "txt", "sh", "j2", "html", "log", "toml", "lock", "cfg", "conf", "ko",
+            "xz", "gz", "tar", "js", "css", "tmpl", "csv", "xml", "ini", "pem", "crt", "service", "socket", "so"}
+
+
+def _not_a_host(cand: str) -> bool:
+    """Noms de fichiers (result.schema.json) et chemins de champs (RuntimeClass.overhead.podFixed) : pas des hôtes.
+    Les vrais noms du cluster, eux, sont couverts par la table exacte (learn_target), majuscules comprises."""
+    return cand.rsplit(".", 1)[-1].lower() in FILE_EXT or cand != cand.lower()
+
+
 def _public(host: str) -> bool:
     h = host.lower().rstrip(".")
     if h.endswith(".svc") or ".svc." in h:  # noms de services internes au cluster (génériques)
@@ -139,7 +149,7 @@ class Anonymizer:
 
         def host(m):
             v = m.group(1)
-            if _public(v) or re.fullmatch(r"[\d.]+", v):
+            if _public(v) or _not_a_host(v) or re.fullmatch(r"[\d.]+", v):
                 return v
             return self._pseudo("host", v.lower(), "hote-") + ".example.invalid"
 
@@ -148,7 +158,8 @@ class Anonymizer:
                        f"{int(self._pseudo('mac', m.group(1).lower(), 'mac-')[4:]) % 256:02x}", s)
         s = RE_IPV4.sub(ip4, s)
         s = RE_IPV6.sub(ip6, s)
-        s = RE_EMAIL.sub(lambda m: self._pseudo("email", m.group(0), "personne-") + "@example.invalid", s)
+        s = RE_EMAIL.sub(lambda m: m.group(0) if m.group(0).endswith(("@127.0.0.1", "@localhost"))
+                         else self._pseudo("email", m.group(0), "personne-") + "@example.invalid", s)
         s = RE_FQDN.sub(host, s)
         return s
 
@@ -185,10 +196,10 @@ def find_leaks(text: str, known: dict | None = None) -> list[str]:
         if not v.lower().startswith("02:00:5e"):
             leaks.append(f"MAC {v}")
     for v in RE_EMAIL.findall(text):
-        if not v.endswith("@example.invalid"):
+        if not v.endswith(("@example.invalid", "@127.0.0.1", "@localhost")):
             leaks.append(f"e-mail {v}")
     for v in RE_FQDN.findall(text):
-        if not _public(v):
+        if not _public(v) and not _not_a_host(v):
             leaks.append(f"nom DNS {v}")
     for kind in ("exact", "ip", "host", "email", "mac"):
         for original in (known or {}).get(kind, {}):
