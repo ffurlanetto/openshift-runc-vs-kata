@@ -2,7 +2,8 @@
 
 Token projeté (audience de l'API server, `expirationSeconds: ttl_s`, 600 minimum). Le kubelet le renouvelle
 à 80 % de sa durée de vie. On vérifie que le fichier vu par le conteneur change, et que le nouveau
-token est accepté par l'API server (403 = authentifié sans droits ; 401 = rejeté).
+token est accepté par l'API server (200 ou 403 = authentifié ; 401 = rejeté). /apis est ouvert à tout
+utilisateur authentifié (rôle system:discovery) : 200 est la réponse normale.
 C'est le mécanisme d'authentification de Vault (`kubernetes`/`jwt`) et de Conjur (`authn-jwt`).
 Les preuves ne contiennent que les claims non sensibles (iat, exp, aud), jamais le token.
 """
@@ -16,6 +17,7 @@ META = {"id": "SCR-03", "category": "SCR", "aspect": "FUN", "priority": "P1",
         "params": {"ttl_s": 600, "poll_s": 15}}
 
 API = "https://kubernetes.default.svc/apis"
+ACCEPTED = ("200", "403")  # 401 = token rejeté
 
 
 def _claims(token: str) -> dict:
@@ -50,15 +52,15 @@ def run(ctx):
             break
     ctx.evidence("claims.json", history)
     lifetime = (first["exp"] - first["iat"]) if first["exp"] and first["iat"] else None
-    ctx.metric("api_accepts_initial_token", int(code0 == "403"), "bool", "higher")
+    ctx.metric("api_accepts_initial_token", int(code0 in ACCEPTED), "bool", "higher")
     if rotated:
         # âge du token au moment où le conteneur voit le nouveau (attendu ≈ 80 % de la durée de vie)
         age = rotated["iat"] - first["iat"]
         ctx.metric("rotation_after", age, "s", "lower")
-        ctx.metric("api_accepts_rotated_token", int(code1 == "403"), "bool", "higher")
+        ctx.metric("api_accepts_rotated_token", int(code1 in ACCEPTED), "bool", "higher")
     ctx.observe(f"{ctx.runtime} : token initial (durée {lifetime} s, aud {first['aud']}) → HTTP {code0} ; "
                 + (f"nouveau token (émis {rotated['iat'] - first['iat']} s après le premier) vu dans le conteneur "
                    f"(sondage toutes les {poll:.0f} s), HTTP {code1}" if rotated else f"AUCUNE rotation vue en {ttl * 1.1:.0f} s"))
     if not rotated:
         return "FAIL"
-    return "PASS" if code0 == "403" and code1 == "403" else "FAIL"
+    return "PASS" if code0 in ACCEPTED and code1 in ACCEPTED else "FAIL"

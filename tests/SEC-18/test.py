@@ -78,6 +78,10 @@ for pid in filter(str.isdigit, os.listdir("/proc")):
     if uid not in cg and uid_us not in cg:
         continue
     comm = open(f"/proc/{pid}/comm").read().strip()
+    try:
+        cmd = open(f"/proc/{pid}/cmdline", "rb").read().replace(b"\0", b" ")[:60].decode(errors="replace")
+    except OSError:
+        cmd = "?"
     hit, scanned = False, 0
     try:
         with open(f"/proc/{pid}/maps") as maps, open(f"/proc/{pid}/mem", "rb", 0) as mem:
@@ -100,7 +104,7 @@ for pid in filter(str.isdigit, os.listdir("/proc")):
     except OSError:
         pass
     res["memory"] |= hit
-    res["pod_processes"].append({"comm": comm, "memory": hit, "scanned_mib": scanned >> 20})
+    res["pod_processes"].append({"comm": comm, "cmdline": cmd.replace(t, "<jeton>"), "memory": hit, "scanned_mib": scanned >> 20})
 
 for pattern in ("/host/var/lib/containers/storage/overlay/*/diff/tmp/" + F,
                 "/host/run/kata-containers/shared/sandboxes/*/*/*/rootfs/tmp/" + F,

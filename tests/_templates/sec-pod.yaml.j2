@@ -4,7 +4,7 @@
       image : clé de images (défaut ubi) ; command : script sh (défaut : sleep infinity)
       privileged (bool) ; run_as_user (int | none) ; allow_pe (bool | none) ; drop_all (bool) ; caps_add (liste)
       seccomp : "RuntimeDefault" | "Unconfined" | none ; host_pid / host_network (bool)
-      host_paths : [{path, mount, ro (bool), type}] ; env : [{name, value}] ; memory (défaut 256Mi) -#}
+      se_type (type SELinux, ex. spc_t) ; host_paths : [{path, mount, ro (bool), type}] ; env : [{name, value}] ; memory (défaut 256Mi) -#}
 {%- set rc = rc | default(none) %}
 {%- set eff_rc = none if rc == "runc" else (rc or runtime_class) %}
 apiVersion: v1
@@ -71,6 +71,9 @@ spec:
 {%- endif %}
 {%- if seccomp | default(none) %}
         seccompProfile: {type: {{ seccomp }}}
+{%- endif %}
+{%- if se_type | default(none) %}
+        seLinuxOptions: {type: {{ se_type }}}
 {%- endif %}
 {%- if host_paths | default([]) %}
       volumeMounts:

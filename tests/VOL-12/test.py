@@ -2,7 +2,7 @@
 
 Victime : pod runc avec une PVC (backend local), qui y écrit un fichier marqueur au nom unique.
 Attaquant (runtime du run) : pod privilégié, root, SANS hostPath ni namespace de l'hôte, sur le même nœud.
-Il monte EN LECTURE SEULE (ro,norecovery) chaque périphérique bloc visible et cherche le fichier marqueur
+Il monte EN LECTURE SEULE (ro,norecovery ; superbloc partagé puis rebascule ro si le nœud l'a déjà monté) chaque périphérique bloc visible et cherche le fichier marqueur
 par son nom. Il relève aussi les montages et répertoires kubelet visibles. Aucune écriture.
 
 runc : les périphériques du nœud sont visibles, le volume de la victime est attendu accessible.
@@ -23,7 +23,14 @@ SCRIPT = r"""
 for dev in $(ls /sys/class/block); do
   [ -b /dev/$dev ] || mknod /dev/$dev b $(tr ':' ' ' < /sys/class/block/$dev/dev) 2>/dev/null
   mkdir -p /mnt/$dev
-  if mount -o ro,norecovery,nouuid /dev/$dev /mnt/$dev 2>/dev/null || mount -o ro /dev/$dev /mnt/$dev 2>/dev/null; then
+  ok=
+  if mount -o ro,norecovery,nouuid /dev/$dev /mnt/$dev 2>/dev/null || mount -o ro /dev/$dev /mnt/$dev 2>/dev/null; then ok=1
+  elif mount /dev/$dev /mnt/$dev 2>/dev/null; then
+    # Partition déjà montée par le nœud (ex. racine XFS) : 2e montage ro du même superbloc refusé par le noyau.
+    # Montage sans option (superbloc partagé), puis rebascule immédiate de la vue en lecture seule.
+    mount -o remount,bind,ro /mnt/$dev 2>/dev/null; ok=1
+  fi
+  if [ -n "$ok" ]; then
     echo "MOUNTED $dev"
     if timeout 180 find /mnt/$dev -xdev -name "$MARKER" -type f 2>/dev/null | grep -q .; then echo "FOUND $dev"; fi
     umount /mnt/$dev 2>/dev/null
