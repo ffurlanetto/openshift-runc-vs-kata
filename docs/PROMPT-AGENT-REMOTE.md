@@ -33,6 +33,8 @@ Tu es chargé de rejouer, sur un cluster distant, la campagne de comparaison **r
 - **Ne jamais utiliser `--allow-destructive`** (FUN-30 en pod réel peut rendre un nœud injoignable : constaté sur ENV-A).
 - **Aucun secret** dans le dépôt, les résultats ou le rapport : kubeconfig, tokens, mots de passe, `dockerconfigjson`, URL internes non anonymisées. Relire `results/` et `evidence/` avant tout commit.
 - Ne pas lancer de campagne sur un arbre git modifié (`--allow-dirty` interdit pour des résultats publiés).
+- **Le dépôt est public** : tout ce qui est poussé (résultats, preuves, rapport, site GitHub Pages) est lisible par tous. Aucun nom d'hôte, IP, URL ou nom interne : anonymiser avant commit.
+- **Tests à pod privilégié** : DIND-14, SCR-04, SCR-05 et VOL-12 lancent des pods privilégiés qui montent en lecture seule les disques du nœud ou le répertoire du kubelet (seuls les objets des pods de test sont lus, par UID ; aucune valeur de secret n'est écrite dans les preuves). Ne les lancer qu'avec l'**accord écrit** de l'exploitant du cluster ; sinon les exclure (`--skip` / sélection `--tests`) et le noter comme « non exécuté faute d'accord ».
 - Si `./precheck` signale un bloquant, **s'arrêter et rapporter** : pas de contournement improvisé.
 
 ## Étapes
@@ -98,6 +100,8 @@ Lister les RuntimeClass Kata du cluster et **faire une campagne par RuntimeClass
 - Kyverno : POL est bloqué si Kyverno est absent. L'installer seulement avec accord (`./setup kyverno`), sinon `--skip POL` et le noter.
 - AGT : les tests automatisés actuels (AGT-08/14/17/20) n'ont besoin ni de l'opérateur Agent Sandbox ni d'un LLM.
 - DIND : variantes V1 à V5 (`V5` = Docker avec stockage en mémoire). Les tests Jenkins / GitHub Actions ne sont pas encore automatisés.
+- VOL / SCR (tests automatisés : VOL-01, VOL-12, SCR-01 à SCR-05) : lancer d'abord un **essai** `./run --context <ctx> --phases VOL,SCR --runs 1 --no-warmup --yes` et classer les écarts (défaut du banc ou comportement), avant la campagne complète. VOL-01 utilise la StorageClass par défaut (backend `local`) ou `campaign.yaml › overrides.VOL-01.params.storage_class`. Les backends NFS, CIFS, S3, Vault et Conjur ne sont pas encore automatisés : ne rien installer pour eux.
+- **Durées observées sur ENV-A (imbriqué)** : campagne complète runc + Kata ≈ 12 h (DIND en Kata ≈ 4 min par run) ; campagne Kata seule pour une 2e RuntimeClass ≈ 6 à 7 h. Sur bare metal, attendre nettement moins, mais prévoir une fenêtre longue. Lancer avec `nohup` (ou équivalent) pour survivre à la fin de session : `nohup ./run … --yes </dev/null > run.log 2>&1 &`.
 - Rejeu à l'identique d'une campagne : `./run --replay results/<campagne>/campaign.json` (avec `--strict` pour refuser tout écart de code ou d'environnement).
 - Surveiller : disque des nœuds (le precheck alerte au-delà de 70 %), namespaces `kvr-*` résiduels (`./run --cleanup`).
 
@@ -105,7 +109,10 @@ Lister les RuntimeClass Kata du cluster et **faire une campagne par RuntimeClass
 
 ```bash
 uv run scripts/validate_results.py
+uv run scripts/report.py --campaign <campagne runc+kata> --campaign <campagne autre RuntimeClass> --site docs-env-b
 ```
+
+`report.py` produit `report/donnees.md` (fiches par test, une colonne par runtime, médiane, p5–p95, n, verdict de significativité) et un site statique. Sur la branche `env-b`, générer le site dans `docs-env-b/` pour ne pas écraser le site ENV-A de `main`.
 
 Pour chaque statut `FAIL`, `PARTIAL`, `NOT_SUPPORTED` ou `BLOCKED` :
 1. lire `results/…/run-<n>.json` (observations, métriques) et `evidence/…` (manifestes, `events.txt`, `pods.json`, sorties, `traceback.txt`) ;
@@ -132,13 +139,18 @@ Pour chacun : résultat sur ta cible, pile exacte, preuve, et si l'écart avec E
 | 8 | `/dev/fuse` (annotation CRI-O) non fourni dans la VM : buildah sans privilège KO (V3) | À vérifier |
 | 9 | Kyverno : comportement identique runc / Kata, aucun contournement | Devrait être reproduit |
 | 10 | Pod Ready : 0,9 s runc vs 19,4 s Kata (imbriqué) | Chiffres ENV-B attendus très inférieurs : ce sont **ceux-là** qui vont au comité |
+| 11 | AGT-17 multiplication de processus : runc contenu par la **limite mémoire** (conteneur OOMKilled en ≈ 2 s, `pids.max=max` dans le conteneur) ; Kata (Rust) contenu par une **limite pids dans l'invité** (`pids.max=336`) | Relever `pids.max` vu dans le conteneur pour chaque runtime ; origine du 336 à identifier |
+| 12 | Démarrage de VM intermittent : agent injoignable en 60 s (`vsock … ETIMEDOUT`) sous charge | Attendu propre à l'imbriqué : confirmer l'absence sur bare metal |
+| 13 | SCR-04 : un administrateur du nœud lit les secrets d'un pod Kata (tmpfs kubelet, environnement, mémoire de la VM) | Attendu identique : Kata ne protège pas du nœud (seule CoCo le fait). Si non exécuté faute d'accord, le dire |
+| 14 | SCR-05 / VOL-12 : un pod compromis avec un `hostPath` ou des disques bloc atteint-il les secrets / volumes d'autres pods ? | À mesurer : ENV-A en cours au moment de la rédaction de ce prompt ; voir `RESULTATS-ENV-A.md` à jour |
 
 ## Livrables
 
 1. Les campagnes commitées (`results/`, `evidence/` anonymisés) et le profil dans `campaign.yaml`, sur une branche `env-b` (ou `env-c`), via une pull request.
 2. `RESULTATS-ENV-B.md` (ou `ENV-C`) sur le modèle de `RESULTATS-ENV-A.md`, avec en tête la **pile exacte** (section 3) et pour chaque constat : statut, preuve (chemin du fichier), catégorie de cause, niveau de confiance (vérifié / à confirmer).
 3. Le tableau de la section 6 rempli.
-4. La liste des actions refusées faute d'accord, des tests `BLOCKED` et de leur prérequis manquant.
+4. Le site généré (`docs-env-b/`) : ne **pas** activer GitHub Pages depuis la branche sans accord ; le site de `main` sera fusionné après relecture.
+5. La liste des actions refusées faute d'accord, des tests `BLOCKED` et de leur prérequis manquant.
 
 ## Style des conclusions
 
