@@ -1,7 +1,8 @@
 """DIND-14 : étape de pipeline malveillante dans un job V1 (dind privilégié).
 
 Depuis un conteneur lancé par le dind interne avec --privileged (ce qu'une PR malveillante peut faire),
-on tente de monter EN LECTURE SEULE (ro,norecovery) chaque partition visible, et on cherche un
+on tente de monter EN LECTURE SEULE (ro,norecovery) chaque partition visible (si la partition est déjà
+montée par le nœud : montage partageant le superbloc puis rebascule immédiate en lecture seule), et on cherche un
 répertoire kubelet de CE pod (…/kubelet/pods/<uid du pod>), qui n'existe que sur le disque du nœud.
 Critère indépendant de la distribution (RHCOS/ostree, Ubuntu…).
 Aucune écriture, aucun exploit : on démontre seulement l'accès au système de fichiers du nœud.
@@ -22,11 +23,27 @@ SCRIPT = r"""
 for dev in $(ls /sys/class/block); do
   [ -b /dev/$dev ] || mknod /dev/$dev b $(tr ':' ' ' < /sys/class/block/$dev/dev) 2>/dev/null
   mkdir -p /mnt/$dev
-  if mount -o ro,norecovery,nouuid /dev/$dev /mnt/$dev 2>/dev/null || mount -o ro /dev/$dev /mnt/$dev 2>/dev/null; then
-    if timeout 120 find /mnt/$dev -maxdepth 9 -type d -path "*kubelet/pods/$POD_UID" 2>/dev/null | grep -q .; then
+  mode=ro
+  if ! { mount -o ro,norecovery,nouuid /dev/$dev /mnt/$dev 2>/dev/null || mount -o ro /dev/$dev /mnt/$dev 2>/dev/null; }; then
+    # Partition déjà montée par le nœud (ex. racine XFS) : le noyau refuse un 2e montage ro du même superbloc.
+    # Un attaquant monte alors sans option (superbloc partagé) ; on rebascule aussitôt la vue en lecture seule.
+    if mount /dev/$dev /mnt/$dev 2>/dev/null; then
+      mount -o remount,bind,ro /mnt/$dev 2>/dev/null; mode=partage
+    else
+      continue
+    fi
+  fi
+  if true; then
+    hit=
+    for c in /mnt/$dev/var/lib/kubelet /mnt/$dev/lib/kubelet /mnt/$dev/ostree/deploy/*/var/lib/kubelet; do
+      [ -d "$c/pods/$POD_UID" ] && hit=1
+    done
+    [ -z "$hit" ] && timeout 120 find /mnt/$dev -maxdepth 9 \( -path "*/ostree/repo" -o -path "*/containers/storage" \) -prune \
+      -o -type d -path "*kubelet/pods/$POD_UID" -print 2>/dev/null | grep -q . && hit=1
+    if [ -n "$hit" ]; then
       echo "NODEFS $dev"
     fi
-    echo "MOUNTED $dev"
+    echo "MOUNTED $dev $mode"
     umount /mnt/$dev 2>/dev/null
   fi
 done
@@ -48,15 +65,17 @@ def run(ctx):
                            f"{(out + err).strip().splitlines()[-1][:200] if (out + err).strip() else ''}")
     lines = out.splitlines()
     mounted = [l.split()[1] for l in lines if l.startswith("MOUNTED ")]
+    modes = {l.split()[1]: (l.split() + ["?", "?", "?"])[2] for l in lines if l.startswith("MOUNTED ")}
     node_devs = [l.split()[1] for l in lines if l.startswith("NODEFS ")]
     devices = next((l[len("DEVICES "):] for l in lines if l.startswith("DEVICES ")), "")
     # La preuve ne conserve pas d'identifiant : seulement le résultat de la comparaison.
-    ctx.evidence("escape-attempt.txt", f"rc={rc}\nmontés={mounted}\ndisques={devices}\n"
+    ctx.evidence("escape-attempt.txt", f"rc={rc}\nmontés (mode)={modes}\ndisques={devices}\n"
                                        f"répertoire kubelet du pod trouvé sur : {node_devs}\n{err[-500:]}")
     node_fs = bool(node_devs)
     ctx.metric("node_rootfs_mounted", int(node_fs), "bool", "lower")
     ctx.metric("block_devices_mountable", len(mounted), "count", "lower")
     ctx.observe(f"{ctx.runtime} : {len(mounted)} partition(s) montée(s) depuis le conteneur imbriqué ; "
-                f"système de fichiers du NŒUD {'ACCESSIBLE' if node_fs else 'non accessible'}")
+                f"système de fichiers du NŒUD {'ACCESSIBLE' if node_fs else 'non accessible'}"
+                f"{' (via ' + ', '.join(f'{d}:{modes[d]}' for d in node_devs) + ')' if node_fs else ''}")
     expected = ctx.runtime == "runc"
     return "PASS" if node_fs == expected else "FAIL"

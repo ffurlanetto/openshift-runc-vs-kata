@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import time
 
+from .cluster import OcError
 from .context import Blocked, NotSupported, TestContext
 
 VARIANTS = ["V1-dind-privileged", "V2-dind-rootless", "V3-buildah", "V4-buildkit-rootless",
@@ -38,7 +39,7 @@ def sh(ctx: TestContext, script: str, timeout_s: int = 600) -> tuple[int, str, s
     return ctx.exec(POD, ["sh", "-c", script], container=CONTAINER, timeout_s=timeout_s)
 
 
-def wait_engine(ctx: TestContext, timeout_s: int = 180) -> float:
+def wait_engine(ctx: TestContext, timeout_s: int = 300) -> float:
     """Attend que le moteur réponde. V1/V2 : démon dockerd. V3 : buildah (sans démon). V4 : buildkitd rootless
     démarré à la demande par buildctl-daemonless.sh. Retourne le délai en secondes."""
     probe = {
@@ -50,7 +51,10 @@ def wait_engine(ctx: TestContext, timeout_s: int = 180) -> float:
     t0 = time.perf_counter()
     last = ""
     while time.perf_counter() - t0 < timeout_s:
-        rc, out, err = sh(ctx, probe + " && echo ok", timeout_s=120)
+        try:
+            rc, out, err = sh(ctx, probe + " && echo ok", timeout_s=60)
+        except OcError as e:  # exec bloqué (VM lente en imbriqué) : on réessaie jusqu'à timeout_s
+            rc, out, err = 1, "", str(e)
         if rc == 0 and "ok" in out:
             return time.perf_counter() - t0
         last = err or out
