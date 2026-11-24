@@ -1,0 +1,40 @@
+{
+  "tmpfs_files": [
+    {
+      "file": "value",
+      "marker": true
+    }
+  ],
+  "procs": [
+    {
+      "comm": "containerd-shim",
+      "environ": false,
+      "memory": true,
+      "scanned_mib": 36
+    },
+    {
+      "comm": "virtiofsd",
+      "environ": false,
+      "memory": true,
+      "scanned_mib": 18
+    },
+    {
+      "comm": "qemu-system-aar",
+      "environ": false,
+      "memory": true,
+      "scanned_mib": 329
+    },
+    {
+      "comm": "vhost-3553425",
+      "environ": false,
+      "memory": false,
+      "scanned_mib": 0
+    },
+    {
+      "comm": "vhost-3553425",
+      "environ": false,
+      "memory": false,
+      "scanned_mib": 0
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+$ buildah build -q --build-arg BASE=registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 --build-arg GREETING=kvr --secret id=token,src=/work/secret.txt -t kvr/demo /work
+rc=0
+695f9b0292c93f1c389bc291b4e2ce808c35e4db5ad27a323ab1a027eb5292df

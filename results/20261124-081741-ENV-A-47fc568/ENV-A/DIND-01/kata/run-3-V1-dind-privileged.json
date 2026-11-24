@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-01",
+  "category": "DIND",
+  "title": "Démarrage du moteur de build",
+  "runtime": "kata",
+  "run": 3,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-081741-ENV-A-47fc568",
+    "git_commit": "47fc5684953a01af0cd3a8b1bccbc49339d926e2",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T08:40:33Z",
+  "duration_s": 133.033,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "pod_ready",
+      "value": 41.8,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_after_pod",
+      "value": 78.0,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "engine_ready_total",
+      "value": 119.9,
+      "unit": "s",
+      "better": "lower"
+    }
+  ],
+  "observations": "V1-dind-privileged : moteur prêt en 119.9s ; storage_driver=overlayfs, cgroup_version=2, engine_version=29.10.0, security=[name=seccomp,profile=builtin name=cgroupns]",
+  "evidence": [
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/DIND-01/kata/run-3-V1-dind-privileged/manifest-1-dind-pod.yaml",
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/DIND-01/kata/run-3-V1-dind-privileged/engine-info.json",
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/DIND-01/kata/run-3-V1-dind-privileged/pods.json",
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/DIND-01/kata/run-3-V1-dind-privileged/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V1-dind-privileged",
+  "manifest_sha256": "d6dd2157cab25624fc1b32961aa49bce2457f373432ab600a0edaf559d6905ac"
+}

@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON           OBJECT   MESSAGE
+6m57s       Normal   Scheduled        pod/ci   Successfully assigned kvr-1738a-dind-05-kata-v5-3/ci to crc
+6m56s       Normal   AddedInterface   pod/ci   Add eth0 [192.0.2.222/23] from ovn-kubernetes
+6m22s       Normal   Pulled           pod/ci   Container image "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c" already present on machine and can be accessed by the pod
+6m21s       Normal   Created          pod/ci   Container created
+6m21s       Normal   Started          pod/ci   Container started

@@ -1,0 +1,13 @@
+LAST SEEN   TYPE      REASON            OBJECT                                              MESSAGE
+37s         Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged      Pod kvr-1738a-pol-14-kata-1/policy-probe: [validation] fail (blocked); privileged: true interdit
+37s         Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged      Job kvr-1738a-pol-14-kata-1/bypass-job: [validation] fail (blocked); privileged: true interdit
+37s         Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged      CronJob kvr-1738a-pol-14-kata-1/bypass-cron: [validation] fail (blocked); privileged: true interdit
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged      Pod kvr-1738a-pol-14-kata-1/target: [validation] fail (blocked); privileged: true interdit
+37s         Warning   PolicyViolation   namespacedvalidatingpolicy/require-run-as-nonroot   Pod kvr-1738a-pol-14-kata-1/policy-probe: [validation] fail (blocked); runAsNonRoot doit être true (pod ou chaque conteneur)
+37s         Warning   PolicyViolation   namespacedvalidatingpolicy/require-run-as-nonroot   Job kvr-1738a-pol-14-kata-1/bypass-job: [validation] fail (blocked); runAsNonRoot doit être true (pod ou chaque conteneur)
+37s         Warning   PolicyViolation   namespacedvalidatingpolicy/require-run-as-nonroot   CronJob kvr-1738a-pol-14-kata-1/bypass-cron: [validation] fail (blocked); runAsNonRoot doit être true (pod ou chaque conteneur)
+38s         Normal    Scheduled         pod/target                                          Successfully assigned kvr-1738a-pol-14-kata-1/target to crc
+37s         Normal    AddedInterface    pod/target                                          Add eth0 [192.0.2.0/23] from ovn-kubernetes
+2s          Normal    Pulled            pod/target                                          Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+1s          Normal    Created           pod/target                                          Container created
+1s          Normal    Started           pod/target                                          Container started

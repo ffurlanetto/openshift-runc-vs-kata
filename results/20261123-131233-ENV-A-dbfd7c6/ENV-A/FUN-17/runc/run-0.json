@@ -14,7 +14,7 @@
   },
   "env": {
     "id": "ENV-A",
-    "context": "crc-admin",
+    "context": "contexte-1",
     "platform": "OpenShift 4.22.1",
     "arch": "arm64",
     "node": "crc",

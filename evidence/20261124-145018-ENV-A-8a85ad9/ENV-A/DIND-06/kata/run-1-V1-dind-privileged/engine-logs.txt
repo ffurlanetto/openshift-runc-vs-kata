@@ -1,0 +1,71 @@
+iptables v1.8.13 (nf_tables)
+time="2026-11-24T16:29:34.200231488Z" level=info msg="Starting up"
+time="2026-11-24T16:29:34.688877523Z" level=warning msg="Binding to IP address without --tlsverify is insecure and gives root access on this machine to everyone who has access to your network." host="tcp://0.0.0.0:2375"
+time="2026-11-24T16:29:34.786286927Z" level=warning msg="Binding to an IP address, even on localhost, can also give access to scripts run in a browser. Be safe out there!" host="tcp://0.0.0.0:2375"
+time="2026-11-24T16:29:34.809606822Z" level=warning msg="[DEPRECATION NOTICE] In future versions this will be a hard failure preventing the daemon from starting! Learn more at: https://docs.docker.com/go/api-security/" host="tcp://0.0.0.0:2375"
+time="2026-11-24T16:29:35.833363805Z" level=warning msg="Binding to an IP address without --tlsverify is deprecated. Startup is intentionally being slowed down to show this message" host="tcp://0.0.0.0:2375"
+time="2026-11-24T16:29:35.839004392Z" level=warning msg="Please consider generating tls certificates with client validation to prevent exposing unauthenticated root access to your network" host="tcp://0.0.0.0:2375"
+time="2026-11-24T16:29:35.840500529Z" level=warning msg="You can override this by explicitly specifying '--tls=false' or '--tlsverify=false'" host="tcp://0.0.0.0:2375"
+time="2026-11-24T16:29:35.840748281Z" level=warning msg="Support for listening on TCP without authentication or explicit intent to run without authentication will be removed in the next release" host="tcp://0.0.0.0:2375"
+time="2026-11-24T16:29:52.330700846Z" level=info msg="containerd not running, starting managed containerd"
+time="2026-11-24T16:29:52.775434613Z" level=info msg="containerd binary not found, starting embedded containerd" error="failed to find containerd binary: containerd: exec: \"containerd\": executable file not found in $PATH"
+time="2026-11-24T16:29:52.783283926Z" level=warning msg="Running with experimental embedded-containerd mode"
+time="2026-11-24T16:29:54.111628346Z" level=info msg="starting embedded containerd server" address=/var/run/docker/containerd/containerd.sock
+time="2026-11-24T16:29:54.695013597Z" level=info msg="loading plugin" id=io.containerd.content.v1.content type=io.containerd.content.v1
+time="2026-11-24T16:29:55.430466648Z" level=warning msg="failed check for fsverity support" error="enable fsverity failed: inappropriate ioctl for device" path=/var/lib/docker/containerd/daemon/io.containerd.content.v1.content
+time="2026-11-24T16:29:55.449929096Z" level=info msg="loading plugin" id=io.containerd.warning.v1.deprecations type=io.containerd.warning.v1
+time="2026-11-24T16:29:55.455813559Z" level=info msg="loading plugin" id=io.containerd.event.v1.exchange type=io.containerd.event.v1
+time="2026-11-24T16:29:55.464609130Z" level=info msg="loading plugin" id=io.containerd.snapshotter.v1.native type=io.containerd.snapshotter.v1
+time="2026-11-24T16:29:55.786560081Z" level=info msg="loading plugin" id=io.containerd.snapshotter.v1.overlayfs type=io.containerd.snapshotter.v1
+time="2026-11-24T16:29:56.550434401Z" level=info msg="loading plugin" id=io.containerd.monitor.task.v1.cgroups type=io.containerd.monitor.task.v1
+time="2026-11-24T16:29:56.705034013Z" level=info msg="loading plugin" id=io.containerd.metadata.v1.bolt type=io.containerd.metadata.v1
+time="2026-11-24T16:29:56.896263168Z" level=info msg="metadata content store policy set" policy=shared
+time="2026-11-24T16:29:59.076024776Z" level=info msg="loading plugin" id=io.containerd.gc.v1.scheduler type=io.containerd.gc.v1
+time="2026-11-24T16:29:59.315549317Z" level=info msg="loading plugin" id=io.containerd.mount-manager.v1.bolt type=io.containerd.mount-manager.v1
+time="2026-11-24T16:30:00.239939880Z" level=info msg="loading plugin" id=io.containerd.differ.v1.walking type=io.containerd.differ.v1
+time="2026-11-24T16:30:00.504628623Z" level=info msg="loading plugin" id=io.containerd.lease.v1.manager type=io.containerd.lease.v1
+time="2026-11-24T16:30:00.639636412Z" level=info msg="loading plugin" id=io.containerd.service.v1.containers-service type=io.containerd.service.v1
+time="2026-11-24T16:30:00.865875472Z" level=info msg="loading plugin" id=io.containerd.service.v1.content-service type=io.containerd.service.v1
+time="2026-11-24T16:30:01.036869090Z" level=info msg="loading plugin" id=io.containerd.service.v1.diff-service type=io.containerd.service.v1
+time="2026-11-24T16:30:01.165405618Z" level=info msg="loading plugin" id=io.containerd.service.v1.images-service type=io.containerd.service.v1
+time="2026-11-24T16:30:01.257132561Z" level=info msg="loading plugin" id=io.containerd.service.v1.introspection-service type=io.containerd.service.v1
+time="2026-11-24T16:30:01.260486421Z" level=info msg="loading plugin" id=io.containerd.service.v1.namespaces-service type=io.containerd.service.v1
+time="2026-11-24T16:30:01.260907257Z" level=info msg="loading plugin" id=io.containerd.service.v1.snapshots-service type=io.containerd.service.v1
+time="2026-11-24T16:30:01.261565304Z" level=info msg="loading plugin" id=io.containerd.shim.v1.manager type=io.containerd.shim.v1
+time="2026-11-24T16:30:01.388584696Z" level=info msg="loading plugin" id=io.containerd.runtime.v2.task type=io.containerd.runtime.v2
+time="2026-11-24T16:30:01.784111277Z" level=info msg="loading plugin" id=io.containerd.service.v1.tasks-service type=io.containerd.service.v1
+time="2026-11-24T16:30:02.140708755Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.containers type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.377552067Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.content type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.534544615Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.diff type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.544172567Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.events type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.580471441Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.images type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.588271878Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.introspection type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.589298470Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.leases type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.593191292Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.namespaces type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.595545020Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.snapshots type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.639831624Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.tasks type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.681230664Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.version type=io.containerd.grpc.v1
+time="2026-11-24T16:30:02.683228596Z" level=info msg="loading plugin" id=io.containerd.grpc.v1.healthcheck type=io.containerd.grpc.v1
+time="2026-11-24T16:30:04.102969873Z" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+time="2026-11-24T16:30:04.578168258Z" level=info msg="CDI directory does not exist, skipping" dir=/etc/cdi
+time="2026-11-24T16:30:04.582871921Z" level=info msg="CDI directory does not exist, skipping" dir=/var/run/cdi
+time="2026-11-24T16:30:24.487227926Z" level=info msg="loaded extension" extension=org.mobyproject.namesgenerator.legacy.v1 origin=builtin providers="[org.mobyproject.extension.containernamegenerator.v0 org.mobyproject.extension.servicenamegenerator.v0]"
+time="2026-11-24T16:30:24.566886179Z" level=info msg="loaded extension" extension=org.mobyproject.storage.bbolt.v0 origin=builtin providers="[org.mobyproject.extension.storage.kv.v0]"
+time="2026-11-24T16:30:24.594131465Z" level=info msg="loaded extension" extension=org.mobyproject.daemon.config.v0 origin=builtin providers="[org.mobyproject.extension.daemon.config.v0]"
+time="2026-11-24T16:30:24.596566942Z" level=info msg="loaded extension" extension=org.mobyproject.daemon.monolith.v0 origin=builtin providers="[org.mobyproject.extension.container.state.v0]"
+time="2026-11-24T16:30:24.597481308Z" level=info msg="loaded extension" extension=org.mobyproject.daemon.api.v0 origin=builtin providers="[org.mobyproject.extension.daemon.api.v0]"
+time="2026-11-24T16:30:25.388657640Z" level=info msg="Creating a containerd client" address=/var/run/docker/containerd/containerd.sock timeout=1m0s
+time="2026-11-24T16:30:27.296603500Z" level=warning msg="failed check for fsverity support" error="enable fsverity failed: inappropriate ioctl for device" path=/var/lib/docker/plugins/storage
+time="2026-11-24T16:30:30.645741763Z" level=info msg="Loading containers: start."
+time="2026-11-24T16:30:30.709610122Z" level=info msg="NRI is disabled"
+time="2026-11-24T16:30:30.772109286Z" level=info msg="Starting daemon with containerd snapshotter integration enabled"
+time="2026-11-24T16:30:32.689695348Z" level=info msg="Restoring containers: start."
+time="2026-11-24T16:30:34.137155650Z" level=warning msg="Failed to find nft tool" error="exec: \"nft\": executable file not found in $PATH"
+time="2026-11-24T16:30:34.164079939Z" level=info msg="Deleting nftables IPv4 rules" error="failed to find nft tool: exec: \"nft\": executable file not found in $PATH"
+time="2026-11-24T16:30:34.165200554Z" level=info msg="Deleting nftables IPv6 rules" error="failed to find nft tool: exec: \"nft\": executable file not found in $PATH"
+time="2026-11-24T16:31:26.843987611Z" level=warning msg="xtables contention detected while running [--wait -t filter -N DOCKER-FORWARD]: Waited for 2.41 seconds and received \"\""
+time="2026-11-24T16:31:31.064582107Z" level=warning msg="xtables contention detected while running [--wait -t filter -N DOCKER-BRIDGE]: Waited for 2.23 seconds and received \"\""
+time="2026-11-24T16:31:43.233240787Z" level=warning msg="xtables contention detected while running [--wait -t nat -A OUTPUT -m addrtype --dst-type LOCAL -j DOCKER ! --dst 192.0.2.226/8]: Waited for 2.24 seconds and received \"\""
+time="2026-11-24T16:31:54.876732059Z" level=warning msg="xtables contention detected while running [--wait -t filter -I DOCKER-FORWARD -j DOCKER-INTERNAL]: Waited for 2.19 seconds and received \"\""
+time="2026-11-24T16:33:00.591623817Z" level=warning msg="xtables contention detected while running [--wait -t nat -N DOCKER]: Waited for 2.53 seconds and received \"\""
+time="2026-11-24T16:33:18.451262653Z" level=warning msg="xtables contention detected while running [--wait -t nat -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER]: Waited for 2.16 seconds and received \"\""

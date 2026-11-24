@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-18",
+  "category": "SEC",
+  "title": "Isolation entre pods : processus, mémoire, fichiers, réseau",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-144102-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T14:47:37Z",
+  "duration_s": 5.124,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "peer_visibility_leaks",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "node_sees_process",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_reads_memory",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_captures_network",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_reads_files",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : voisins (voisin runc) : AUCUNE visibilité (processus visibles par le voisin runc : 2) ; administrateur du nœud : processus marqué invisible (processus du pod vus sur le nœud : bash, conmon, sleep), mémoire LUE, fichier TROUVÉ, réseau CAPTURÉ",
+  "evidence": [
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-18/runc/run-1/manifest-1-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-18/runc/run-1/manifest-2-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-18/runc/run-1/peers.json",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-18/runc/run-1/manifest-3-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-18/runc/run-1/node-view.json",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-18/runc/run-1/pods.json",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-18/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "adc238076b34e6cbf157e79d144949f585b547866c3953ea576c67a138c28657"
+}

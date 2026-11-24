@@ -1,6 +1,6 @@
 LAST SEEN   TYPE     REASON           OBJECT     MESSAGE
 4m1s        Normal   Scheduled        pod/disk   Successfully assigned kvr-8ceb4-pol-16-kata-1/disk to crc
-4m1s        Normal   AddedInterface   pod/disk   Add eth0 [10.217.0.186/23] from ovn-kubernetes
+4m1s        Normal   AddedInterface   pod/disk   Add eth0 [192.0.2.0/23] from ovn-kubernetes
 3m29s       Normal   Pulled           pod/disk   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
 3m28s       Normal   Created          pod/disk   Container created
 3m28s       Normal   Started          pod/disk   Container started

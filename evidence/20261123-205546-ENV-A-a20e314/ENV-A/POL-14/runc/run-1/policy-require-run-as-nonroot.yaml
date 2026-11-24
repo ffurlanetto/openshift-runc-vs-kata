@@ -1,0 +1,33 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: require-run-as-nonroot
+  namespace: kvr-4d877-pol-14-runc-1
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Exécution en non-root obligatoire"
+spec:
+  validationActions: ["Deny"]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+    - name: workload
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : [])"
+    - name: containers
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : []) + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])"
+  validations:
+    - message: "runAsNonRoot doit être true (pod ou chaque conteneur)"
+      expression: "variables.containers.all(c,\n  (has(c.securityContext) && has(c.securityContext.runAsNonRoot))\n    ? c.securityContext.runAsNonRoot == true\n    : (has(object.spec.securityContext) && has(object.spec.securityContext.runAsNonRoot)\n       && object.spec.securityContext.runAsNonRoot == true))"
+    - message: "runAsUser: 0 interdit"
+      expression: "variables.containers.all(c, !(has(c.securityContext) && has(c.securityContext.runAsUser))\n  || c.securityContext.runAsUser != 0)\n&& (!(has(object.spec.securityContext) && has(object.spec.securityContext.runAsUser))\n  || object.spec.securityContext.runAsUser != 0)"

@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-09",
+  "category": "POL",
+  "title": "Kyverno : seccomp RuntimeDefault obligatoire",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261124-104157-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T13:29:46Z",
+  "duration_s": 1.022,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "violating_admitted_without_policy",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "policy_propagation",
+      "value": 94,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "compliant_admitted_enforce",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "violating_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "violating_deployment_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "Kyverno v1.20.0 (cel) ; Enforce : conforme admis, non conforme refusé, Deployment non conforme refusé",
+  "evidence": [
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-09/kata/run-0/manifest-1-conforme.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-09/kata/run-0/manifest-2-non-conforme.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-09/kata/run-0/manifest-3-deployment-non-conforme.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-09/kata/run-0/policy-restrict-seccomp.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-09/kata/run-0/admission.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-09/kata/run-0/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "3ed392d7f3c4d8efbb1bfab6dbd98e5ab163d8437fa4e4c52adf12cd921582da"
+}

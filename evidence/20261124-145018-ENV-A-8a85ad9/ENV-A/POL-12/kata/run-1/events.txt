@@ -1,0 +1,2 @@
+LAST SEEN   TYPE      REASON            OBJECT                                    MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/require-kata   Pod kvr-1738a-pol-12-kata-1/policy-probe: [validation] fail (blocked); runtimeClassName: kata obligatoire dans ce namespace

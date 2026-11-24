@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "test_id": "AGT-08",
+  "category": "AGT",
+  "title": "Latence d'un appel d'outil (exec)",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261124-081741-ENV-A-47fc568",
+    "git_commit": "47fc5684953a01af0cd3a8b1bccbc49339d926e2",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T08:17:43Z",
+  "duration_s": 75.399,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "exec_latency_p50",
+      "value": 359,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "exec_latency_p95",
+      "value": 962,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "exec_failures",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "100 exec : p50 359 ms, p95 962 ms, échecs 0",
+  "evidence": [
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/AGT-08/kata/run-0/manifest-1-probe-pod.yaml",
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/AGT-08/kata/run-0/latencies_ms.json",
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/AGT-08/kata/run-0/pods.json",
+    "evidence/20261124-081741-ENV-A-47fc568/ENV-A/AGT-08/kata/run-0/events.txt"
+  ],
+  "aspect": "PERF",
+  "agent_mode": "replay",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

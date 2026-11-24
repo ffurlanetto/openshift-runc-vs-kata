@@ -15,4 +15,4 @@ LAST SEEN   TYPE      REASON            OBJECT                                  
 12s         Normal    Started           pod/policy-probe                                    Container started
 12s         Normal    Created           pod/policy-probe                                    Container created
 12s         Normal    Pulled            pod/policy-probe                                    Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
-12s         Normal    AddedInterface    pod/policy-probe                                    Add eth0 [10.217.0.171/23] from ovn-kubernetes
+12s         Normal    AddedInterface    pod/policy-probe                                    Add eth0 [192.0.2.0/23] from ovn-kubernetes

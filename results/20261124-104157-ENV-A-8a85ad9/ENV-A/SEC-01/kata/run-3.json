@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-01",
+  "category": "SEC",
+  "title": "Identification du noyau vu par le pod",
+  "runtime": "kata",
+  "run": 3,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-104157-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T13:48:12Z",
+  "duration_s": 27.918,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "kernel_shared_with_node",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "noyau pod=6.18.62 ; noyau nœud=5.14.0-687.13.1.el9_8.aarch64",
+  "evidence": [
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-01/kata/run-3/manifest-1-probe-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-01/kata/run-3/proc_version.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-01/kata/run-3/pods.json",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-01/kata/run-3/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

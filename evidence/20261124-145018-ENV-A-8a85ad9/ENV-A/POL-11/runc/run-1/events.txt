@@ -1,0 +1,3 @@
+LAST SEEN   TYPE      REASON            OBJECT                                                MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/privileged-requires-kata   Pod kvr-1738a-pol-11-runc-1/policy-probe: [validation] fail (blocked); un conteneur privilégié exige runtimeClassName: kata
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/privileged-requires-kata   Pod kvr-1738a-pol-11-runc-1/policy-probe: [validation] fail (blocked); un conteneur privilégié exige runtimeClassName: kata

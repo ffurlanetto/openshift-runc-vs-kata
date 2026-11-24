@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<repo>/scripts/kvr/runner.py", line 237, in execute_step
+    for leak in anonymize.find_leaks(f.read_text(errors="replace"), self.anon.map if self.anon.enabled else None):
+     ^^^^^^^^^^^^^^^^^
+  File "<repo>/tests/DIND-05/test.py", line 15, in run
+    dind.deploy(ctx)
+    ~~~~~~~~~~~^^^^^
+  File "<repo>/scripts/kvr/dind.py", line 34, in deploy
+    ctx.wait(f"pod/{POD}", timeout_s=timeout_s)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/context.py", line 104, in wait
+    try:
+    
+        self.cluster.oc("wait", ref, f"--for={condition}", f"--timeout={timeout_s}s",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/cluster.py", line 69, in oc
+    raise OcError(f"kubectl {' '.join(args)} -> rc={r.returncode} : {r.stderr.strip()}")
+kvr.cluster.OcError: kubectl wait pod/ci --for=condition=Ready --timeout=300s -n kvr-a47ff-dind-05-kata-v3-0 -> rc=1 : error: timed out waiting for the condition on pods/ci

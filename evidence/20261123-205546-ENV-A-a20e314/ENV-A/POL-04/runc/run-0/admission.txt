@@ -1,0 +1,11 @@
+## sans policy : conforme=True non-conforme=True
+
+
+## Enforce : conforme=True
+
+
+## Enforce : pod non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-e1be9986" denied the request: Policy disallow-privileged failed: privileged: true interdit
+
+## Enforce : Deployment non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-e1be9986" denied the request: Policy disallow-privileged failed: privileged: true interdit

@@ -1,0 +1,16 @@
+LAST SEEN   TYPE     REASON                  OBJECT                       MESSAGE
+50s         Normal   WaitForFirstConsumer    persistentvolumeclaim/data   waiting for first consumer to be created before binding
+49s         Normal   Provisioning            persistentvolumeclaim/data   External provisioner is provisioning volume for claim "kvr-4aca1-vol-01-kata-1/data"
+49s         Normal   ExternalProvisioning    persistentvolumeclaim/data   Waiting for a volume to be created either by the external provisioner 'kubevirt.io.hostpath-provisioner' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.
+49s         Normal   ProvisioningSucceeded   persistentvolumeclaim/data   Successfully provisioned volume pvc-1d08c36a-2f56-48d5-b9af-243d09427225
+48s         Normal   Scheduled               pod/writer                   Successfully assigned kvr-4aca1-vol-01-kata-1/writer to crc
+48s         Normal   AddedInterface          pod/writer                   Add eth0 [192.0.2.151/23] from ovn-kubernetes
+31s         Normal   Pulled                  pod/writer                   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+31s         Normal   Created                 pod/writer                   Container created
+31s         Normal   Started                 pod/writer                   Container started
+24s         Normal   AddedInterface          pod/reader                   Add eth0 [192.0.2.150/23] from ovn-kubernetes
+24s         Normal   Scheduled               pod/reader                   Successfully assigned kvr-4aca1-vol-01-kata-1/reader to crc
+24s         Normal   Killing                 pod/writer                   Stopping container main
+5s          Normal   Pulled                  pod/reader                   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+4s          Normal   Created                 pod/reader                   Container created
+4s          Normal   Started                 pod/reader                   Container started

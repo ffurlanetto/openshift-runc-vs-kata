@@ -1,0 +1,55 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-context
+  namespace: kvr-1738a-dind-05-kata-v2-2
+data:
+  Dockerfile: |
+    ARG BASE
+    FROM ${BASE} AS build
+    ARG GREETING=default
+    RUN --mount=type=secret,id=token \
+        test -s /run/secrets/token \
+        && echo "greeting=${GREETING}" > /out.txt \
+        && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt \
+        && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+    FROM ${BASE}
+    COPY --from=build /out.txt /out.txt
+    CMD ["cat", "/out.txt"]
+  secret.txt: "jeton-factice-du-banc-kvr"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ci
+  namespace: kvr-1738a-dind-05-kata-v2-2
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+  runtimeClassName: kata
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: engine
+      image: docker.io/library/docker@sha256:5a703ad0d72cd5e4fb4beca8024d6eddef6d22a46ed1d9812bf3d24ff43ccbce
+      env:
+        - {name: DOCKER_TLS_CERTDIR, value: ""}
+        - {name: DOCKER_HOST, value: "unix:///run/user/1000/docker.sock"}
+      securityContext:
+        privileged: true          # requis par dind-rootless (user namespaces imbriqués) ; démon non root
+        runAsUser: 1000
+        runAsGroup: 1000
+      volumeMounts:
+        - {name: engine-storage, mountPath: /home/rootless/.local/share}   # dockerd crée et possède docker/
+        - {name: build-context, mountPath: /work}
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests: {cpu: 500m, memory: 512Mi}
+        limits: {cpu: "2", memory: 2Gi}
+  volumes:
+    - name: engine-storage
+      emptyDir: {}
+    - name: build-context
+      configMap: {name: build-context}

@@ -1,0 +1,2 @@
+runtimeClassName=kata admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-bce577fa" denied the request: Policy require-kata failed: runtimeClassName: kata-qemu obligatoire dans ce namespace

@@ -1,0 +1,11 @@
+## sans policy : conforme=True non-conforme=True
+
+
+## Enforce : conforme=True
+
+
+## Enforce : pod non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-d3a86ff9" denied the request: Policy require-image-digest failed: image à référencer par digest (@sha256:…)
+
+## Enforce : Deployment non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-d3a86ff9" denied the request: Policy require-image-digest failed: image à référencer par digest (@sha256:…)

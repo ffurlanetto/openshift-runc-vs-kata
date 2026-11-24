@@ -1,0 +1,4 @@
+iptables v1.8.13 (nf_tables)
+open: No such file or directory
+[rootlesskit:parent] error: failed to setup network &{logWriter:0x6083fc70e7b0 binary:slirp4netns mtu:1500 ipnet:<nil> disableHostLoopback:true apiSocketPath: enableSandbox:false enableSeccomp:false enableIPv6:false ifname:tap0 infoMu:{w:{_:{} mu:{state:0 sema:0}} writerSem:0 readerSem:0 readerCount:{_:{} v:0} readerWait:{_:{} v:0}} info:<nil>}: setting up tap tap0: executing [[nsenter -t 28 -n -m -U --preserve-credentials ip tuntap add name tap0 mode tap] [nsenter -t 28 -n -m -U --preserve-credentials ip link set tap0 up]]: exit status 1
+[rootlesskit:child ] error: EOF

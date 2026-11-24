@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                           MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged   Pod kvr-4d877-pol-04-kata-1/policy-probe: [validation] fail (blocked); privileged: true interdit
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged   Pod kvr-4d877-pol-04-kata-1/policy-probe: [validation] fail (blocked); privileged: true interdit
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privileged   Deployment kvr-4d877-pol-04-kata-1/policy-probe-deploy: [validation] fail (blocked); privileged: true interdit

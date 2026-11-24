@@ -1,0 +1,35 @@
+{
+  "process_by_name": false,
+  "pod_processes": [
+    {
+      "comm": "conmon",
+      "cmdline": "/usr/bin/conmon -b /run/containers/storage/overlay-container",
+      "memory": false,
+      "scanned_mib": 6
+    },
+    {
+      "comm": "sleep",
+      "cmdline": "/usr/bin/coreutils --coreutils-prog-shebang=sleep /usr/bin/s",
+      "memory": true,
+      "scanned_mib": 4
+    },
+    {
+      "comm": "bash",
+      "cmdline": "bash -c \necho \"kvr-file-$KVR_TOKEN\" > /tmp/kvr-file-$KVR_TOK",
+      "memory": true,
+      "scanned_mib": 1
+    },
+    {
+      "comm": "sleep",
+      "cmdline": "/usr/bin/coreutils --coreutils-prog-shebang=sleep /usr/bin/s",
+      "memory": true,
+      "scanned_mib": 4
+    }
+  ],
+  "memory": true,
+  "files": [
+    "lib/…"
+  ],
+  "network": true,
+  "network_iface": "d1ff…"
+}

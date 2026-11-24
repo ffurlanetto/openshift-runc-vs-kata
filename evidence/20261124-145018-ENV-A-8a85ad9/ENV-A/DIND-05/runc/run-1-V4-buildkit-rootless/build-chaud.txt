@@ -1,0 +1,31 @@
+$ buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=/work --local dockerfile=/work --opt build-arg:BASE=registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 --opt build-arg:GREETING=kvr --secret id=token,src=/work/secret.txt --output type=oci,dest=/tmp/demo.tar
+rc=0
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 857B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BASE} results in empty or invalid base image name (line 2)
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BASE} results in empty or invalid base image name (line 9)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [build 1/2] FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+#4 resolve registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 done
+#4 DONE 0.0s
+
+#5 [build 2/2] RUN --mount=type=secret,id=token     test -s /run/secrets/token     && echo "greeting=kvr" > /out.txt     && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt     && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+#5 CACHED
+
+#6 [stage-1 2/2] COPY --from=build /out.txt /out.txt
+#6 CACHED
+
+#7 exporting to oci image format
+#7 exporting layers done
+#7 exporting manifest sha256:06387e38f4e2af4325c8193db7a16d0a5efdebec084876fada9431cf53a56ed0 done
+#7 exporting config sha256:1df4e540b20aee7a4fec0571ae073c52e20b64e13e7009edef88f73737f4b150 done
+#7 sending tarball 0.1s done
+#7 DONE 0.1s

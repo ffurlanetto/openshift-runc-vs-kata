@@ -1,0 +1,22 @@
+{
+  "tmpfs_files": [
+    {
+      "file": "value",
+      "marker": true
+    }
+  ],
+  "procs": [
+    {
+      "comm": "conmon",
+      "environ": false,
+      "memory": false,
+      "scanned_mib": 6
+    },
+    {
+      "comm": "sleep",
+      "environ": true,
+      "memory": true,
+      "scanned_mib": 4
+    }
+  ]
+}

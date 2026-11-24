@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-18",
+  "category": "POL",
+  "title": "Kyverno : pas de hostNetwork avec Kata",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-104157-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T13:46:16Z",
+  "duration_s": 1.018,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "hostnetwork_admitted_without_policy",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "policy_propagation",
+      "value": 227,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "hostnetwork_admitted_with_policy",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "kata : pod hostNetwork refusé avec la policy",
+  "evidence": [
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-18/kata/run-1/manifest-1-hostnetwork.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-18/kata/run-1/policy-disallow-hostnetwork-kata.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-18/kata/run-1/manifest-2-sonde-kata-hostnetwork.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-18/kata/run-1/admission.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-18/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "279fcfe2f6f0c21bfde69c530acc130568c357f1455bbeac4de1d9a5d739d9a3"
+}

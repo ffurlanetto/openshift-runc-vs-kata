@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-03",
+  "category": "SEC",
+  "title": "Visibilité du nœud depuis un pod restreint",
+  "runtime": "kata",
+  "run": 4,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T08:16:16Z",
+  "duration_s": 24.356,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "visible_procs",
+      "value": 4,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "visible_block_devices",
+      "value": 25,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "visible_dev_nodes",
+      "value": 15,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "visible_mounts",
+      "value": 24,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "visible_net_interfaces",
+      "value": 2,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "visible_cpus",
+      "value": 1,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "visible_memory",
+      "value": 257,
+      "unit": "MiB",
+      "better": "lower"
+    }
+  ],
+  "observations": "mémoire visible 257 MiB (nœud 23982 MiB), CPU visibles 1 (nœud 12)",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/SEC-03/kata/run-4/manifest-1-probe-pod.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/SEC-03/kata/run-4/inventory.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/SEC-03/kata/run-4/pods.json",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/SEC-03/kata/run-4/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-06",
+  "category": "DIND",
+  "title": "Conteneurs imbriqués : réseau et MTU",
+  "runtime": "kata",
+  "run": 2,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-145018-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T16:33:45Z",
+  "duration_s": 262.451,
+  "status": "FAIL",
+  "metrics": [
+    {
+      "name": "nested_https_ok",
+      "value": 0,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "V1-dind-privileged : MTU pod=1400 bridge docker=1500 ; conteneur imbriqué NON démarré (rc=125) : docker: Error response from daemon: failed to mount /tmp/containerd-mount1064430347: mount source: \"overlay\", target: \"/tmp/containerd-mount1064430347\", fstype: overlay, flags: 0, data: \"workdir=/var/lib/docker/container",
+  "evidence": [
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V1-dind-privileged/manifest-1-dind-pod.yaml",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V1-dind-privileged/nested-curl.txt",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V1-dind-privileged/pods.json",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V1-dind-privileged/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V1-dind-privileged",
+  "manifest_sha256": "d6dd2157cab25624fc1b32961aa49bce2457f373432ab600a0edaf559d6905ac"
+}

@@ -1,0 +1,619 @@
+{
+  "campaign_id": "20261124-144102-ENV-A-8a85ad9",
+  "runner_version": "0.1.0",
+  "started_at": "2026-11-24T14:41:03Z",
+  "command": [
+    "scripts/campaign.py",
+    "run",
+    "--context",
+    "contexte-1",
+    "--tests",
+    "SEC-04,SEC-05,SEC-08,SEC-09,SEC-18,SEC-19",
+    "--runs",
+    "1",
+    "--no-warmup",
+    "--non-safe",
+    "--yes"
+  ],
+  "target": {
+    "context": "contexte-1",
+    "api_server": "https://api.crc.testing:6443",
+    "platform": "openshift",
+    "env_id": "ENV-A",
+    "description": "OpenShift Local (CRC) arm64, vfkit --nested, Kata via kata-deploy upstream",
+    "nested_virt": true,
+    "anonymize": true,
+    "kata_version": "4.4.0 (kata-deploy, qemu-runtime-rs)",
+    "node_selector": {},
+    "runtimes": {
+      "runc": null,
+      "kata": "kata"
+    },
+    "registry": {
+      "mirrors": [],
+      "pull_secret": null
+    }
+  },
+  "images_resolved": {
+    "ubi_minimal": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+    "ubi": "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd",
+    "docker_dind": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
+    "docker_dind_rootless": "docker.io/library/docker@sha256:5a703ad0d72cd5e4fb4beca8024d6eddef6d22a46ed1d9812bf3d24ff43ccbce",
+    "buildah": "quay.io/buildah/stable@sha256:7c4a2893a2ec7a8eecb37debacc0cd657f453cfdc3d4a36b0171f5f9ac6cf618",
+    "buildkit_rootless": "docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be",
+    "ubi_minimal_tag": "registry.access.redhat.com/ubi9/ubi-minimal:latest"
+  },
+  "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+  "git_dirty": false,
+  "replay_of": null,
+  "config": {
+    "operator": "",
+    "phases": [
+      "FUN",
+      "PERF",
+      "SEC",
+      "POL",
+      "OPS",
+      "DIND",
+      "AGT",
+      "VOL",
+      "SCR"
+    ],
+    "registry": {
+      "mirrors": [],
+      "pull_secret": null
+    },
+    "images": {
+      "ubi_minimal": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+      "ubi": "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd",
+      "docker_dind": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
+      "docker_dind_rootless": "docker.io/library/docker@sha256:5a703ad0d72cd5e4fb4beca8024d6eddef6d22a46ed1d9812bf3d24ff43ccbce",
+      "buildah": "quay.io/buildah/stable@sha256:7c4a2893a2ec7a8eecb37debacc0cd657f453cfdc3d4a36b0171f5f9ac6cf618",
+      "buildkit_rootless": "docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be",
+      "ubi_minimal_tag": "registry.access.redhat.com/ubi9/ubi-minimal:latest"
+    },
+    "unpinned_images_allowed": [
+      "ubi_minimal_tag"
+    ],
+    "charts": {
+      "kyverno": {
+        "ref": "oci://ghcr.io/kyverno/charts/kyverno",
+        "version": "3.10.0"
+      },
+      "kata-deploy": {
+        "ref": "oci://ghcr.io/kata-containers/kata-deploy-charts/kata-deploy",
+        "version": "4.4.0",
+        "values": "setup-values/kata-deploy.yaml"
+      }
+    },
+    "defaults": {
+      "runs": 5,
+      "warmup": true,
+      "namespace_prefix": "kvr",
+      "cleanup_timeout_s": 300
+    },
+    "overrides": {
+      "PERF-01": {
+        "runs": 30
+      },
+      "FUN-17": {
+        "params": {
+          "memory_limit": "128Mi"
+        }
+      },
+      "POL-03": {
+        "params": {
+          "max_memory": "2Gi",
+          "max_cpu": "2"
+        }
+      }
+    }
+  },
+  "config_sha256": "05abdc710a0540bdba78d1c630108cf147f4866ffd29a4ec12693ed368e7356f",
+  "plan": [
+    {
+      "test_id": "SEC-04",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-04",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-05",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-05",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-08",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-08",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-09",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-09",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-18",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-18",
+      "runtime": "kata",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-19",
+      "runtime": "runc",
+      "run": 1
+    },
+    {
+      "test_id": "SEC-19",
+      "runtime": "kata",
+      "run": 1
+    }
+  ],
+  "fingerprint": {
+    "platform": "openshift",
+    "api_server": "https://api.crc.testing:6443",
+    "version": "OpenShift 4.22.1",
+    "nodes": [
+      {
+        "name": "crc",
+        "arch": "arm64",
+        "kernel": "5.14.0-687.13.1.el9_8.aarch64",
+        "os_image": "Red Hat Enterprise Linux CoreOS 9.8.20260605-0 (Plow)",
+        "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+        "kubelet": "v1.35.5",
+        "cpu": "12",
+        "memory": "24557648Ki"
+      }
+    ],
+    "runtime_classes": {
+      "kata": {
+        "handler": "kata-qemu-runtime-rs",
+        "overhead": {
+          "podFixed": {
+            "cpu": "250m",
+            "memory": "320Mi"
+          }
+        },
+        "scheduling": {
+          "nodeSelector": {
+            "kata-deploy.katacontainers.io/default": "true",
+            "katacontainers.io/kata-runtime": "true"
+          }
+        }
+      }
+    },
+    "kyverno": {
+      "flavor": "cel",
+      "api_version": "v1",
+      "version": "v1.20.0",
+      "namespace": "kyverno",
+      "enforce_cluster_policies": []
+    },
+    "components": {
+      "cluster": {
+        "kubernetes": "v1.35.5",
+        "distribution": "OpenShift",
+        "version": "4.22.1",
+        "infrastructure": "None",
+        "topology": "SingleReplica"
+      },
+      "nodes": {
+        "container_runtime": [
+          "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+        ],
+        "os_image": [
+          "Red Hat Enterprise Linux CoreOS 9.8.20260605-0 (Plow)"
+        ],
+        "kernel": [
+          "5.14.0-687.13.1.el9_8.aarch64"
+        ],
+        "arch": [
+          "arm64"
+        ],
+        "nodes": 1
+      },
+      "cni": "OVN-Kubernetes",
+      "kata": {
+        "runtime_classes": {
+          "kata": {
+            "handler": "kata-qemu-runtime-rs",
+            "shim": "rust",
+            "hypervisor": "qemu",
+            "overhead": {
+              "cpu": "250m",
+              "memory": "320Mi"
+            },
+            "node_selector": {
+              "kata-deploy.katacontainers.io/default": "true",
+              "katacontainers.io/kata-runtime": "true"
+            }
+          },
+          "kata-qemu": {
+            "handler": "kata-qemu",
+            "shim": "go",
+            "hypervisor": "qemu",
+            "overhead": {
+              "cpu": "250m",
+              "memory": "320Mi"
+            },
+            "node_selector": {
+              "kata-deploy.katacontainers.io/default": "true",
+              "katacontainers.io/kata-runtime": "true"
+            }
+          },
+          "kata-qemu-runtime-rs": {
+            "handler": "kata-qemu-runtime-rs",
+            "shim": "rust",
+            "hypervisor": "qemu",
+            "overhead": {
+              "cpu": "250m",
+              "memory": "320Mi"
+            },
+            "node_selector": {
+              "kata-deploy.katacontainers.io/default": "true",
+              "katacontainers.io/kata-runtime": "true"
+            }
+          }
+        },
+        "install": "kata-deploy (upstream, Helm)",
+        "version": "4.4.0",
+        "namespace": "kata-deploy",
+        "helm_revision": "3",
+        "chart": "kata-deploy 4.4.0"
+      }
+    }
+  },
+  "precheck": {
+    "ok": true,
+    "kyverno": {
+      "flavor": "cel",
+      "api_version": "v1",
+      "version": "v1.20.0",
+      "namespace": "kyverno",
+      "enforce_cluster_policies": []
+    },
+    "images": {
+      "ubi_minimal": "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352",
+      "ubi": "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd",
+      "docker_dind": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
+      "docker_dind_rootless": "docker.io/library/docker@sha256:5a703ad0d72cd5e4fb4beca8024d6eddef6d22a46ed1d9812bf3d24ff43ccbce",
+      "buildah": "quay.io/buildah/stable@sha256:7c4a2893a2ec7a8eecb37debacc0cd657f453cfdc3d4a36b0171f5f9ac6cf618",
+      "buildkit_rootless": "docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be",
+      "ubi_minimal_tag": "registry.access.redhat.com/ubi9/ubi-minimal:latest"
+    },
+    "checks": [
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "kubectl",
+        "detail": "v1.37.1",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "dépôt git",
+        "detail": "propre",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "images épinglées par digest",
+        "detail": "7 image(s)",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "helm (phase DIND)",
+        "detail": "présent",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "local",
+        "name": "helm (phase AGT)",
+        "detail": "présent",
+        "hint": ""
+      },
+      {
+        "level": "WARN",
+        "area": "local",
+        "name": "veille du Mac",
+        "detail": "possible (capot fermé : même caffeinate ne l'empêche pas)",
+        "hint": "pendant la campagne : sudo pmset -a disablesleep 1 (rétablir ensuite : sudo pmset -a disablesleep 0), ou garder le capot ouvert sur secteur"
+      },
+      {
+        "level": "OK",
+        "area": "cluster",
+        "name": "connexion API",
+        "detail": "https://api.crc.testing:6443",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "cluster",
+        "name": "plateforme",
+        "detail": "OpenShift 4.22.1",
+        "hint": ""
+      },
+      {
+        "level": "WARN",
+        "area": "cluster",
+        "name": "écart de version kubectl",
+        "detail": "client 1.37 / serveur 1.35",
+        "hint": "kubectl supporte ±1 version mineure : installer un client adapté"
+      },
+      {
+        "level": "OK",
+        "area": "droits",
+        "name": "RBAC / SCC",
+        "detail": "14 droits vérifiés",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "composants",
+        "name": "distribution",
+        "detail": "OpenShift 4.22.1 (k8s v1.35.5), infra None (sans intégration cloud)",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "composants",
+        "name": "nœuds",
+        "detail": "1 nœud(s), CRI cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9, OS Red Hat Enterprise Linux CoreOS 9.8.20260605-0 (Plow)",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "composants",
+        "name": "CNI",
+        "detail": "OVN-Kubernetes",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "composants",
+        "name": "kata",
+        "detail": "kata-deploy (upstream, Helm), version 4.4.0",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "composants",
+        "name": "RuntimeClass kata",
+        "detail": "handler kata-qemu-runtime-rs, shim rust, hyperviseur qemu, overhead {'cpu': '250m', 'memory': '320Mi'}",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "composants",
+        "name": "RuntimeClass kata-qemu",
+        "detail": "handler kata-qemu, shim go, hyperviseur qemu, overhead {'cpu': '250m', 'memory': '320Mi'}",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "composants",
+        "name": "RuntimeClass kata-qemu-runtime-rs",
+        "detail": "handler kata-qemu-runtime-rs, shim rust, hyperviseur qemu, overhead {'cpu': '250m', 'memory': '320Mi'}",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "nœuds",
+        "name": "nœuds de bench",
+        "detail": "1 nœud(s), arch ['arm64'], sélecteur aucun",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "nœuds",
+        "name": "état",
+        "detail": "Ready, sans pression ressources, planifiables",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "nœuds",
+        "name": "disque",
+        "detail": "< 70% sur 1 nœud(s)",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "runtimes",
+        "name": "RuntimeClass kata",
+        "detail": "handler=kata-qemu-runtime-rs overhead={'cpu': '250m', 'memory': '320Mi'}",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "runtimes",
+        "name": "placement kata",
+        "detail": "nodeSelector={'kata-deploy.katacontainers.io/default': 'true', 'katacontainers.io/kata-runtime': 'true'}",
+        "hint": ""
+      },
+      {
+        "level": "INFO",
+        "area": "registre",
+        "name": "réécriture miroir",
+        "detail": "aucune (pull direct, ou miroir géré par le cluster)",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "kyverno",
+        "name": "présence",
+        "detail": "version v1.20.0 (ns kyverno), API cel v1",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "kyverno",
+        "name": "policies cluster en Enforce",
+        "detail": "aucune",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "droits",
+        "name": "phase POL",
+        "detail": "OK",
+        "hint": "droits de création des policies Kyverno namespacées"
+      },
+      {
+        "level": "INFO",
+        "area": "phases",
+        "name": "sélection",
+        "detail": "FUN, PERF, SEC, POL, OPS, DIND, AGT, VOL, SCR",
+        "hint": ""
+      },
+      {
+        "level": "WARN",
+        "area": "phases",
+        "name": "AGT : CRD",
+        "detail": "absentes : ['sandboxes.agents.x-k8s.io', 'sandboxtemplates.extensions.agents.x-k8s.io']",
+        "hint": "installer Agent Sandbox (agent-sandbox-operator ou upstream) ; sinon tests AGT BLOCKED"
+      },
+      {
+        "level": "OK",
+        "area": "cluster",
+        "name": "Metrics API",
+        "detail": "disponible",
+        "hint": "nécessaire pour l'overhead (PERF/OPS). CRC : crc config set enable-cluster-monitoring true"
+      },
+      {
+        "level": "OK",
+        "area": "cluster",
+        "name": "APIServices indisponibles",
+        "detail": "aucune",
+        "hint": "une APIService en panne bloque la suppression des namespaces (Terminating) : réparer le service concerné"
+      },
+      {
+        "level": "WARN",
+        "area": "cluster",
+        "name": "namespaces résiduels",
+        "detail": "1 namespace(s) du banc",
+        "hint": "./run --cleanup"
+      },
+      {
+        "level": "OK",
+        "area": "admission",
+        "name": "pod restreint (FUN/PERF/SEC)",
+        "detail": "admis",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "admission",
+        "name": "pod bonnes pratiques (POL)",
+        "detail": "admis",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "admission",
+        "name": "pod privilégié (SEC/DIND/POL-11)",
+        "detail": "admis",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "ubi_minimal",
+        "detail": "tirée en 3s : registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a3",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "ubi",
+        "detail": "tirée en 3s : registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "docker_dind",
+        "detail": "tirée en 3s : docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e84",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "docker_dind_rootless",
+        "detail": "tirée en 3s : docker.io/library/docker@sha256:5a703ad0d72cd5e4fb4beca8024d6eddef6d22a46ed1d9812bf3d24ff4",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "buildah",
+        "detail": "tirée en 3s : quay.io/buildah/stable@sha256:7c4a2893a2ec7a8eecb37debacc0cd657f453cfdc3d4a36b0171f5f9ac6c",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "images",
+        "name": "buildkit_rootless",
+        "detail": "tirée en 3s : docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "smoke",
+        "name": "pod runc",
+        "detail": "Ready en 0.8s, noyau 5.14.0-687.13.1.el9_8.aarch64",
+        "hint": ""
+      },
+      {
+        "level": "OK",
+        "area": "smoke",
+        "name": "pod kata",
+        "detail": "Ready en 18.9s, noyau 6.18.62",
+        "hint": ""
+      }
+    ]
+  },
+  "allow_destructive": false,
+  "safe_mode": false,
+  "excluded_intrusive": [],
+  "anonymized": true,
+  "finished_at": "2026-11-24T14:49:46Z",
+  "summary": {
+    "PASS": 9,
+    "FAIL": 2,
+    "PARTIAL": 1
+  },
+  "host_suspensions": [],
+  "public_check": {
+    "leaks": [],
+    "count": 0
+  }
+}

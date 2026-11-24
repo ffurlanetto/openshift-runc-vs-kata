@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-05",
+  "category": "SEC",
+  "title": "hostPath : accès au nœud malgré Kata ?",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-144102-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T14:42:35Z",
+  "duration_s": 2.861,
+  "status": "FAIL",
+  "metrics": [
+    {
+      "name": "hostpath_read",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "hostpath_write_seen_on_node",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_sensitive_files_readable",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : hostPath lu=non, écriture vue par le nœud=non (propriétaire côté nœud -) ; types de montage xfs overlay ; fichiers sensibles du nœud lisibles via hostPath / : aucun ; écriture sur / monté en lecture seule : non ; résidus : 0",
+  "evidence": [
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/runc/run-1/manifest-1-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/runc/run-1/manifest-2-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/runc/run-1/pod-side.txt",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/runc/run-1/node-side.txt",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/runc/run-1/pods.json",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "563b671f057e724893448b42020d4e54a93d04c0ce35f0f226aec2a7d191b180"
+}

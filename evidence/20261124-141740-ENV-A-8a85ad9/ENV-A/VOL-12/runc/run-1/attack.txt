@@ -1,0 +1,6 @@
+rc=0
+backend={'name': 'crc-csi-hostpath-provisioner', 'provisioner': 'kubevirt.io.hostpath-provisioner', 'binding': 'WaitForFirstConsumer'}
+montés=['loop0', 'vda2']
+trouvé sur=[]
+disques=loop0 vda vda1 vda2 vda3 vda4 
+KUBELET_MOUNTS 0

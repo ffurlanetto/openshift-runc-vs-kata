@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                            MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/require-image-digest   Pod kvr-a5b1b-pol-10-kata-1/policy-probe: [validation] fail (blocked); image à référencer par digest (@sha256:…)
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/require-image-digest   Pod kvr-a5b1b-pol-10-kata-1/policy-probe: [validation] fail (blocked); image à référencer par digest (@sha256:…)
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/require-image-digest   Deployment kvr-a5b1b-pol-10-kata-1/policy-probe-deploy: [validation] fail (blocked); image à référencer par digest (@sha256:…)

@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SCR-02",
+  "category": "SCR",
+  "title": "Secret natif : propagation d'une rotation",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-141740-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T14:18:15Z",
+  "duration_s": 112.175,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "propagation_few",
+      "value": 85.6,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "propagation_many",
+      "value": 85.6,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "subpath_updated",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "env_updated",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "kata : rotation propagée en 85.6 s (3 clés), 85.6 s (40 clés) ; subPath non mis à jour (attendu) ; variable d'environnement inchangée (attendu)",
+  "evidence": [
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/secret-few-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/secret-many-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/secret-env-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/manifest-1-secret-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/secret-few-replace.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/secret-many-replace.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/secret-env-replace.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/timeline.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/pods.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-02/kata/run-1/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "fb6af7622b3e5e23a0445e44af7a775b467e57c8505703b12a17370f2a1bcb86"
+}

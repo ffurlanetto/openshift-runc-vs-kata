@@ -1,0 +1,309 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>01 — Environnement de test : état des lieux, manques, installation</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#5f5d57;--line:#e3e0d8;--card:#ffffff;--accent:#1f5f8b;--code:#f2efe8;
+--ok:#2e7d32;--ko:#b3261e;--warn:#9a6700}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151514;--fg:#ecebe6;--muted:#a5a39b;
+--line:#33322e;--card:#1d1d1b;--accent:#7cb7e0;--code:#26251f;--ok:#81c784;--ko:#ef9a9a;--warn:#e6c35c}}
+:root[data-theme="dark"]{--bg:#151514;--fg:#ecebe6;--muted:#a5a39b;--line:#33322e;--card:#1d1d1b;--accent:#7cb7e0;
+--code:#26251f;--ok:#81c784;--ko:#ef9a9a;--warn:#e6c35c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",
+Roboto,"Helvetica Neue",Arial,sans-serif}
+header{border-bottom:1px solid var(--line);background:var(--card)}
+header .in,main{max-width:1100px;margin:0 auto;padding:0 16px}
+header .in{display:flex;gap:24px;align-items:center;min-height:56px;flex-wrap:wrap}
+header strong{font-size:15px}
+nav a{color:var(--muted);text-decoration:none;margin-right:16px;font-size:14px}
+nav a.on{color:var(--fg);font-weight:600}
+main{padding-top:24px;padding-bottom:64px}
+h1{font-size:30px;line-height:1.2;margin:8px 0 16px}
+h2{font-size:22px;margin-top:40px;padding-top:8px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin-top:28px}
+a{color:var(--accent)}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.88em}
+pre{background:var(--code);padding:12px;border-radius:6px;overflow-x:auto}
+pre code{padding:0}
+blockquote{margin:16px 0;padding:8px 16px;border-left:3px solid var(--accent);background:var(--card);color:var(--muted)}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-size:14px;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--card)}
+td sub{color:var(--muted);font-size:11px;display:block}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 16px;font-size:14px}
+.toc ul{margin:4px 0;padding-left:18px}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding:16px;text-align:center}
+</style></head><body>
+<header><div class="in"><strong>runc vs Kata · OpenShift</strong><nav><a href="index.html">Rapport</a><a href="donnees.html">Données par test</a><a href="plan.html">Plan de tests</a><a href="environnement.html" class=on>Environnement</a></nav></div></header>
+<main><h1 id="01-environnement-de-test-etat-des-lieux-manques-installation">01 — Environnement de test : état des lieux, manques, installation</h1><div class="toc"><span class="toctitle">Sommaire</span><ul>
+<li><a href="#1-synthese">1. Synthèse</a></li>
+<li><a href="#2-prerequis-du-poste-qui-lance-le-banc">2. Prérequis du poste qui lance le banc</a></li>
+<li><a href="#3-points-bloquants-pour-kata-et-options">3. Points bloquants pour Kata et options</a></li>
+</ul>
+</div>
+
+<blockquote>
+<p>Audit réalisé le 2026-11-23 sur le poste de test. Relançable avec <code>./precheck</code>.</p>
+</blockquote>
+<h2 id="1-synthese">1. Synthèse</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Élément</th>
+<th>État</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenShift Local (CRC) 2.62.0, OCP 4.22.1, MicroShift 4.22.0</td>
+<td>✅ Running (operator <code>image-registry</code> dégradé)</td>
+<td>OK pour runc</td>
+</tr>
+<tr>
+<td>Architecture du nœud</td>
+<td>⚠️ <strong>arm64</strong> (Apple M5 Max, VM vfkit)</td>
+<td>Voir §3 : support Red Hat de Kata</td>
+</tr>
+<tr>
+<td>Ressources VM CRC</td>
+<td>⚠️ 8 vCPU / 15 Go RAM / 35 Go disque, ~12 Go RAM déjà utilisés</td>
+<td>Trop juste pour des tests de densité Kata</td>
+</tr>
+<tr>
+<td><code>/dev/kvm</code> dans la VM CRC</td>
+<td>❌ <strong>Absent</strong></td>
+<td><strong>Bloquant</strong> : Kata ne peut pas lancer de micro-VM</td>
+</tr>
+<tr>
+<td>Virtualisation imbriquée</td>
+<td>❌ <code>vfkit</code> supporte <code>--nested</code>, mais CRC ne passe pas l'option</td>
+<td>Contournement possible (§3.1)</td>
+</tr>
+<tr>
+<td>Operator OpenShift Sandboxed Containers (OSC)</td>
+<td>⚠️ v1.13.1 au catalogue, <strong>architectures supportées : amd64, s390x uniquement</strong></td>
+<td>Pas d'OSC supporté sur arm64 (§3.2)</td>
+</tr>
+<tr>
+<td>RuntimeClass existantes</td>
+<td>aucune (runtimes CRI-O : <code>runc</code>, <code>crun</code>)</td>
+<td>Normal avant installation</td>
+</tr>
+<tr>
+<td>Metrics API (<code>oc adm top</code>)</td>
+<td>❌ indisponible (monitoring désactivé par défaut dans CRC)</td>
+<td>Nécessaire pour les mesures d'overhead</td>
+</tr>
+<tr>
+<td><code>agent-sandbox-operator</code> (Agent Sandbox : <code>Sandbox</code>, <code>SandboxTemplate</code>, <code>SandboxClaim</code>, <code>SandboxWarmPool</code>)</td>
+<td>⚠️ v0.9.0, canal <strong>preview</strong>, <strong>amd64 uniquement</strong></td>
+<td>Sur ENV-A : projet upstream <code>kubernetes-sigs/agent-sandbox</code></td>
+</tr>
+<tr>
+<td>Backend LLM pour les tests d'agents</td>
+<td>❌ à choisir</td>
+<td>API distante (clé + egress) ou modèle local sur le Mac (Ollama, via <code>host.crc.testing</code>)</td>
+</tr>
+<tr>
+<td>Disque de la VM CRC</td>
+<td>✅ 80 Go (54 % utilisés après redimensionnement ; DiskPressure résolu)</td>
+<td><code>crc config set disk-size 80</code> appliqué le 2026-11-23</td>
+</tr>
+<tr>
+<td>APIService <code>v1beta1.external.metrics.k8s.io</code> (KEDA)</td>
+<td>❌ indisponible (pods KEDA non planifiables)</td>
+<td>Les namespaces supprimés restent en <code>Terminating</code></td>
+</tr>
+<tr>
+<td>Kyverno</td>
+<td>❌ absent sur CRC</td>
+<td><code>./setup kyverno</code> (chart 3.10.0, Kyverno v1.20.0)</td>
+</tr>
+<tr>
+<td>Operators sécurité au catalogue</td>
+<td>✅ <code>compliance-operator</code>, <code>security-profiles-operator</code>, <code>file-integrity-operator</code></td>
+<td>Utilisables pour le volet sécurité</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="2-prerequis-du-poste-qui-lance-le-banc">2. Prérequis du poste qui lance le banc</h2>
+<p>Le banc est portable : il pilote <strong>n'importe quel cluster</strong> OpenShift ou Kubernetes, local ou distant, uniquement via <code>kubectl</code>. Le contexte kube est choisi au lancement. <code>./precheck</code> vérifie tout ce qui suit.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Outil</th>
+<th>Requis pour</th>
+<th>Statut</th>
+<th>Installation (poste connecté)</th>
+<th>Site airgappé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kubectl</code></td>
+<td>tout (<code>oc</code> n'est <strong>pas</strong> nécessaire)</td>
+<td>obligatoire</td>
+<td><code>brew install kubectl</code></td>
+<td>binaire depuis un dépôt generic Artifactory ; version ±1 mineure du cluster</td>
+</tr>
+<tr>
+<td><code>uv</code></td>
+<td>Python + dépendances du banc</td>
+<td>obligatoire</td>
+<td><code>brew install uv</code></td>
+<td>binaire depuis Artifactory ; <code>KVR_PYPI_INDEX</code> = index PyPI miroir ; Python ≥ 3.12 local (<code>UV_PYTHON</code>, <code>UV_PYTHON_DOWNLOADS=never</code>) ou <code>UV_PYTHON_INSTALL_MIRROR</code></td>
+</tr>
+<tr>
+<td><code>git</code></td>
+<td>traçabilité (commit de chaque campagne)</td>
+<td>obligatoire</td>
+<td>Xcode CLT / paquet système</td>
+<td>paquet système</td>
+</tr>
+<tr>
+<td><code>bash</code></td>
+<td>wrappers <code>./precheck</code>, <code>./run</code>, <code>./setup</code></td>
+<td>obligatoire</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>helm</code></td>
+<td><code>./setup</code> (Kyverno, et plus tard Kata, Jenkins, ARC, Agent Sandbox)</td>
+<td>phases POL/DIND/AGT, sur cluster de test</td>
+<td><code>brew install helm</code></td>
+<td>binaire + charts OCI via miroir (réécriture <code>registry.mirrors</code>)</td>
+</tr>
+<tr>
+<td><code>pandoc</code></td>
+<td>export PDF/DOCX du rapport comité</td>
+<td>optionnel</td>
+<td><code>brew install pandoc</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Plus besoin d'installer en local <code>jq</code>, <code>yq</code>, <code>k6</code>, <code>hey</code>, <code>trivy</code> ou <code>kubescape</code> : les outils de charge et de scan tournent <strong>dans des pods</strong>, à partir d'images épinglées et mirrorables.</p>
+<p>État constaté sur le poste de test (2026-11-23) : <code>kubectl</code> 1.37.1, <code>uv</code> 0.13.0, <code>git</code>, <code>helm</code> 4.2.4 présents.
+Avertissement : <code>kubectl</code> 1.37 face à un serveur 1.35 dépasse l'écart supporté (±1). C'est fonctionnel pour le banc, mais il vaut mieux un client 1.35/1.36.</p>
+<h3 id="images-et-outils-sur-site-airgappe-miroir-artifactory">Images et outils sur site airgappé (miroir Artifactory)</h3>
+<ul>
+<li><strong>Images</strong> : toutes déclarées et épinglées par digest dans <code>campaign.yaml › images</code>. <code>./run --print-images</code> donne la liste à mirrorer.</li>
+<li><strong>Accès au miroir</strong>, deux modes :</li>
+<li>le cluster gère le miroir (OpenShift <code>ImageDigestMirrorSet</code>, miroirs containerd) : rien à configurer ;</li>
+<li>réécriture par le banc : règles <code>registry.mirrors</code> (préfixe → préfixe), globales ou par profil de cluster.</li>
+<li><strong>Digest</strong> : il reste identique si le dépôt Artifactory est un <em>remote</em> (proxy) du registre d'origine, donc la reproductibilité est conservée.</li>
+<li><strong>Secret de pull</strong> : <code>registry.pull_secret</code>, copié depuis un namespace du cluster ou créé depuis un fichier <code>dockerconfigjson</code> local, puis attaché au ServiceAccount de chaque namespace de test.</li>
+<li><strong>Charts Helm</strong> : <code>campaign.yaml › charts</code>, même réécriture (dépôt OCI Artifactory).</li>
+<li><strong>Dépendances Python</strong> : <code>export KVR_PYPI_INDEX=https://artifactory…/api/pypi/&lt;repo&gt;/simple</code>. Les versions <strong>et hashes</strong> du <code>uv.lock</code> sont imposés.</li>
+</ul>
+<p>Attention : <code>uv sync --frozen</code> ignore les miroirs et télécharge depuis les URL pypi.org du lockfile. Constat vérifié le 2026-11-23, d'où le passage par un export épinglé quand <code>KVR_PYPI_INDEX</code> est défini.
+- <strong>Pré-vérification</strong> : le precheck tire réellement chaque image via le miroir et signale <code>ErrImagePull</code> ou <code>ImagePullBackOff</code> avec la cause probable.</p>
+<h2 id="3-points-bloquants-pour-kata-et-options">3. Points bloquants pour Kata et options</h2>
+<h3 id="31-pas-de-devkvm-dans-la-vm-crc">3.1 Pas de <code>/dev/kvm</code> dans la VM CRC</h3>
+<p>Kata lance chaque pod dans une micro-VM (QEMU/KVM). Sur ce poste, cela implique de la <strong>virtualisation imbriquée</strong> :
+macOS (Hypervisor.framework) → VM CRC (RHCOS) → micro-VM Kata.</p>
+<ul>
+<li>Le matériel le permet (Apple M3+ et macOS 15+ ; ici M5 Max / macOS 27, <code>kern.hv_support: 1</code>).</li>
+<li><code>vfkit</code> a l'option <code>-n, --nested</code>, mais <strong>CRC 2.62 ne l'expose pas</strong> (<code>crc config</code> n'a pas d'option nested).</li>
+</ul>
+<p><strong>Contournement proposé</strong> (modifie un binaire système, il faut <code>sudo</code>, réversible) :</p>
+<pre><code class="language-bash">crc stop
+sudo mv /usr/local/crc/vfkit /usr/local/crc/vfkit.real
+sudo tee /usr/local/crc/vfkit &gt;/dev/null &lt;&lt;'EOF'
+#!/bin/sh
+case &quot;$1&quot; in --version|-v|--help|-h) exec /usr/local/crc/vfkit.real &quot;$@&quot;;; esac
+exec /usr/local/crc/vfkit.real --nested &quot;$@&quot;
+EOF
+sudo chmod 755 /usr/local/crc/vfkit
+crc config set memory 24576   # 24 Go recommandés pour Kata (overhead par pod)
+crc config set cpus 12
+crc config set disk-size 80
+crc config set enable-cluster-monitoring true
+crc start
+# Vérification :
+ssh -i ~/.crc/machines/crc/id_ed25519 -p 2222 core@127.0.0.1 'ls -l /dev/kvm'
+</code></pre>
+<p>Retour arrière : <code>sudo mv /usr/local/crc/vfkit.real /usr/local/crc/vfkit</code>. Une mise à jour de CRC écrase le wrapper.</p>
+<h3 id="32-loperator-osc-nest-pas-supporte-sur-arm64">3.2 L'operator OSC n'est pas supporté sur arm64</h3>
+<p>Le CSV <code>sandboxed-containers-operator.v1.13.1</code> déclare <code>arch.amd64</code> et <code>arch.s390x</code> uniquement. Sur CRC arm64 :</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Fidélité à la production OpenShift</th>
+<th>Coût</th>
+<th>Usage recommandé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A. Kata upstream via <code>kata-deploy</code> (Helm) sur CRC arm64 + nested</strong></td>
+<td>Moyenne : même technologie (Kata 3.x, QEMU, CRI-O handler), mais pas le packaging/support Red Hat, pas de <code>KataConfig</code></td>
+<td>Faible</td>
+<td>Tests <strong>fonctionnels et sécurité</strong>, découverte des limites</td>
+</tr>
+<tr>
+<td><strong>B. OCP x86_64 sur bare metal (ou instance cloud <em>metal</em>) + OSC 1.13</strong></td>
+<td>Élevée : stack supportée Red Hat</td>
+<td>Moyen à élevé</td>
+<td>Tests de <strong>performance, densité, exploitation</strong> et validation finale</td>
+</tr>
+<tr>
+<td>C. CRC sur un poste x86_64 avec nested KVM</td>
+<td>Bonne pour le fonctionnel (OSC installable), perf non représentative</td>
+<td>Faible</td>
+<td>Alternative à A si un poste Linux x86 est disponible</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommandation</strong> : options <strong>A puis B</strong>. A permet de démarrer tout de suite les campagnes fonctionnelle et sécurité. Les chiffres de performance obtenus sur CRC (double niveau de virtualisation, nœud unique) sont <strong>indicatifs uniquement</strong> et ne doivent pas être présentés au comité comme des valeurs de référence. Le plan de tests marque les tests qui exigent l'environnement B.</p>
+<h3 id="33-autres-points-dattention-crc">3.3 Autres points d'attention CRC</h3>
+<ul>
+<li><strong>Nœud unique</strong> : pas de tests de drain/migration multi-nœuds, pas de réseau inter-nœuds.</li>
+<li><strong><code>image-registry</code> dégradé</strong> : pousser l'image d'outillage sur un registre externe (quay.io) ou réparer le registre interne (<code>oc patch configs.imageregistry.operator.openshift.io cluster --type merge -p '{"spec":{"managementState":"Managed","storage":{"emptyDir":{}}}}'</code>).</li>
+<li><strong>podman machine</strong> (4 vCPU / 3,7 Go) tourne en parallèle : l'arrêter pendant les mesures (<code>podman machine stop</code>) pour limiter le bruit.</li>
+<li><strong>Console retirée pendant les campagnes</strong> : le pod <code>downloads</code> de la console recopie ~3,1 Go de binaires <code>oc</code> dans un <code>emptyDir</code> à chaque redémarrage de conteneur, sans nettoyage. 18 redémarrages pendant la campagne du 2026-11-23 → 54 Go, disque plein, cluster non redémarrable. Console désactivée : <code>kubectl patch console.operator.openshift.io cluster --type merge -p '{"spec":{"managementState":"Removed"}}'</code> (rétablir avec <code>Managed</code>). Le precheck alerte au-delà de 70 % de disque.</li>
+</ul>
+<h3 id="34-kata-upstream-kata-deploy-sur-openshift-correctifs-necessaires">3.4 Kata upstream (kata-deploy) sur OpenShift : correctifs nécessaires</h3>
+<p>Constatés sur ENV-A, intégrés à <code>./setup kata</code> :</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Symptôme</th>
+<th>Cause</th>
+<th>Correctif</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>spawn virtiofsd: Permission denied</code></td>
+<td>Le shim lance QEMU/virtiofsd en <code>container_kvm_t</code> ; kata-deploy installe ses binaires en <code>var_t</code></td>
+<td>Labels OSC posés via <code>kubectl debug node</code> : <code>qemu_exec_t</code>, <code>bin_t</code>, <code>usr_t</code> (retirés avant chaque mise à jour)</td>
+</tr>
+<tr>
+<td><code>virtiofsd</code> : <code>CleanMount: Permission denied</code></td>
+<td>Bac à sable par namespaces refusé dans ce domaine SELinux</td>
+<td><code>virtiofsd --sandbox chroot</code> (drop-in)</td>
+</tr>
+<tr>
+<td>QEMU : <code>host-arm-cpu.pmu</code> introuvable</td>
+<td>KVM imbriqué macOS sans PMU (CRC arm64 seulement)</td>
+<td><code>cpu_features = ""</code></td>
+</tr>
+<tr>
+<td>Agent injoignable (vsock)</td>
+<td>Invité plus lent à démarrer que 3 s (imbriqué)</td>
+<td><code>reconnect_timeout_ms = 60000</code></td>
+</tr>
+<tr>
+<td>Pod Kata <code>hostNetwork</code> → nœud injoignable</td>
+<td>Kata ne supporte pas <code>hostNetwork</code> ; rien ne le bloque à l'admission</td>
+<td>FUN-30 en dry-run par défaut ; policy POL-18</td>
+</tr>
+</tbody>
+</table></div>
+<p>Les deux premiers points valent pour tout OpenShift en SELinux enforcing : argument pour OSC sur l'environnement de référence.</p></main>
+<footer>Généré par <code>scripts/report.py</code> · <a href="https://github.com/ffurlanetto/openshift-runc-vs-kata">dépôt</a> · campagnes jusqu'au 2026-11-24</footer>
+</body></html>

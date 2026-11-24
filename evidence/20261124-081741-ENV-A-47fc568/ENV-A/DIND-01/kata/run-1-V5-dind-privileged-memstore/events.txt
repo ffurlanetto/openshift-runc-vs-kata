@@ -1,0 +1,7 @@
+LAST SEEN   TYPE      REASON                   OBJECT   MESSAGE
+5m          Normal    Scheduled                pod/ci   Successfully assigned kvr-a47ff-dind-01-kata-v5-1/ci to crc
+3m58s       Warning   FailedCreatePodSandBox   pod/ci   Failed to create pod sandbox: rpc error: code = Unknown desc = CreateContainer failed: Failed to Check if grpc server is working: rpc error: code = DeadlineExceeded desc = timed out connecting to vsock 3330516595:1024: unknown
+2m56s       Warning   FailedCreatePodSandBox   pod/ci   Failed to create pod sandbox: rpc error: code = Unknown desc = CreateContainer failed: Failed to Check if grpc server is working: rpc error: code = DeadlineExceeded desc = timed out connecting to vsock 4150237308:1024: unknown
+115s        Warning   FailedCreatePodSandBox   pod/ci   Failed to create pod sandbox: rpc error: code = Unknown desc = CreateContainer failed: Failed to Check if grpc server is working: rpc error: code = DeadlineExceeded desc = timed out connecting to vsock 1962359677:1024: unknown
+52s         Normal    AddedInterface           pod/ci   Add eth0 [192.0.2.0/23] from ovn-kubernetes
+52s         Warning   FailedCreatePodSandBox   pod/ci   Failed to create pod sandbox: rpc error: code = Unknown desc = CreateContainer failed: Failed to Check if grpc server is working: rpc error: code = DeadlineExceeded desc = timed out connecting to vsock 807999811:1024: unknown

@@ -1,0 +1,31 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: privileged-requires-kata
+  namespace: kvr-a5b1b-pol-11-kata-1
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Pod privilégié autorisé seulement dans Kata"
+spec:
+  validationActions: ["Deny"]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+    - name: workload
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : [])"
+    - name: containers
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : []) + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])"
+  validations:
+    - message: "un conteneur privilégié exige runtimeClassName: kata-qemu"
+      expression: "!variables.containers.exists(c, has(c.securityContext) && has(c.securityContext.privileged)\n  && c.securityContext.privileged == true)\n|| (has(object.spec.runtimeClassName) && object.spec.runtimeClassName == 'kata-qemu')"

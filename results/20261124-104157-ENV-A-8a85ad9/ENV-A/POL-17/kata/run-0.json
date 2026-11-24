@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-17",
+  "category": "POL",
+  "title": "Privilèges effectifs d'un pod conforme",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261124-104157-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T13:43:59Z",
+  "duration_s": 73.095,
+  "status": "FAIL",
+  "metrics": [
+    {
+      "name": "uid_non_root",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "no_new_privs",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "no_effective_caps",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "seccomp_filter",
+      "value": 0,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "etc_read_only",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "{'uid': '1004440000', 'CapPrm': '0000000000000000', 'CapEff': '0000000000000000', 'NoNewPrivs': '1', 'Seccomp': '0', 'etc_writable': '0'} ; écarts : ['seccomp_filter']",
+  "evidence": [
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-17/kata/run-0/manifest-1-policy-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-17/kata/run-0/privileges.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-17/kata/run-0/pods.json",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-17/kata/run-0/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "d07b24a82ff9755986ef22fa5b53897ef515f56a5ee0793fbc59ded4b395a1fd"
+}

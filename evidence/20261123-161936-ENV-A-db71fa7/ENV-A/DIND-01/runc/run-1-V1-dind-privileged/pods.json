@@ -1,241 +1,241 @@
 {
-    "apiVersion": "v1",
-    "items": [
-        {
-            "apiVersion": "v1",
-            "kind": "Pod",
-            "metadata": {
-                "annotations": {
-                    "k8s.ovn.org/pod-networks": "{\"default\":{\"ip_addresses\":[\"10.217.0.243/23\"],\"mac_address\":\"0a:58:0a:d9:00:f3\",\"gateway_ips\":[\"10.217.0.1\"],\"routes\":[{\"dest\":\"10.217.0.0/22\",\"nextHop\":\"10.217.0.1\"},{\"dest\":\"10.217.4.0/23\",\"nextHop\":\"10.217.0.1\"},{\"dest\":\"169.254.0.5/32\",\"nextHop\":\"10.217.0.1\"},{\"dest\":\"100.64.0.0/16\",\"nextHop\":\"10.217.0.1\"}],\"ip_address\":\"10.217.0.243/23\",\"gateway_ip\":\"10.217.0.1\",\"role\":\"primary\"}}",
-                    "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"ovn-kubernetes\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"10.217.0.243\"\n    ],\n    \"mac\": \"0a:58:0a:d9:00:f3\",\n    \"default\": true,\n    \"dns\": {}\n}]",
-                    "openshift.io/scc": "hostpath-provisioner",
-                    "security.openshift.io/validated-scc-subject-type": "user"
-                },
-                "creationTimestamp": "2026-11-23T16:19:37Z",
-                "generation": 1,
-                "labels": {
-                    "app.kubernetes.io/part-of": "kvr"
-                },
-                "name": "ci",
-                "namespace": "kvr-62943-dind-01-runc-v1-1",
-                "resourceVersion": "506472",
-                "uid": "295f87ae-aeaa-4687-8f28-b75be48563a9"
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "annotations": {
+          "k8s.ovn.org/pod-networks": "{\"default\":{\"ip_addresses\":[\"192.0.2.0/23\"],\"mac_address\":\"02:00:5e:00:00:92\",\"gateway_ips\":[\"192.0.2.0\"],\"routes\":[{\"dest\":\"192.0.2.0/22\",\"nextHop\":\"192.0.2.0\"},{\"dest\":\"192.0.2.0/23\",\"nextHop\":\"192.0.2.0\"},{\"dest\":\"192.0.2.0/32\",\"nextHop\":\"192.0.2.0\"},{\"dest\":\"192.0.2.0/16\",\"nextHop\":\"192.0.2.0\"}],\"ip_address\":\"192.0.2.0/23\",\"gateway_ip\":\"192.0.2.0\",\"role\":\"primary\"}}",
+          "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"ovn-kubernetes\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"192.0.2.0\"\n    ],\n    \"mac\": \"02:00:5e:00:00:92\",\n    \"default\": true,\n    \"dns\": {}\n}]",
+          "openshift.io/scc": "hostpath-provisioner",
+          "security.openshift.io/validated-scc-subject-type": "user"
+        },
+        "creationTimestamp": "2026-11-23T16:19:37Z",
+        "generation": 1,
+        "labels": {
+          "app.kubernetes.io/part-of": "kvr"
+        },
+        "name": "ci",
+        "namespace": "kvr-62943-dind-01-runc-v1-1",
+        "resourceVersion": "506472",
+        "uid": "295f87ae-aeaa-4687-8f28-b75be48563a9"
+      },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "DOCKER_TLS_CERTDIR"
+              }
+            ],
+            "image": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
+            "imagePullPolicy": "IfNotPresent",
+            "name": "engine",
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "512Mi"
+              }
             },
-            "spec": {
-                "automountServiceAccountToken": false,
-                "containers": [
-                    {
-                        "env": [
-                            {
-                                "name": "DOCKER_TLS_CERTDIR"
-                            }
-                        ],
-                        "image": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
-                        "imagePullPolicy": "IfNotPresent",
-                        "name": "engine",
-                        "resources": {
-                            "limits": {
-                                "cpu": "2",
-                                "memory": "2Gi"
-                            },
-                            "requests": {
-                                "cpu": "500m",
-                                "memory": "512Mi"
-                            }
-                        },
-                        "securityContext": {
-                            "capabilities": {
-                                "drop": [
-                                    "KILL",
-                                    "MKNOD",
-                                    "SETGID",
-                                    "SETUID"
-                                ]
-                            },
-                            "privileged": true
-                        },
-                        "terminationMessagePath": "/dev/termination-log",
-                        "terminationMessagePolicy": "File",
-                        "volumeMounts": [
-                            {
-                                "mountPath": "/var/lib/docker",
-                                "name": "engine-storage"
-                            },
-                            {
-                                "mountPath": "/work",
-                                "name": "build-context"
-                            }
-                        ]
-                    }
-                ],
-                "dnsPolicy": "ClusterFirst",
-                "enableServiceLinks": true,
-                "imagePullSecrets": [
-                    {
-                        "name": "default-dockercfg-ms4pr"
-                    }
-                ],
-                "nodeName": "crc",
-                "preemptionPolicy": "PreemptLowerPriority",
-                "priority": 0,
-                "restartPolicy": "Never",
-                "schedulerName": "default-scheduler",
-                "securityContext": {},
-                "serviceAccount": "default",
-                "serviceAccountName": "default",
-                "terminationGracePeriodSeconds": 0,
-                "tolerations": [
-                    {
-                        "effect": "NoExecute",
-                        "key": "node.kubernetes.io/not-ready",
-                        "operator": "Exists",
-                        "tolerationSeconds": 300
-                    },
-                    {
-                        "effect": "NoExecute",
-                        "key": "node.kubernetes.io/unreachable",
-                        "operator": "Exists",
-                        "tolerationSeconds": 300
-                    },
-                    {
-                        "effect": "NoSchedule",
-                        "key": "node.kubernetes.io/memory-pressure",
-                        "operator": "Exists"
-                    }
-                ],
-                "volumes": [
-                    {
-                        "emptyDir": {},
-                        "name": "engine-storage"
-                    },
-                    {
-                        "configMap": {
-                            "defaultMode": 420,
-                            "name": "build-context"
-                        },
-                        "name": "build-context"
-                    }
+            "securityContext": {
+              "capabilities": {
+                "drop": [
+                  "KILL",
+                  "MKNOD",
+                  "SETGID",
+                  "SETUID"
                 ]
+              },
+              "privileged": true
             },
-            "status": {
-                "conditions": [
-                    {
-                        "lastProbeTime": null,
-                        "lastTransitionTime": "2026-11-23T16:19:39Z",
-                        "observedGeneration": 1,
-                        "status": "True",
-                        "type": "PodReadyToStartContainers"
-                    },
-                    {
-                        "lastProbeTime": null,
-                        "lastTransitionTime": "2026-11-23T16:19:37Z",
-                        "observedGeneration": 1,
-                        "status": "True",
-                        "type": "Initialized"
-                    },
-                    {
-                        "lastProbeTime": null,
-                        "lastTransitionTime": "2026-11-23T16:19:39Z",
-                        "observedGeneration": 1,
-                        "status": "True",
-                        "type": "Ready"
-                    },
-                    {
-                        "lastProbeTime": null,
-                        "lastTransitionTime": "2026-11-23T16:19:39Z",
-                        "observedGeneration": 1,
-                        "status": "True",
-                        "type": "ContainersReady"
-                    },
-                    {
-                        "lastProbeTime": null,
-                        "lastTransitionTime": "2026-11-23T16:19:37Z",
-                        "observedGeneration": 1,
-                        "status": "True",
-                        "type": "PodScheduled"
-                    }
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/var/lib/docker",
+                "name": "engine-storage"
+              },
+              {
+                "mountPath": "/work",
+                "name": "build-context"
+              }
+            ]
+          }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "imagePullSecrets": [
+          {
+            "name": "default-dockercfg-ms4pr"
+          }
+        ],
+        "nodeName": "crc",
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Never",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 0,
+        "tolerations": [
+          {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "tolerationSeconds": 300
+          },
+          {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "tolerationSeconds": 300
+          },
+          {
+            "effect": "NoSchedule",
+            "key": "node.kubernetes.io/memory-pressure",
+            "operator": "Exists"
+          }
+        ],
+        "volumes": [
+          {
+            "emptyDir": {},
+            "name": "engine-storage"
+          },
+          {
+            "configMap": {
+              "defaultMode": 420,
+              "name": "build-context"
+            },
+            "name": "build-context"
+          }
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-23T16:19:39Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "PodReadyToStartContainers"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-23T16:19:37Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "Initialized"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-23T16:19:39Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "Ready"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-23T16:19:39Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "ContainersReady"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-23T16:19:37Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "PodScheduled"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "allocatedResources": {
+              "cpu": "500m",
+              "memory": "512Mi"
+            },
+            "containerID": "cri-o://203439412b5bcd3bc30ece17cdea629f7fee772b59b3189ea05fab8cd5948406",
+            "image": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
+            "imageID": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
+            "lastState": {},
+            "name": "engine",
+            "ready": true,
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "512Mi"
+              }
+            },
+            "restartCount": 0,
+            "started": true,
+            "state": {
+              "running": {
+                "startedAt": "2026-11-23T16:19:38Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 0,
+                "supplementalGroups": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  6,
+                  10,
+                  11,
+                  20,
+                  26,
+                  27
                 ],
-                "containerStatuses": [
-                    {
-                        "allocatedResources": {
-                            "cpu": "500m",
-                            "memory": "512Mi"
-                        },
-                        "containerID": "cri-o://203439412b5bcd3bc30ece17cdea629f7fee772b59b3189ea05fab8cd5948406",
-                        "image": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
-                        "imageID": "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c",
-                        "lastState": {},
-                        "name": "engine",
-                        "ready": true,
-                        "resources": {
-                            "limits": {
-                                "cpu": "2",
-                                "memory": "2Gi"
-                            },
-                            "requests": {
-                                "cpu": "500m",
-                                "memory": "512Mi"
-                            }
-                        },
-                        "restartCount": 0,
-                        "started": true,
-                        "state": {
-                            "running": {
-                                "startedAt": "2026-11-23T16:19:38Z"
-                            }
-                        },
-                        "user": {
-                            "linux": {
-                                "gid": 0,
-                                "supplementalGroups": [
-                                    0,
-                                    1,
-                                    2,
-                                    3,
-                                    4,
-                                    6,
-                                    10,
-                                    11,
-                                    20,
-                                    26,
-                                    27
-                                ],
-                                "uid": 0
-                            }
-                        },
-                        "volumeMounts": [
-                            {
-                                "mountPath": "/var/lib/docker",
-                                "name": "engine-storage"
-                            },
-                            {
-                                "mountPath": "/work",
-                                "name": "build-context"
-                            }
-                        ]
-                    }
-                ],
-                "hostIP": "192.168.126.11",
-                "hostIPs": [
-                    {
-                        "ip": "192.168.126.11"
-                    }
-                ],
-                "observedGeneration": 1,
-                "phase": "Running",
-                "podIP": "10.217.0.243",
-                "podIPs": [
-                    {
-                        "ip": "10.217.0.243"
-                    }
-                ],
-                "qosClass": "Burstable",
-                "startTime": "2026-11-23T16:19:37Z"
-            }
-        }
-    ],
-    "kind": "List",
-    "metadata": {
-        "resourceVersion": ""
+                "uid": 0
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/var/lib/docker",
+                "name": "engine-storage"
+              },
+              {
+                "mountPath": "/work",
+                "name": "build-context"
+              }
+            ]
+          }
+        ],
+        "hostIP": "192.0.2.0",
+        "hostIPs": [
+          {
+            "ip": "192.0.2.0"
+          }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "192.0.2.0",
+        "podIPs": [
+          {
+            "ip": "192.0.2.0"
+          }
+        ],
+        "qosClass": "Burstable",
+        "startTime": "2026-11-23T16:19:37Z"
+      }
     }
+  ],
+  "kind": "List",
+  "metadata": {
+    "resourceVersion": ""
+  }
 }

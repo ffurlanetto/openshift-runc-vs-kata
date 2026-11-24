@@ -1,0 +1,19 @@
+== defaut
+READ non
+WRITE non
+FSTYPE xfs
+LABEL system_u:system_r:container_t:s0:c42,c58
+
+== spc
+READ oui
+WRITE oui
+FSTYPE xfs
+LABEL system_u:system_r:spc_t:s0:c734,c755
+
+== racine
+FSTYPE overlay
+SENSITIVE shadow lisible
+SENSITIVE config.yaml absent
+SENSITIVE kubelet.conf lisible
+ROOTWRITE oui
+

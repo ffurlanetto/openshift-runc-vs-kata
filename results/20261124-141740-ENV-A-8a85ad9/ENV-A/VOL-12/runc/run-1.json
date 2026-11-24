@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "test_id": "VOL-12",
+  "category": "VOL",
+  "title": "Pod compromis : accès aux volumes des autres pods",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-141740-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T14:39:51Z",
+  "duration_s": 4.511,
+  "status": "FAIL",
+  "metrics": [
+    {
+      "name": "victim_volume_reached",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "block_devices_mountable",
+      "value": 2,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "attaquant runc privilégié : 2 périphérique(s) monté(s) (loop0, vda2) ; volume de la victime (crc-csi-hostpath-provisioner) non atteint",
+  "evidence": [
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-12/runc/run-1/manifest-1-pvc-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-12/runc/run-1/manifest-2-host-reader-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-12/runc/run-1/attack.txt",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-12/runc/run-1/pods.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-12/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "b397258433ec74db1b12847f3f240beedc5bac4c04ccd34909f0a09a9423efa0"
+}

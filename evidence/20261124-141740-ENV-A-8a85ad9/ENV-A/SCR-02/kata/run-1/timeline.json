@@ -1,0 +1,194 @@
+[
+  {
+    "t": 1.5,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 4.5,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 7.4,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 10.2,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 13.0,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 15.8,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 18.5,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 21.2,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 23.8,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 26.8,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 29.6,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 32.5,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 35.4,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 38.1,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 40.9,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 43.5,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 46.1,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 48.8,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 51.4,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 54.0,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 56.7,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 59.1,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 61.5,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 64.2,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 67.1,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 69.8,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 72.5,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 75.2,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 77.8,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 80.4,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 83.0,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 85.6,
+    "few": true,
+    "many": true,
+    "subpath": false
+  }
+]

@@ -1,0 +1,9 @@
+LAST SEEN   TYPE      REASON           OBJECT          MESSAGE
+4m2s        Normal    Scheduled        pod/nodecheck   Successfully assigned kvr-a5b1b-sec-05-kata-2/nodecheck to crc
+4m1s        Normal    AddedInterface   pod/nodecheck   Add eth0 [192.0.2.109/23] from ovn-kubernetes
+4m1s        Normal    Pulled           pod/nodecheck   Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+4m1s        Normal    Created          pod/nodecheck   Container created
+4m1s        Normal    Started          pod/nodecheck   Container started
+4m          Normal    AddedInterface   pod/hostpath    Add eth0 [192.0.2.108/23] from ovn-kubernetes
+17s         Warning   Failed           pod/hostpath    Error: CreateContainer failed: Permission denied (os error 13)...
+2s          Normal    Pulled           pod/hostpath    Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod

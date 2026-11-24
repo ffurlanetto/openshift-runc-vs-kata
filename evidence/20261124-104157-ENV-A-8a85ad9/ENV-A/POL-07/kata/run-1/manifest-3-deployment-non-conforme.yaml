@@ -1,0 +1,34 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: policy-probe-deploy
+  namespace: kvr-a5b1b-pol-07-kata-1
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: policy-probe}}
+  template:
+    metadata:
+      labels: {app: policy-probe}
+    spec:
+      
+      runtimeClassName: kata-qemu
+      hostNetwork: true
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 0
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: main
+          image: registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+          imagePullPolicy: IfNotPresent
+          command: ["sleep", "infinity"]
+          resources:
+            requests: {cpu: 50m, memory: 32Mi}
+            limits: {cpu: 200m, memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]

@@ -1,0 +1,41 @@
+{
+  "process_by_name": false,
+  "pod_processes": [
+    {
+      "comm": "containerd-shim",
+      "cmdline": "/var/opt/kata/runtime-rs/bin/containerd-shim-kata-v2 -id 046",
+      "memory": false,
+      "scanned_mib": 45
+    },
+    {
+      "comm": "virtiofsd",
+      "cmdline": "/var/opt/kata/libexec/virtiofsd --socket-path /run/kata/0465",
+      "memory": true,
+      "scanned_mib": 114
+    },
+    {
+      "comm": "qemu-system-aar",
+      "cmdline": "/var/opt/kata/bin/qemu-system-aarch64 -name sandbox-04657c22",
+      "memory": true,
+      "scanned_mib": 457
+    },
+    {
+      "comm": "vhost-530063",
+      "cmdline": "",
+      "memory": false,
+      "scanned_mib": 0
+    },
+    {
+      "comm": "vhost-530063",
+      "cmdline": "",
+      "memory": false,
+      "scanned_mib": 0
+    }
+  ],
+  "memory": true,
+  "files": [
+    "lib/…"
+  ],
+  "network": true,
+  "network_iface": "0465…"
+}

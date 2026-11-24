@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-14",
+  "category": "DIND",
+  "title": "Étape malveillante : accès au disque du nœud",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-145018-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T17:19:54Z",
+  "duration_s": 304.571,
+  "status": "NOT_SUPPORTED",
+  "metrics": [],
+  "observations": "NON SUPPORTÉ : conteneur imbriqué non lancé (rc=125) : scénario non exécutable ; command terminated with exit code 125",
+  "evidence": [
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-14/kata/run-1-V1-dind-privileged/manifest-1-dind-pod.yaml",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-14/kata/run-1-V1-dind-privileged/escape-attempt.txt",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-14/kata/run-1-V1-dind-privileged/pods.json",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-14/kata/run-1-V1-dind-privileged/events.txt"
+  ],
+  "aspect": "SEC",
+  "variant": "V1-dind-privileged",
+  "manifest_sha256": "d6dd2157cab25624fc1b32961aa49bce2457f373432ab600a0edaf559d6905ac"
+}

@@ -1,0 +1,14 @@
+LAST SEEN   TYPE     REASON                  OBJECT                              MESSAGE
+36s         Normal   WaitForFirstConsumer    persistentvolumeclaim/victim-data   waiting for first consumer to be created before binding
+36s         Normal   ProvisioningSucceeded   persistentvolumeclaim/victim-data   Successfully provisioned volume pvc-27a16c98-e21b-420c-977e-35075dc0ac17
+36s         Normal   Provisioning            persistentvolumeclaim/victim-data   External provisioner is provisioning volume for claim "kvr-4aca1-vol-12-kata-1/victim-data"
+36s         Normal   ExternalProvisioning    persistentvolumeclaim/victim-data   Waiting for a volume to be created either by the external provisioner 'kubevirt.io.hostpath-provisioner' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.
+35s         Normal   AddedInterface          pod/victim                          Add eth0 [192.0.2.155/23] from ovn-kubernetes
+35s         Normal   Scheduled               pod/victim                          Successfully assigned kvr-4aca1-vol-12-kata-1/victim to crc
+35s         Normal   Pulled                  pod/victim                          Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+35s         Normal   Created                 pod/victim                          Container created
+35s         Normal   Started                 pod/victim                          Container started
+34s         Normal   AddedInterface          pod/attacker                        Add eth0 [192.0.2.154/23] from ovn-kubernetes
+15s         Normal   Pulled                  pod/attacker                        Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+14s         Normal   Started                 pod/attacker                        Container started
+14s         Normal   Created                 pod/attacker                        Container created

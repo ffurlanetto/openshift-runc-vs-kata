@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "test_id": "AGT-20",
+  "category": "AGT",
+  "title": "Arrêt d'urgence (processus ignorant SIGTERM)",
+  "runtime": "runc",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T21:01:52Z",
+  "duration_s": 10.96,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "time_to_gone",
+      "value": 8.5,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "beyond_grace",
+      "value": 3.5,
+      "unit": "s",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : pod supprimé en 8.5s (grâce 5s, dépassement 3.5s)",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/AGT-20/runc/run-0/manifest-1-probe-pod.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/AGT-20/runc/run-0/events.txt"
+  ],
+  "aspect": "SEC",
+  "agent_mode": "replay",
+  "manifest_sha256": "43fa4ca0563917db55592cffdfebd82c9ddfe577925f52735176ccaaf1945e3f"
+}

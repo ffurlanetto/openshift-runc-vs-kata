@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-05",
+  "category": "DIND",
+  "title": "Build Dockerfile multi-étapes (build-arg, secret, cache)",
+  "runtime": "kata",
+  "run": 3,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T01:51:46Z",
+  "duration_s": 545.658,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "build_cold",
+      "value": 202.8,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "build_warm",
+      "value": 110.7,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "image_verified",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "V5-dind-privileged-memstore : build froid 202.8s, chaud 110.7s, image OK",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/kata/run-3-V5-dind-privileged-memstore/manifest-1-dind-pod.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/kata/run-3-V5-dind-privileged-memstore/build-froid.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/kata/run-3-V5-dind-privileged-memstore/build-chaud.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/kata/run-3-V5-dind-privileged-memstore/image.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/kata/run-3-V5-dind-privileged-memstore/pods.json",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/kata/run-3-V5-dind-privileged-memstore/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V5-dind-privileged-memstore",
+  "manifest_sha256": "dce1ec225ed810486f657d237a3903ce0ac196b950f620bfb25155df2b54ed0c"
+}

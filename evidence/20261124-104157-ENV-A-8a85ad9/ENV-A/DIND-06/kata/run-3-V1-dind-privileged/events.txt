@@ -1,0 +1,8 @@
+LAST SEEN   TYPE      REASON                   OBJECT   MESSAGE
+4m47s       Normal    Scheduled                pod/ci   Successfully assigned kvr-a5b1b-dind-06-kata-v1-3/ci to crc
+3m45s       Warning   FailedCreatePodSandBox   pod/ci   Failed to create pod sandbox: rpc error: code = Unknown desc = CreateContainer failed: Failed to Check if grpc server is working: rpc error: code = DeadlineExceeded desc = timed out connecting to vsock 869329636:1024: unknown
+2m44s       Warning   FailedCreatePodSandBox   pod/ci   Failed to create pod sandbox: rpc error: code = Unknown desc = CreateContainer failed: Failed to Check if grpc server is working: rpc error: code = DeadlineExceeded desc = timed out connecting to vsock 982873120:1024: unknown
+2m43s       Normal    AddedInterface           pod/ci   Add eth0 [192.0.2.30/23] from ovn-kubernetes
+110s        Normal    Pulled                   pod/ci   Container image "docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c" already present on machine and can be accessed by the pod
+109s        Normal    Created                  pod/ci   Container created
+109s        Normal    Started                  pod/ci   Container started

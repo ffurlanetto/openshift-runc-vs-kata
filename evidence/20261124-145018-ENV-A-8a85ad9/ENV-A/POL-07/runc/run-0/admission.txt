@@ -1,0 +1,11 @@
+## sans policy : conforme=True non-conforme=True
+
+
+## Enforce : conforme=True
+
+
+## Enforce : pod non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-d6469617" denied the request: Policy disallow-host-namespaces failed: hostNetwork, hostPID et hostIPC interdits
+
+## Enforce : Deployment non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-d6469617" denied the request: Policy disallow-host-namespaces failed: hostNetwork, hostPID et hostIPC interdits

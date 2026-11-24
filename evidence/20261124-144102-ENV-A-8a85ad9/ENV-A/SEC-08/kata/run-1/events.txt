@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON           OBJECT           MESSAGE
+23s         Normal   Scheduled        pod/restricted   Successfully assigned kvr-4afa6-sec-08-kata-1/restricted to crc
+23s         Normal   AddedInterface   pod/restricted   Add eth0 [192.0.2.167/23] from ovn-kubernetes
+3s          Normal   Pulled           pod/restricted   Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+2s          Normal   Created          pod/restricted   Container created
+2s          Normal   Started          pod/restricted   Container started

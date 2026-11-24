@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-08",
+  "category": "POL",
+  "title": "Kyverno : hostPath interdit",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T07:54:08Z",
+  "duration_s": 0.915,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "violating_admitted_without_policy",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "policy_propagation",
+      "value": 73,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "compliant_admitted_enforce",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "violating_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "violating_deployment_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "Kyverno v1.20.0 (cel) ; Enforce : conforme admis, non conforme refusé, Deployment non conforme refusé",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-08/kata/run-0/manifest-1-conforme.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-08/kata/run-0/manifest-2-non-conforme.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-08/kata/run-0/manifest-3-deployment-non-conforme.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-08/kata/run-0/policy-disallow-host-path.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-08/kata/run-0/admission.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-08/kata/run-0/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "5b73066544c33b51681d49ddad6b2882f807ff849b24cc273345275968f2c822"
+}

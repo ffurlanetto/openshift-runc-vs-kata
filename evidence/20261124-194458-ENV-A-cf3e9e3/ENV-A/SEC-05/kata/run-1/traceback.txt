@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "<repo>/scripts/kvr/runner.py", line 304, in execute_step
+    status = t.module.run(ctx)
+  File "<repo>/tests/SEC-05/test.py", line 72, in run
+    escape.deploy(ctx, f"hp-{variant}", run_as_user=0, allow_pe=False, node_name=node, se_type=se,
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  host_paths=shared)
+                  ^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/escape.py", line 38, in deploy
+    ctx.wait(f"pod/{name}", timeout_s=timeout_s)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/context.py", line 105, in wait
+    self.cluster.oc("wait", ref, f"--for={condition}", f"--timeout={timeout_s}s",
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    "-n", self.namespace, timeout=timeout_s + 30)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/cluster.py", line 69, in oc
+    raise OcError(f"kubectl {' '.join(args)} -> rc={r.returncode} : {r.stderr.strip()}")
+kvr.cluster.OcError: kubectl wait pod/hp-defaut --for=condition=Ready --timeout=240s -n kvr-e8695-sec-05-kata-1 -> rc=1 : error: timed out waiting for the condition on pods/hp-defaut

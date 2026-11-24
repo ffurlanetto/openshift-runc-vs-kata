@@ -1,0 +1,80 @@
+{
+  "calls": {
+    "unshare": {
+      "result": "atteint",
+      "detail": "succès"
+    },
+    "setns": {
+      "result": "atteint",
+      "detail": "EBADF"
+    },
+    "keyctl": {
+      "result": "atteint",
+      "detail": "succès"
+    },
+    "add_key": {
+      "result": "atteint",
+      "detail": "succès"
+    },
+    "bpf": {
+      "result": "atteint",
+      "detail": "EINVAL"
+    },
+    "userfaultfd": {
+      "result": "bloqué",
+      "detail": "ENOSYS"
+    },
+    "io_uring_setup": {
+      "result": "atteint",
+      "detail": "succès"
+    },
+    "ptrace": {
+      "result": "atteint",
+      "detail": "succès"
+    },
+    "perf_event_open": {
+      "result": "atteint",
+      "detail": "EFAULT"
+    },
+    "mount": {
+      "result": "bloqué",
+      "detail": "EPERM"
+    },
+    "open_by_handle_at": {
+      "result": "atteint",
+      "detail": "EFAULT"
+    },
+    "init_module": {
+      "result": "bloqué",
+      "detail": "ENOSYS"
+    },
+    "kexec_load": {
+      "result": "bloqué",
+      "detail": "ENOSYS"
+    },
+    "clock_settime": {
+      "result": "atteint",
+      "detail": "EINVAL"
+    },
+    "pivot_root": {
+      "result": "bloqué",
+      "detail": "EPERM"
+    },
+    "chroot": {
+      "result": "bloqué",
+      "detail": "EPERM"
+    },
+    "swapon": {
+      "result": "bloqué",
+      "detail": "EPERM"
+    },
+    "syslog": {
+      "result": "atteint",
+      "detail": "succès"
+    }
+  },
+  "seccomp": "0",
+  "no_new_privs": "1",
+  "kernel": "6.18.62",
+  "uid": 1001
+}

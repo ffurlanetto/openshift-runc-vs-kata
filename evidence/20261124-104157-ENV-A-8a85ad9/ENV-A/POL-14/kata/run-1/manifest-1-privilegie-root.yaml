@@ -1,0 +1,30 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: policy-probe
+  namespace: kvr-a5b1b-pol-14-kata-1
+  labels: {app.kubernetes.io/part-of: kvr}
+spec:
+  
+  runtimeClassName: kata-qemu
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: false
+    runAsUser: 0
+    seccompProfile: {type: RuntimeDefault}
+  containers:
+    - name: main
+      image: registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+      imagePullPolicy: IfNotPresent
+      command: ["sleep", "infinity"]
+      resources:
+        requests: {cpu: 50m, memory: 32Mi}
+        limits: {cpu: 200m, memory: 256Mi}
+      securityContext:
+        allowPrivilegeEscalation: true
+        privileged: true
+        capabilities:
+          drop: ["ALL"]

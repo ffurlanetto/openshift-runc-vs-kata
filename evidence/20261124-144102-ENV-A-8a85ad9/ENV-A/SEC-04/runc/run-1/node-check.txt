@@ -1,0 +1,8 @@
+rc=0
+FOUND kvr-sec04-7abea699e2a00429-priv-core_pattern
+FOUND kvr-sec04-7abea699e2a00429-priv-disk-vda4
+FOUND kvr-sec04-7abea699e2a00429-privpid-core_pattern
+FOUND kvr-sec04-7abea699e2a00429-privpid-disk-vda4
+FOUND kvr-sec04-7abea699e2a00429-privpid-nsenter
+LEFT 0
+

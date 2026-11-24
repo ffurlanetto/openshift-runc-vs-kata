@@ -1,0 +1,2 @@
+pod/policy-probe created
+Warning: Policy require-run-as-nonroot failed: runAsNonRoot doit être true (pod ou chaque conteneur)

@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON           OBJECT   MESSAGE
+69s         Normal   Scheduled        pod/ci   Successfully assigned kvr-a5b1b-dind-05-kata-v3-2/ci to crc
+68s         Normal   AddedInterface   pod/ci   Add eth0 [192.0.2.17/23] from ovn-kubernetes
+18s         Normal   Pulled           pod/ci   Container image "quay.io/buildah/stable@sha256:7c4a2893a2ec7a8eecb37debacc0cd657f453cfdc3d4a36b0171f5f9ac6cf618" already present on machine and can be accessed by the pod
+17s         Normal   Created          pod/ci   Container created
+17s         Normal   Started          pod/ci   Container started

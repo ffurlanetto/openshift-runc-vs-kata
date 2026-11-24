@@ -1,0 +1,17 @@
+LAST SEEN   TYPE     REASON           OBJECT          MESSAGE
+47s         Normal   Scheduled        pod/victim      Successfully assigned kvr-e8695-sec-18-kata-1/victim to crc
+47s         Normal   AddedInterface   pod/victim      Add eth0 [192.0.2.0/23] from ovn-kubernetes
+26s         Normal   Pulled           pod/victim      Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+25s         Normal   Started          pod/victim      Container started
+25s         Normal   Created          pod/victim      Container created
+24s         Normal   Pulled           pod/peer-runc   Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+24s         Normal   Started          pod/peer-runc   Container started
+24s         Normal   Created          pod/peer-runc   Container created
+24s         Normal   AddedInterface   pod/peer-runc   Add eth0 [192.0.2.0/23] from ovn-kubernetes
+23s         Normal   AddedInterface   pod/peer-same   Add eth0 [192.0.2.0/23] from ovn-kubernetes
+6s          Normal   Pulled           pod/peer-same   Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+6s          Normal   Created          pod/peer-same   Container created
+6s          Normal   Started          pod/peer-same   Container started
+3s          Normal   Pulled           pod/nodeview    Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+3s          Normal   Started          pod/nodeview    Container started
+3s          Normal   Created          pod/nodeview    Container created

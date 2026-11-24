@@ -1,0 +1,36 @@
+{
+  "process_by_name": false,
+  "pod_processes": [
+    {
+      "comm": "containerd-shim",
+      "memory": false,
+      "scanned_mib": 45
+    },
+    {
+      "comm": "virtiofsd",
+      "memory": true,
+      "scanned_mib": 98
+    },
+    {
+      "comm": "qemu-system-aar",
+      "memory": true,
+      "scanned_mib": 403
+    },
+    {
+      "comm": "vhost-3590076",
+      "memory": false,
+      "scanned_mib": 0
+    },
+    {
+      "comm": "vhost-3590076",
+      "memory": false,
+      "scanned_mib": 0
+    }
+  ],
+  "memory": true,
+  "files": [
+    "lib/…"
+  ],
+  "network": true,
+  "network_iface": "8bdd…"
+}

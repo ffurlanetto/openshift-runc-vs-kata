@@ -1,0 +1,14 @@
+LAST SEEN   TYPE     REASON           OBJECT          MESSAGE
+87s         Normal   AddedInterface   pod/priv        Add eth0 [192.0.2.101/23] from ovn-kubernetes
+87s         Normal   Scheduled        pod/priv        Successfully assigned kvr-a5b1b-sec-04-kata-1/priv to crc
+59s         Normal   Pulled           pod/priv        Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+58s         Normal   Started          pod/priv        Container started
+58s         Normal   Created          pod/priv        Container created
+57s         Normal   AddedInterface   pod/privpid     Add eth0 [192.0.2.102/23] from ovn-kubernetes
+40s         Normal   Pulled           pod/privpid     Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+39s         Normal   Created          pod/privpid     Container created
+39s         Normal   Started          pod/privpid     Container started
+37s         Normal   Started          pod/nodecheck   Container started
+37s         Normal   Created          pod/nodecheck   Container created
+37s         Normal   Pulled           pod/nodecheck   Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+37s         Normal   AddedInterface   pod/nodecheck   Add eth0 [192.0.2.100/23] from ovn-kubernetes

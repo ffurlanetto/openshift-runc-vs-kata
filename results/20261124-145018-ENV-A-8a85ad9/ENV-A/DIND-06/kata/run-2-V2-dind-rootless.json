@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-06",
+  "category": "DIND",
+  "title": "Conteneurs imbriqués : réseau et MTU",
+  "runtime": "kata",
+  "run": 2,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-145018-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T16:52:25Z",
+  "duration_s": 327.052,
+  "status": "NOT_SUPPORTED",
+  "metrics": [],
+  "observations": "NON SUPPORTÉ : moteur V2-dind-rootless indisponible après 300s : error: cannot exec into a container in a completed pod; current phase is Failed",
+  "evidence": [
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V2-dind-rootless/manifest-1-dind-pod.yaml",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V2-dind-rootless/engine-logs.txt",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V2-dind-rootless/pods.json",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-06/kata/run-2-V2-dind-rootless/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V2-dind-rootless",
+  "manifest_sha256": "ea523aa0bf108f8e8cb40e81e5888670489cf798f3b39f1038dd00d797dd578d"
+}

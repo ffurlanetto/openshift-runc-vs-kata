@@ -1,0 +1,6 @@
+{
+  "storage_driver": "overlayfs",
+  "cgroup_version": "2",
+  "engine_version": "29.10.0",
+  "security": "[name=seccomp,profile=builtin name=cgroupns]"
+}

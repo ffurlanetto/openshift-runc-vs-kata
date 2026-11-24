@@ -1,0 +1,6 @@
+exec rc=137 en 2.0s
+command terminated with exit code 137
+
+cgroup avant : {'pids.max': 'max ', 'memory.max': '268435456 '}
+cgroup après : {}
+conteneur : {'allocatedResources': {'cpu': '100m', 'memory': '64Mi'}, 'containerID': 'cri-o://c538fd929b36b5fc9ef42102a3a62fd5fe2faa15b45249929f687be2660ffa2d', 'image': 'registry.access.redhat.com/ubi9/ubi-minimal:latest', 'imageID': 'registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352', 'lastState': {}, 'name': 'main', 'ready': False, 'resources': {'limits': {'cpu': '500m', 'memory': '256Mi'}, 'requests': {'cpu': '100m', 'memory': '64Mi'}}, 'restartCount': 0, 'started': False, 'state': {'terminated': {'containerID': 'cri-o://c538fd929b36b5fc9ef42102a3a62fd5fe2faa15b45249929f687be2660ffa2d', 'exitCode': 137, 'finishedAt': '2026-11-23T20:59:35Z', 'reason': 'OOMKilled', 'startedAt': '2026-11-23T20:59:32Z'}}, 'user': {'linux': {'gid': 0, 'supplementalGroups': [0, 1004520000], 'uid': 1004520000}}}

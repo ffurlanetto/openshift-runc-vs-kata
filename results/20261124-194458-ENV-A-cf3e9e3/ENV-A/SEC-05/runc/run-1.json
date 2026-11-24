@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-05",
+  "category": "SEC",
+  "title": "hostPath : accès au nœud malgré Kata ?",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-194458-ENV-A-cf3e9e3",
+    "git_commit": "cf3e9e3b3f6510585774dc13937fccac19c74ce1",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T20:02:19Z",
+  "duration_s": 5.4,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "hostpath_read",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "hostpath_write_seen_on_node",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "hostpath_access_default_selinux",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_sensitive_files_readable",
+      "value": 2,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : hostPath avec spc_t : lu=oui, écriture vue par le nœud=oui (propriétaire côté nœud 0:0) ; avec le SELinux par défaut (system_u:system_r:container_t:s0:c42,c58) : lu=non, écrit=non ; type de montage xfs ; racine du nœud en lecture seule : fichiers sensibles lisibles ['shadow', 'kubelet.conf'], écriture refusée=NON ; résidus : 0",
+  "evidence": [
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/manifest-1-sec-pod.yaml",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/manifest-2-sec-pod.yaml",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/manifest-3-sec-pod.yaml",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/manifest-4-sec-pod.yaml",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/pod-side.txt",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/node-side.txt",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/pods.json",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SEC-05/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "c385ed5075af5f4dddfad9b3243d40eb8315609eac64225cd9e0f8ab6733c1e1"
+}

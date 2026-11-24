@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON           OBJECT    MESSAGE
+37s         Normal   Scheduled        pod/cpu   Successfully assigned kvr-1738a-pol-15-kata-2/cpu to crc
+37s         Normal   AddedInterface   pod/cpu   Add eth0 [192.0.2.0/23] from ovn-kubernetes
+18s         Normal   Pulled           pod/cpu   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+17s         Normal   Created          pod/cpu   Container created
+17s         Normal   Started          pod/cpu   Container started

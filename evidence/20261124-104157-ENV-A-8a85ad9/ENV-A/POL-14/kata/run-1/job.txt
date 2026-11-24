@@ -1,0 +1,2 @@
+admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-472bb0fa" denied the request: Policy require-run-as-nonroot failed: runAsNonRoot doit être true (pod ou chaque conteneur); Policy disallow-privileged failed: privileged: true interdit

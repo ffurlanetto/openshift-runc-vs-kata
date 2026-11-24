@@ -1,0 +1,6 @@
+uid=1002640000
+CapPrm=0000000000000000
+CapEff=0000000000000000
+NoNewPrivs=1
+Seccomp=0
+etc_writable=0

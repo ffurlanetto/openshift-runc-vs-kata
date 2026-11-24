@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                             MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/restrict-capabilities   Pod kvr-a5b1b-pol-06-kata-0/policy-probe: [validation] fail (blocked); seule la capability NET_BIND_SERVICE peut être ajoutée
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/restrict-capabilities   Pod kvr-a5b1b-pol-06-kata-0/policy-probe: [validation] fail (blocked); seule la capability NET_BIND_SERVICE peut être ajoutée
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/restrict-capabilities   Deployment kvr-a5b1b-pol-06-kata-0/policy-probe-deploy: [validation] fail (blocked); seule la capability NET_BIND_SERVICE peut être ajoutée

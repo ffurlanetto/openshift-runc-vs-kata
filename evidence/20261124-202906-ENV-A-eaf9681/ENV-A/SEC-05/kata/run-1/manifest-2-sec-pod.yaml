@@ -1,0 +1,31 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hp-defaut
+  namespace: kvr-84e5e-sec-05-kata-1
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+  runtimeClassName: kata
+  nodeName: crc
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: main
+      image: registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd
+      imagePullPolicy: IfNotPresent
+      command: ["bash", "-c", "exec sleep infinity"]
+      resources:
+        requests: {cpu: 100m, memory: 64Mi}
+        limits: {cpu: "1", memory: 256Mi}
+      securityContext:
+        runAsUser: 0
+        runAsNonRoot: false
+        allowPrivilegeEscalation: false
+      volumeMounts:
+        - {name: host1, mountPath: /shared, readOnly: false}
+  volumes:
+    - name: host1
+      hostPath: {path: /var/tmp/kvr-sec05-8a9eec7e5fb77826, type: Directory}

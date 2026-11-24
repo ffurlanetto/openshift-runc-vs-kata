@@ -1,0 +1,3 @@
+non privilégié admis=True
+privilégié admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-429d0416" denied the request: Policy privileged-requires-kata failed: un conteneur privilégié exige runtimeClassName: kata

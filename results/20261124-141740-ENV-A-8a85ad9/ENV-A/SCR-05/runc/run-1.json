@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SCR-05",
+  "category": "SCR",
+  "title": "Pod compromis : collecte des secrets des autres pods du nœud",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-141740-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T14:37:53Z",
+  "duration_s": 22.04,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "stolen_from_kata",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "stolen_from_runc",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "attaquant runc (hostPath kubelet en lecture seule) : secret de la victime runc VOLÉ, de la victime Kata VOLÉ ; répertoires des pods visibles : runc=True, kata=True ; montages sous /host : 251",
+  "evidence": [
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/secret-victim-kata-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/manifest-1-secret-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/secret-victim-runc-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/manifest-2-secret-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/manifest-3-host-reader-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/attack.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/pods.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-05/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "acd969b6b1f04782b2ef877f94bcae27aaf7cae7556b4f7aa674b232f379116b"
+}

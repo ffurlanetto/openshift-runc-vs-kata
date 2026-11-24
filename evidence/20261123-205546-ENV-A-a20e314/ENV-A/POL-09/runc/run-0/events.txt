@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                        MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/restrict-seccomp   Pod kvr-4d877-pol-09-runc-0/policy-probe: [validation] fail (blocked); seccompProfile.type doit être RuntimeDefault ou Localhost
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/restrict-seccomp   Pod kvr-4d877-pol-09-runc-0/policy-probe: [validation] fail (blocked); seccompProfile.type doit être RuntimeDefault ou Localhost
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/restrict-seccomp   Deployment kvr-4d877-pol-09-runc-0/policy-probe-deploy: [validation] fail (blocked); seccompProfile.type doit être RuntimeDefault ou Localhost

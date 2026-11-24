@@ -1,0 +1,37 @@
+$ buildctl-daemonless.sh build --frontend dockerfile.v0 --local context=/work --local dockerfile=/work --opt build-arg:BASE=registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 --opt build-arg:GREETING=kvr --secret id=token,src=/work/secret.txt --output type=oci,dest=/tmp/demo.tar
+rc=0
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 857B done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BASE} results in empty or invalid base image name (line 2)
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BASE} results in empty or invalid base image name (line 9)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+#2 DONE 0.9s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [build 1/2] FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+#4 resolve registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 done
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 0B / 38.70MB 0.2s
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 10.49MB / 38.70MB 0.3s
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 27.26MB / 38.70MB 0.5s
+#4 sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 38.70MB / 38.70MB 0.6s done
+#4 extracting sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a
+#4 extracting sha256:aba77be659b3ca4c2aca19e9a0e50914427b3b809b11dc864d16e2377d40e17a 0.4s done
+#4 DONE 1.0s
+
+#5 [build 2/2] RUN --mount=type=secret,id=token     test -s /run/secrets/token     && echo "greeting=kvr" > /out.txt     && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt     && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+#5 DONE 0.2s
+
+#6 [stage-1 2/2] COPY --from=build /out.txt /out.txt
+#6 DONE 0.0s
+
+#7 exporting to oci image format
+#7 exporting layers 0.0s done
+#7 exporting manifest sha256:98aeee3aee35c733c35f4f569804c81f8352fbf1b224d4f0c7fa77d3b682145a done
+#7 exporting config sha256:b8f70bcbb8f16d2c5bce84ec90ae02527ef7ff781a2b233deea7f337ebc78a64 done
+#7 sending tarball 0.0s done
+#7 DONE 0.1s

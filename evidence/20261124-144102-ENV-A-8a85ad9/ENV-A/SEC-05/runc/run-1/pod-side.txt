@@ -1,0 +1,10 @@
+rc=0
+READ non
+WRITE non
+FSTYPE xfs overlay
+SENSITIVE shadow absent
+SENSITIVE config.yaml absent
+SENSITIVE kubelet.conf absent
+ROOTWRITE non
+
+/tmp/kvr.sh: line 4: /shared/from-pod: Permission denied

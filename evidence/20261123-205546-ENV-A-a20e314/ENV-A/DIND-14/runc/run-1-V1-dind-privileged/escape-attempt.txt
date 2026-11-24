@@ -1,0 +1,11 @@
+rc=0
+montés=['loop0', 'vda2']
+disques=loop0 vda vda1 vda2 vda3 vda4 
+répertoire kubelet du pod trouvé sur : []
+366f189333c30b5ce528efd92c40c68b074592b971fcd' locally
+registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd: Pulling from ubi9/ubi
+f4384193270b: Pulling fs layer
+f4384193270b: Download complete
+f4384193270b: Pull complete
+Digest: sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd
+Status: Downloaded newer image for registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd

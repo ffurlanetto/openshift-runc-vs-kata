@@ -1,0 +1,7 @@
+rc=0
+SEEN_defaut non
+OWNER_defaut -
+SEEN_spc oui
+OWNER_spc 0:0
+LEFT 0
+

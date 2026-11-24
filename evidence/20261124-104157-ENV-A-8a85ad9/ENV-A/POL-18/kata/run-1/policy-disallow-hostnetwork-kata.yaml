@@ -1,0 +1,31 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: disallow-hostnetwork-kata
+  namespace: kvr-a5b1b-pol-18-kata-1
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Pas de hostNetwork / hostPID / hostIPC avec Kata"
+spec:
+  validationActions: ["Deny"]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+    - name: workload
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : [])"
+    - name: containers
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : []) + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])"
+  validations:
+    - message: "hostNetwork/hostPID/hostIPC interdits avec une RuntimeClass Kata (risque de perte du nœud)"
+      expression: "!(has(object.spec.runtimeClassName)\n  && (object.spec.runtimeClassName == 'kata-qemu' || object.spec.runtimeClassName.startsWith('kata')))\n|| !((has(object.spec.hostNetwork) && object.spec.hostNetwork)\n     || (has(object.spec.hostPID) && object.spec.hostPID)\n     || (has(object.spec.hostIPC) && object.spec.hostIPC))"

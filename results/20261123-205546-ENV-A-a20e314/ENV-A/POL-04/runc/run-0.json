@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-04",
+  "category": "POL",
+  "title": "Kyverno : conteneurs privilégiés interdits",
+  "runtime": "runc",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T07:53:52Z",
+  "duration_s": 0.957,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "violating_admitted_without_policy",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "policy_propagation",
+      "value": 83,
+      "unit": "ms",
+      "better": "lower"
+    },
+    {
+      "name": "compliant_admitted_enforce",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "violating_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "violating_deployment_admitted_enforce",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "Kyverno v1.20.0 (cel) ; Enforce : conforme admis, non conforme refusé, Deployment non conforme refusé",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-04/runc/run-0/manifest-1-conforme.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-04/runc/run-0/manifest-2-non-conforme.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-04/runc/run-0/manifest-3-deployment-non-conforme.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-04/runc/run-0/policy-disallow-privileged.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-04/runc/run-0/admission.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-04/runc/run-0/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "6365671960b50ae76d3f3123de36a9e341d07037ef8d9702e9d4780733f09225"
+}

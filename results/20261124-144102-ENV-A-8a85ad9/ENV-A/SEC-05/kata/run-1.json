@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-05",
+  "category": "SEC",
+  "title": "hostPath : accès au nœud malgré Kata ?",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-144102-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T14:42:38Z",
+  "duration_s": 242.395,
+  "status": "FAIL",
+  "metrics": [],
+  "observations": "ERREUR : OcError: kubectl wait pod/hostpath --for=condition=Ready --timeout=240s -n kvr-4afa6-sec-05-kata-1 -> rc=1 : error: timed out waiting for the condition on pods/hostpath",
+  "evidence": [
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/kata/run-1/manifest-1-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/kata/run-1/manifest-2-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/kata/run-1/node-side.txt",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/kata/run-1/traceback.txt",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/kata/run-1/pods.json",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-05/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "65ac8cc5c2e7c2bb27e01a0f9bc4ab1c893f85d866873f0f67de6ce03b804f5e"
+}

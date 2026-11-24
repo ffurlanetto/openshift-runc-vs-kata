@@ -1,0 +1,3 @@
+admis=False
+
+Error from server: admission webhook "nvpol.validate.kyverno.svc-fail" denied the request: Policy disallow-privileged failed: privileged: true interdit

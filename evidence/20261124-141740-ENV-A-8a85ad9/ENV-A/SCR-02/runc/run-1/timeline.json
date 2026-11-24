@@ -1,0 +1,14 @@
+[
+  {
+    "t": 0.2,
+    "few": false,
+    "many": false,
+    "subpath": false
+  },
+  {
+    "t": 2.3,
+    "few": true,
+    "many": true,
+    "subpath": false
+  }
+]

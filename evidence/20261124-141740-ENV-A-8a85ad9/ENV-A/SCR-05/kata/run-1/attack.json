@@ -1,0 +1,19 @@
+{
+  "attacker_runtime": "kata",
+  "victims": {
+    "kata": {
+      "pod_dir_visible": true,
+      "read": false,
+      "error": "dir=1\ncat: /host/ad1e4741-46f3-4225-828f-083193e756e8/volumes/kubernetes.io~secret/s/value: No such file or directory\n"
+    },
+    "runc": {
+      "pod_dir_visible": true,
+      "read": false,
+      "error": "dir=1\ncat: /host/cb6f86a0-309e-49af-a410-43c81322b5ea/volumes/kubernetes.io~secret/s/value: No such file or directory\n"
+    }
+  },
+  "host_mounts": [
+    "1",
+    "virtiofs"
+  ]
+}

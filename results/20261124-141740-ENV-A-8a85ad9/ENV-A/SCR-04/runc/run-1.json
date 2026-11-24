@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SCR-04",
+  "category": "SCR",
+  "title": "Secret lisible par l'administrateur du nœud ?",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-141740-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T14:37:28Z",
+  "duration_s": 3.372,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "readable_node_tmpfs",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "readable_proc_environ",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "readable_process_memory",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : depuis le nœud, secret LU dans le tmpfs du kubelet, LU dans /proc/<pid>/environ, LU dans la mémoire de sleep ; processus du pod vus sur le nœud : conmon(6 MiB), sleep(4 MiB)",
+  "evidence": [
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-04/runc/run-1/secret-victim-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-04/runc/run-1/manifest-1-secret-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-04/runc/run-1/manifest-2-host-reader-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-04/runc/run-1/node-view.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-04/runc/run-1/pods.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-04/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "8a92b72766fafe6d33e53c7456cbdd6724c8cbd4cb5a9050f0c03695c59fa112"
+}

@@ -1,0 +1,31 @@
+{
+  "process_by_name": false,
+  "pod_processes": [
+    {
+      "comm": "conmon",
+      "memory": false,
+      "scanned_mib": 6
+    },
+    {
+      "comm": "sleep",
+      "memory": true,
+      "scanned_mib": 4
+    },
+    {
+      "comm": "bash",
+      "memory": true,
+      "scanned_mib": 1
+    },
+    {
+      "comm": "sleep",
+      "memory": true,
+      "scanned_mib": 4
+    }
+  ],
+  "memory": true,
+  "files": [
+    "lib/…"
+  ],
+  "network": true,
+  "network_iface": "8985…"
+}

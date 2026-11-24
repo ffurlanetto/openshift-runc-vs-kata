@@ -1,0 +1,60 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-context
+  namespace: kvr-4d877-dind-01-kata-v3-0
+data:
+  Dockerfile: |
+    ARG BASE
+    FROM ${BASE} AS build
+    ARG GREETING=default
+    RUN --mount=type=secret,id=token \
+        test -s /run/secrets/token \
+        && echo "greeting=${GREETING}" > /out.txt \
+        && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt \
+        && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+    FROM ${BASE}
+    COPY --from=build /out.txt /out.txt
+    CMD ["cat", "/out.txt"]
+  secret.txt: "jeton-factice-du-banc-kvr"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ci
+  namespace: kvr-4d877-dind-01-kata-v3-0
+  labels:
+    app.kubernetes.io/part-of: kvr
+  annotations:
+    io.kubernetes.cri-o.Devices: "/dev/fuse"   # buildah sans privilège (méthode Red Hat) : fuse-overlayfs
+spec:
+  runtimeClassName: kata
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: engine
+      image: quay.io/buildah/stable@sha256:7c4a2893a2ec7a8eecb37debacc0cd657f453cfdc3d4a36b0171f5f9ac6cf618
+      command: ["sleep", "infinity"]
+      env:
+        - {name: STORAGE_DRIVER, value: overlay}
+        - {name: BUILDAH_ISOLATION, value: chroot}
+      securityContext:                # buildah rootless : utilisateur build (subuid), newuidmap à file capabilities
+        privileged: false
+        runAsUser: 1000
+        runAsGroup: 1000
+        allowPrivilegeEscalation: true
+        capabilities: {add: ["SETUID", "SETGID"]}
+      volumeMounts:
+        - {name: engine-storage, mountPath: /home/build/.local/share/containers}
+        - {name: build-context, mountPath: /work}
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests: {cpu: 500m, memory: 512Mi}
+        limits: {cpu: "2", memory: 2Gi}
+  volumes:
+    - name: engine-storage
+      emptyDir: {}
+    - name: build-context
+      configMap: {name: build-context}

@@ -1,0 +1,16 @@
+{
+  "process_by_name": false,
+  "pod_processes": [
+    {
+      "comm": "qemu-system-aar",
+      "memory": true,
+      "scanned_mib": 444
+    }
+  ],
+  "memory": true,
+  "files": [
+    "lib/…"
+  ],
+  "network": true,
+  "network_iface": "ee43…"
+}

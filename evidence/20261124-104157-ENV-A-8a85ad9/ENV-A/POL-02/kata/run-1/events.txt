@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                               MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/require-requests-limits   Pod kvr-a5b1b-pol-02-kata-1/policy-probe: [validation] fail (blocked); chaque conteneur doit déclarer requests.cpu, requests.memory et limits.memory
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/require-requests-limits   Pod kvr-a5b1b-pol-02-kata-1/policy-probe: [validation] fail (blocked); chaque conteneur doit déclarer requests.cpu, requests.memory et limits.memory
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/require-requests-limits   Deployment kvr-a5b1b-pol-02-kata-1/policy-probe-deploy: [validation] fail (blocked); chaque conteneur doit déclarer requests.cpu, requests.memory et limits.memory

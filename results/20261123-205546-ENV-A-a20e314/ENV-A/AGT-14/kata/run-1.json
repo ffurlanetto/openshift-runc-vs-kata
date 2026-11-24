@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "test_id": "AGT-14",
+  "category": "AGT",
+  "title": "Accès à l'API Kubernetes et aux métadonnées",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-23T20:59:08Z",
+  "duration_s": 23.07,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "sa_token_present",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "api_denied",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "metadata_unreachable",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "token SA présent=False ; API sans identité → HTTP 403 ; métadonnées → 000",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/AGT-14/kata/run-1/manifest-1-probe-pod.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/AGT-14/kata/run-1/pods.json",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/AGT-14/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "agent_mode": "replay",
+  "manifest_sha256": "ea1b6e9276963feae66aab573645975cee7f3a9f041db952583527284a38516a"
+}

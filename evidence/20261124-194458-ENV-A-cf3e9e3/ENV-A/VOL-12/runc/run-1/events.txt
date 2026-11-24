@@ -1,0 +1,14 @@
+LAST SEEN   TYPE     REASON                  OBJECT                              MESSAGE
+5s          Normal   ExternalProvisioning    persistentvolumeclaim/victim-data   Waiting for a volume to be created either by the external provisioner 'kubevirt.io.hostpath-provisioner' or manually by the system administrator. If volume creation is delayed, please verify that the provisioner is running and correctly registered.
+5s          Normal   ProvisioningSucceeded   persistentvolumeclaim/victim-data   Successfully provisioned volume pvc-d73dec60-3c41-484f-aa87-bb04ffdc1e24
+5s          Normal   Provisioning            persistentvolumeclaim/victim-data   External provisioner is provisioning volume for claim "kvr-e8695-vol-12-runc-1/victim-data"
+5s          Normal   WaitForFirstConsumer    persistentvolumeclaim/victim-data   waiting for first consumer to be created before binding
+4s          Normal   Scheduled               pod/victim                          Successfully assigned kvr-e8695-vol-12-runc-1/victim to crc
+3s          Normal   AddedInterface          pod/victim                          Add eth0 [192.0.2.0/23] from ovn-kubernetes
+3s          Normal   Pulled                  pod/victim                          Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+3s          Normal   Created                 pod/victim                          Container created
+3s          Normal   Started                 pod/victim                          Container started
+2s          Normal   Started                 pod/attacker                        Container started
+2s          Normal   Created                 pod/attacker                        Container created
+2s          Normal   Pulled                  pod/attacker                        Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+2s          Normal   AddedInterface          pod/attacker                        Add eth0 [192.0.2.0/23] from ovn-kubernetes

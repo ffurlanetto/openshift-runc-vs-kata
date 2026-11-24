@@ -1,0 +1,33 @@
+{
+  "expected": {
+    "/secrets/full/small": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947",
+    "/secrets/full/binary": "c6b23dd23cc18c7cd127e86c4d6c349355d1b966d885e66906c3a3f1d1c79c9e",
+    "/secrets/full/large": "c4d79002f2b833581583f154281e892f93435fb1e3b1e80c4adb51ef462c5a13",
+    "/secrets/items/nested/bin.dat": "c6b23dd23cc18c7cd127e86c4d6c349355d1b966d885e66906c3a3f1d1c79c9e",
+    "/secrets/frozen/token": "0bd2861c4450167af780ba2328ca8ae9602bb7d51233bc2871d8182925d5fb84",
+    "/secrets/projected/secret-small": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947",
+    "/etc/kvr-small": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947",
+    "env:KVR_SMALL": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947"
+  },
+  "seen": {
+    "/secrets/full/small": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947",
+    "/secrets/full/binary": "c6b23dd23cc18c7cd127e86c4d6c349355d1b966d885e66906c3a3f1d1c79c9e",
+    "/secrets/full/large": "c4d79002f2b833581583f154281e892f93435fb1e3b1e80c4adb51ef462c5a13",
+    "/secrets/items/nested/bin.dat": "c6b23dd23cc18c7cd127e86c4d6c349355d1b966d885e66906c3a3f1d1c79c9e",
+    "/secrets/frozen/token": "0bd2861c4450167af780ba2328ca8ae9602bb7d51233bc2871d8182925d5fb84",
+    "/secrets/projected/secret-small": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947",
+    "/etc/kvr-small": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947",
+    "env:KVR_SMALL": "4344abb3adc7670e5fd72b489b9b783bcf338ab5346a9ce16aa165565e35b947"
+  },
+  "details": [
+    "consumer",
+    "2",
+    "440 0 1000980000",
+    "777",
+    "/secrets/full virtiofs",
+    "/secrets/items tmpfs",
+    "/secrets/frozen tmpfs",
+    "/secrets/missing virtiofs",
+    "/secrets/projected virtiofs"
+  ]
+}

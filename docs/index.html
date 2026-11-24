@@ -1,0 +1,1023 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>runc ou Kata Containers sur OpenShift : rapport au comité</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#5f5d57;--line:#e3e0d8;--card:#ffffff;--accent:#1f5f8b;--code:#f2efe8;
+--ok:#2e7d32;--ko:#b3261e;--warn:#9a6700}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151514;--fg:#ecebe6;--muted:#a5a39b;
+--line:#33322e;--card:#1d1d1b;--accent:#7cb7e0;--code:#26251f;--ok:#81c784;--ko:#ef9a9a;--warn:#e6c35c}}
+:root[data-theme="dark"]{--bg:#151514;--fg:#ecebe6;--muted:#a5a39b;--line:#33322e;--card:#1d1d1b;--accent:#7cb7e0;
+--code:#26251f;--ok:#81c784;--ko:#ef9a9a;--warn:#e6c35c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",
+Roboto,"Helvetica Neue",Arial,sans-serif}
+header{border-bottom:1px solid var(--line);background:var(--card)}
+header .in,main{max-width:1100px;margin:0 auto;padding:0 16px}
+header .in{display:flex;gap:24px;align-items:center;min-height:56px;flex-wrap:wrap}
+header strong{font-size:15px}
+nav a{color:var(--muted);text-decoration:none;margin-right:16px;font-size:14px}
+nav a.on{color:var(--fg);font-weight:600}
+main{padding-top:24px;padding-bottom:64px}
+h1{font-size:30px;line-height:1.2;margin:8px 0 16px}
+h2{font-size:22px;margin-top:40px;padding-top:8px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin-top:28px}
+a{color:var(--accent)}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.88em}
+pre{background:var(--code);padding:12px;border-radius:6px;overflow-x:auto}
+pre code{padding:0}
+blockquote{margin:16px 0;padding:8px 16px;border-left:3px solid var(--accent);background:var(--card);color:var(--muted)}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-size:14px;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--card)}
+td sub{color:var(--muted);font-size:11px;display:block}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 16px;font-size:14px}
+.toc ul{margin:4px 0;padding-left:18px}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding:16px;text-align:center}
+</style></head><body>
+<header><div class="in"><strong>runc vs Kata · OpenShift</strong><nav><a href="index.html" class=on>Rapport</a><a href="donnees.html">Données par test</a><a href="plan.html">Plan de tests</a><a href="environnement.html">Environnement</a></nav></div></header>
+<main><h1 id="runc-ou-kata-containers-sur-openshift-rapport-au-comite">runc ou Kata Containers sur OpenShift : rapport au comité</h1><div class="toc"><span class="toctitle">Sommaire</span><ul>
+<li><a href="#1-synthese-decisionnelle">1. Synthèse décisionnelle</a></li>
+<li><a href="#2-contexte-et-perimetre">2. Contexte et périmètre</a></li>
+<li><a href="#3-tableau-de-bord">3. Tableau de bord</a></li>
+<li><a href="#4-resultats-par-domaine">4. Résultats par domaine</a></li>
+<li><a href="#5-comparaison-des-shims-rust-et-go">5. Comparaison des shims Rust et Go</a></li>
+<li><a href="#6-cas-dusage-cibles">6. Cas d'usage cibles</a></li>
+<li><a href="#7-matrice-avantages-inconvenients-et-limites">7. Matrice avantages, inconvénients et limites</a></li>
+<li><a href="#8-recommandations-dusage">8. Recommandations d'usage</a></li>
+<li><a href="#9-risques-prerequis-et-couts">9. Risques, prérequis et coûts</a></li>
+<li><a href="#10-limites-de-letude">10. Limites de l'étude</a></li>
+<li><a href="#11-prochaines-etapes">11. Prochaines étapes</a></li>
+<li><a href="#12-annexes">12. Annexes</a></li>
+</ul>
+</div>
+
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Version</td>
+<td>1.0 (ENV-A)</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>24 novembre 2026</td>
+</tr>
+<tr>
+<td>Statut</td>
+<td><strong>Brouillon pour revue</strong> : résultats ENV-A (poste de travail), à confirmer sur ENV-B (bare metal x86_64)</td>
+</tr>
+<tr>
+<td>Diffusion</td>
+<td>Comité d'architecture, équipes plateforme, sécurité, CI et IA</td>
+</tr>
+<tr>
+<td>Données</td>
+<td><a href="donnees.html">Fiches de test générées</a> · <a href="plan.html">Plan de tests</a> · <a href="environnement.html">Environnement</a> · résultats bruts dans <code>results/</code>, preuves dans <code>evidence/</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="1-synthese-decisionnelle">1. Synthèse décisionnelle</h2>
+<p><strong>Recommandation</strong> : garder <strong>runc par défaut</strong> et réserver <strong>Kata</strong> aux charges qui ont besoin d'une frontière forte avec le nœud : builds CI qui exigent des privilèges, agents IA qui exécutent du code non relu, charges multi-tenants non fiables. Kata doit être <strong>imposé par une policy d'admission</strong>, jamais laissé au choix du pod, et ne remplace aucun des autres contrôles (admission, SELinux, egress, gestion des secrets).</p>
+<p><strong>Constats clés (ENV-A, Kata 4.4.0, shims Rust et Go)</strong></p>
+<ol>
+<li><strong>Kata protège le nœud contre un pod privilégié.</strong> Un pod privilégié runc atteint le nœud par 5 techniques sur 2 profils (SEC-04), modifie un sysctl du nœud et y charge un module noyau (SEC-09), monte le disque d'un autre pod (VOL-12) et lit les secrets des autres pods (SCR-05). En Kata, <strong>aucune</strong> de ces actions n'atteint le nœud ni les autres pods : elles restent dans la VM. Le résultat est identique avec les deux shims.</li>
+<li><strong>Kata ne protège pas le pod contre le nœud.</strong> Un administrateur du nœud lit la mémoire, les fichiers et le trafic réseau d'un pod Kata comme ceux d'un pod runc (SEC-18, SCR-04). Seule la visibilité du processus change. Protéger le pod contre l'hôte relève des <em>Confidential Containers</em> (CoCo), hors périmètre.</li>
+<li><strong>L'isolation entre pods voisins est identique.</strong> Aucun voisin, runc ou Kata, ne voit les processus, la mémoire ni les fichiers d'un autre pod (SEC-18). L'escalade de privilèges dans le pod est bloquée à l'identique (SEC-19).</li>
+<li><strong>Trois garde-fous de runc disparaissent ou changent en Kata</strong> et doivent être compensés :
+   - aucun filtre seccomp dans le conteneur (SEC-08, POL-17) ;
+   - la limite <code>ephemeral-storage</code> n'est pas appliquée, le pod n'est pas évincé (POL-16) ;
+   - avec le shim Rust, l'OOM est signalé <code>Error</code> et non <code>OOMKilled</code> (FUN-17), ce qui aveugle la supervision.</li>
+<li><strong>Coût de démarrage élevé (en virtualisation imbriquée).</strong> Pod prêt en 20,6 s (Rust) et 30,9 s (Go) contre 0,65 s en runc (PERF-01, médiane sur 30 runs). Un exec d'outil coûte environ 240 ms contre 60 ms (AGT-08). Ces chiffres sont <strong>pessimistes</strong> et seront remesurés sur ENV-B.</li>
+</ol>
+<p><strong>Décision demandée au comité</strong></p>
+<ul>
+<li>Valider le principe « runc par défaut, Kata imposé par policy pour les classes de charges listées au §8 ».</li>
+<li>Autoriser la campagne ENV-B (bare metal, OpenShift Sandboxed Containers) pour confirmer les performances et les écarts de supervision avant un pilote.</li>
+<li>Désigner un propriétaire pour les trois écarts du constat 4 (seccomp, <code>ephemeral-storage</code>, OOM).</li>
+</ul>
+<hr />
+<h2 id="2-contexte-et-perimetre">2. Contexte et périmètre</h2>
+<p><strong>Objectif</strong> : comparer runc (runtime par défaut d'OpenShift) et Kata Containers (pod dans une micro-VM) sur la sécurité, le fonctionnel, la performance et l'exploitation, et en particulier pour deux cas d'usage : la CI qui construit des images (Docker-in-Docker et variantes) et les agents IA autonomes.</p>
+<p><strong>Deux implémentations de Kata sont comparées</strong> :</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>RuntimeClass</th>
+<th>Shim</th>
+<th>Statut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kata</code></td>
+<td><code>kata-qemu-runtime-rs</code> (Rust)</td>
+<td>défaut de kata-deploy 4.4</td>
+</tr>
+<tr>
+<td><code>kata-qemu</code></td>
+<td><code>kata-qemu</code> (Go)</td>
+<td>implémentation historique, base d'OpenShift Sandboxed Containers</td>
+</tr>
+</tbody>
+</table></div>
+<p>Dans ce rapport, « Kata » désigne les deux shims quand leur comportement est identique ; sinon le shim est précisé.</p>
+<p><strong>Environnement ENV-A</strong> : OpenShift Local (CRC) 4.22.1, un nœud arm64 de 12 vCPU et 24 Go, dans une VM sur Mac, donc <strong>virtualisation imbriquée</strong>. Kata 4.4.0 installé par kata-deploy (pas OpenShift Sandboxed Containers), QEMU, noyau invité 6.18.62. Kyverno 1.20.0. Détails : <a href="environnement.html">01-ENVIRONNEMENT</a>.</p>
+<blockquote>
+<p><strong>Avertissement</strong> : ENV-A sert à valider le comportement et le banc de test. Les <strong>constats fonctionnels et de sécurité</strong> sont représentatifs. Les <strong>mesures de performance</strong> ne le sont pas : la virtualisation imbriquée les dégrade fortement.</p>
+</blockquote>
+<p><strong>Hors périmètre</strong> : Confidential Containers, peer-pods, Windows, GPU, attaques par canaux auxiliaires (cache, timing).</p>
+<p><strong>Méthode</strong> : 163 tests au plan, dont 44 automatisés, tous exécutés ici. Banc rejouable (<code>./precheck</code>, <code>./run</code>), chaque run produit un JSON validé par schéma et des preuves brutes. Mode sûr par défaut : les tests intrusifs (<code>--non-safe</code>) ont été exécutés uniquement sur ce cluster personnel. Toutes les données publiées sont anonymisées.</p>
+<hr />
+<h2 id="3-tableau-de-bord">3. Tableau de bord</h2>
+<h3 id="31-couverture-et-statuts">3.1 Couverture et statuts</h3>
+<p>Statut le plus défavorable sur l'ensemble des runs mesurés, par test et par variante (détail : <a href="donnees.html">donnees.md</a>).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Domaine</th>
+<th>Tests (variantes)</th>
+<th>runc PASS</th>
+<th>Kata Rust PASS / PARTIAL / FAIL / NON SUPP.</th>
+<th>Kata Go PASS / PARTIAL / FAIL / NON SUPP.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fonctionnel</td>
+<td>2</td>
+<td>2</td>
+<td>0 / 1 / 0 / 1</td>
+<td>1 / 0 / 0 / 1</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>1</td>
+<td>1</td>
+<td>1 / 0 / 0 / 0</td>
+<td>1 / 0 / 0 / 0</td>
+</tr>
+<tr>
+<td>Sécurité</td>
+<td>8</td>
+<td>8</td>
+<td>6 / 1 / 1 / 0</td>
+<td>6 / 1 / 1 / 0</td>
+</tr>
+<tr>
+<td>Policies d'admission (Kyverno)</td>
+<td>18</td>
+<td>18</td>
+<td>16 / 0 / 2 / 0</td>
+<td>16 / 0 / 2 / 0</td>
+</tr>
+<tr>
+<td>CI dans Kata (DIND)</td>
+<td>4 (15)</td>
+<td>15</td>
+<td>4 / 0 / 5 / 6</td>
+<td>5 / 0 / 6 / 4</td>
+</tr>
+<tr>
+<td>Agents IA</td>
+<td>4</td>
+<td>4</td>
+<td>4 / 0 / 0 / 0</td>
+<td>3 / 0 / 1 / 0</td>
+</tr>
+<tr>
+<td>Volumes</td>
+<td>2</td>
+<td>2</td>
+<td>2 / 0 / 0 / 0</td>
+<td>non mesuré</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>5</td>
+<td>5</td>
+<td>5 / 0 / 0 / 0</td>
+<td>non mesuré</td>
+</tr>
+</tbody>
+</table></div>
+<p>Lecture des statuts pour les tests de sécurité : <strong>PASS = comportement conforme à l'attendu du plan</strong>, y compris quand l'attendu est « runc atteint le nœud ». Un PASS runc sur SEC-04 signifie donc que l'évasion a bien été démontrée.</p>
+<h3 id="32-indicateurs-cles">3.2 Indicateurs clés</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Indicateur</th>
+<th>runc</th>
+<th>Kata Rust</th>
+<th>Kata Go</th>
+<th>Tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pod prêt, médiane (p5–p95)</td>
+<td>0,65 s (0,45–1,5)</td>
+<td>20,6 s (19,6–21,7)</td>
+<td>30,9 s (22,3–60,7)</td>
+<td>PERF-01, 30 runs</td>
+</tr>
+<tr>
+<td>Exec d'un outil, p50 / p95</td>
+<td>61 / 75 ms</td>
+<td>237 / 318 ms</td>
+<td>287 / 489 ms</td>
+<td>AGT-08, 3×100 exec</td>
+</tr>
+<tr>
+<td>Overhead déclaré par pod</td>
+<td>0</td>
+<td>250m CPU, 320 Mi</td>
+<td>250m CPU, 320 Mi</td>
+<td>POL-12</td>
+</tr>
+<tr>
+<td>Noyau partagé avec le nœud</td>
+<td>oui</td>
+<td>non</td>
+<td>non</td>
+<td>SEC-01</td>
+</tr>
+<tr>
+<td>Techniques d'évasion d'un pod privilégié réussies</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>SEC-04</td>
+</tr>
+<tr>
+<td>Sysctl / module noyau du nœud modifiables par un pod privilégié</td>
+<td>oui / oui</td>
+<td>non / non</td>
+<td>non / non</td>
+<td>SEC-09</td>
+</tr>
+<tr>
+<td>Volume d'un autre pod atteint par un pod privilégié</td>
+<td>oui</td>
+<td>non</td>
+<td>(non mesuré)</td>
+<td>VOL-12</td>
+</tr>
+<tr>
+<td>Secrets d'autres pods volés (hostPath kubelet en lecture)</td>
+<td>oui</td>
+<td>non</td>
+<td>(non mesuré)</td>
+<td>SCR-05</td>
+</tr>
+<tr>
+<td>Voisin qui voit processus / mémoire / fichiers d'un pod</td>
+<td>non</td>
+<td>non</td>
+<td>non</td>
+<td>SEC-18</td>
+</tr>
+<tr>
+<td>Administrateur du nœud qui lit mémoire / fichiers / réseau du pod</td>
+<td>oui</td>
+<td>oui</td>
+<td>oui</td>
+<td>SEC-18, SCR-04</td>
+</tr>
+<tr>
+<td>Filtre seccomp actif dans un pod restreint</td>
+<td>oui</td>
+<td><strong>non</strong></td>
+<td><strong>non</strong></td>
+<td>SEC-08, POL-17</td>
+</tr>
+<tr>
+<td>Limite CPU respectée</td>
+<td>oui (0,50 cœur)</td>
+<td>oui</td>
+<td>oui</td>
+<td>POL-15</td>
+</tr>
+<tr>
+<td>Limite <code>ephemeral-storage</code> appliquée (éviction)</td>
+<td>oui (80 s)</td>
+<td><strong>non</strong></td>
+<td><strong>non</strong></td>
+<td>POL-16</td>
+</tr>
+<tr>
+<td>OOM signalé <code>OOMKilled</code></td>
+<td>oui (1,5 s)</td>
+<td><strong>non</strong> (<code>Error</code>, 26 s)</td>
+<td>oui (55 s)</td>
+<td>FUN-17</td>
+</tr>
+<tr>
+<td>Policies Kyverno appliquées à l'identique</td>
+<td>18/18</td>
+<td>18/18 à l'admission</td>
+<td>18/18 à l'admission</td>
+<td>POL-01..18</td>
+</tr>
+<tr>
+<td>Kata imposable par policy (mutation + overhead)</td>
+<td>—</td>
+<td>oui</td>
+<td>oui</td>
+<td>POL-12</td>
+</tr>
+<tr>
+<td><code>hostNetwork</code></td>
+<td>oui</td>
+<td>non supporté, <strong>admis par le cluster</strong></td>
+<td>idem</td>
+<td>FUN-30, POL-18</td>
+</tr>
+<tr>
+<td>Build d'image : variantes qui fonctionnent</td>
+<td>5/5</td>
+<td>1/5 (dind privilégié, stockage en mémoire)</td>
+<td>1/5</td>
+<td>DIND-05</td>
+</tr>
+<tr>
+<td>Étape CI malveillante qui atteint le disque du nœud</td>
+<td>oui</td>
+<td>non</td>
+<td>non</td>
+<td>DIND-14</td>
+</tr>
+<tr>
+<td>Arrêt d'un processus qui ignore SIGTERM</td>
+<td>8,3 s</td>
+<td>3,4 s</td>
+<td>4,5 s</td>
+<td>AGT-20</td>
+</tr>
+<tr>
+<td>Rotation d'un secret visible dans le pod</td>
+<td>2,3 s</td>
+<td>85,6 s</td>
+<td>(non mesuré)</td>
+<td>SCR-02</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="33-notation-ponderee-env-a-provisoire">3.3 Notation pondérée (ENV-A, provisoire)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Domaine</th>
+<th>Poids</th>
+<th>runc</th>
+<th>Kata</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sécurité / isolation</td>
+<td>35 %</td>
+<td>3</td>
+<td>4</td>
+<td>runc : évasion avec pod privilégié (SEC-04, SEC-09, VOL-12, SCR-05). Kata : pas d'évasion vers le nœud, mais seccomp absent (SEC-08) et pod non protégé de l'hôte (SEC-18)</td>
+</tr>
+<tr>
+<td>Compatibilité fonctionnelle</td>
+<td>25 %</td>
+<td>5</td>
+<td>3</td>
+<td>Kata : <code>hostNetwork</code> non supporté, 4 variantes de build sur 5 en échec (DIND), <code>ephemeral-storage</code> non appliqué (POL-16)</td>
+</tr>
+<tr>
+<td>Performance / coût</td>
+<td>20 %</td>
+<td>5</td>
+<td>1 (indicatif)</td>
+<td>Δ &gt; 100 % au démarrage et à l'exec (PERF-01, AGT-08) en virtualisation imbriquée ; à remesurer sur ENV-B</td>
+</tr>
+<tr>
+<td>Exploitabilité</td>
+<td>15 %</td>
+<td>5</td>
+<td>3</td>
+<td>Motif OOM différent (FUN-17, Rust), rotation des secrets plus lente (SCR-02), admission à durcir (POL-11, POL-18)</td>
+</tr>
+<tr>
+<td>Support / maturité</td>
+<td>5 %</td>
+<td>5</td>
+<td>3</td>
+<td>kata-deploy upstream ; le support Red Hat passe par OpenShift Sandboxed Containers (à évaluer sur ENV-B)</td>
+</tr>
+<tr>
+<td><strong>Score pondéré</strong></td>
+<td>100 %</td>
+<td><strong>4,3</strong></td>
+<td><strong>3,1</strong></td>
+<td>Score attendu en hausse sur ENV-B pour la performance</td>
+</tr>
+</tbody>
+</table></div>
+<p>Le score global favorise runc parce qu'il agrège des critères qui ne pèsent pas pareil pour chaque charge. La décision se prend par classe de charge (§8), pas sur ce score.</p>
+<hr />
+<h2 id="4-resultats-par-domaine">4. Résultats par domaine</h2>
+<h3 id="41-securite-et-isolation">4.1 Sécurité et isolation</h3>
+<p><strong>Ce que Kata apporte : une frontière entre le pod et le nœud.</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Scénario</th>
+<th>runc</th>
+<th>Kata (Rust et Go)</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Noyau vu par le pod</td>
+<td>celui du nœud (5.14 RHCOS)</td>
+<td>celui de la VM (6.18)</td>
+<td>SEC-01</td>
+</tr>
+<tr>
+<td>Ressources visibles depuis un pod restreint</td>
+<td>12 CPU, 24 Go (tout le nœud)</td>
+<td>1 à 2 CPU, 0,3 à 2,2 Go (la VM)</td>
+<td>SEC-03</td>
+</tr>
+<tr>
+<td>Pod privilégié : évasion vers le nœud</td>
+<td>5 techniques réussies, témoin trouvé sur le nœud</td>
+<td>0 : chaque technique n'atteint que la VM</td>
+<td>SEC-04</td>
+</tr>
+<tr>
+<td>Pod privilégié : sysctl et module noyau</td>
+<td>appliqués au nœud (restaurés)</td>
+<td>appliqués à la VM seulement ; module du nœud refusé</td>
+<td>SEC-09</td>
+</tr>
+<tr>
+<td>Pod privilégié : disques et volumes des autres pods</td>
+<td>4 périphériques montés, volume de la victime lu</td>
+<td>1 disque (celui de la VM), volume non atteint</td>
+<td>VOL-12</td>
+</tr>
+<tr>
+<td>Pod compromis : secrets des autres pods (hostPath kubelet)</td>
+<td>volés, y compris ceux d'un pod Kata</td>
+<td>aucun secret lu</td>
+<td>SCR-05</td>
+</tr>
+<tr>
+<td>Étape CI malveillante dans un dind privilégié</td>
+<td>disque du nœud monté</td>
+<td>seul le disque de la VM</td>
+<td>DIND-14</td>
+</tr>
+</tbody>
+</table></div>
+<p>Chaque constat d'évasion est vérifié par une <strong>sonde runc distincte</strong> sur le même nœud, et chaque modification est annulée puis vérifiée. Aucun résidu n'a été laissé (métriques <code>node_left_modified</code>, <code>node_settings_not_restored</code> à 0).</p>
+<p><strong>Ce que Kata n'apporte pas : la protection du pod contre le nœud.</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Scénario</th>
+<th>runc</th>
+<th>Kata</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Voisin (runc ou même runtime) qui voit processus, mémoire, fichiers</td>
+<td>non</td>
+<td>non</td>
+<td>SEC-18</td>
+</tr>
+<tr>
+<td>Administrateur du nœud : processus du pod visible par son nom</td>
+<td>oui</td>
+<td>non (seuls QEMU, virtiofsd, le shim apparaissent)</td>
+<td>SEC-18</td>
+</tr>
+<tr>
+<td>Administrateur du nœud : mémoire du pod lisible</td>
+<td>oui</td>
+<td>oui (mémoire de la VM)</td>
+<td>SEC-18, SCR-04</td>
+</tr>
+<tr>
+<td>Administrateur du nœud : fichiers et trafic réseau du pod</td>
+<td>oui</td>
+<td>oui</td>
+<td>SEC-18</td>
+</tr>
+<tr>
+<td>Secret monté lisible depuis le nœud (tmpfs kubelet)</td>
+<td>oui</td>
+<td>oui</td>
+<td>SCR-04</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Garde-fous internes au pod.</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Contrôle</th>
+<th>runc</th>
+<th>Kata</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Filtre seccomp <code>RuntimeDefault</code></td>
+<td>actif ; 3 appels sensibles sur 18 atteignent le noyau du nœud</td>
+<td><strong>absent</strong> ; 11 sur 18 atteignent le noyau de la VM</td>
+<td>SEC-08, POL-17</td>
+</tr>
+<tr>
+<td><code>no_new_privs</code>, capacités effectives nulles, uid non root</td>
+<td>oui</td>
+<td>oui</td>
+<td>SEC-19, POL-17</td>
+</tr>
+<tr>
+<td>Escalade par binaire setuid avec <code>allowPrivilegeEscalation: false</code></td>
+<td>bloquée</td>
+<td>bloquée</td>
+<td>SEC-19</td>
+</tr>
+<tr>
+<td>Espace de noms utilisateur depuis un pod restreint</td>
+<td>refusé</td>
+<td><strong>autorisé</strong> (conséquence de l'absence de seccomp, limité à la VM)</td>
+<td>SEC-19</td>
+</tr>
+</tbody>
+</table></div>
+<p>L'absence de seccomp ne permet pas d'atteindre le nœud (la frontière est la VM), mais elle <strong>élargit la surface du noyau invité</strong> et supprime une défense en profondeur. Avec kata-deploy, le shim n'applique pas le profil seccomp du pod dans l'invité. À vérifier avec OpenShift Sandboxed Containers sur ENV-B.</p>
+<p><strong>hostPath (SEC-05).</strong> En runc, un pod root non privilégié avec un hostPath n'a accès au répertoire que si son contexte SELinux le permet. Avec le contexte par défaut (<code>container_t</code>), l'accès est refusé ; avec <code>spc_t</code>, la lecture et l'écriture sont vues par le nœud. Un hostPath de <code>/</code> en lecture seule ne protège pas les points de montage imbriqués : l'écriture dans <code>/var/tmp</code> du nœud a réussi (comportement connu de Kubernetes, corrigé par <code>recursiveReadOnly</code>). En Kata (Rust et Go), <strong>aucun pod hostPath non privilégié n'a démarré</strong> : l'agent refuse la création du conteneur (<code>Permission denied</code>). Kata est donc ici plus restrictif, mais par effet de bord, pas par conception. La protection contre les hostPath doit rester à l'admission (SCC, Kyverno POL-08).</p>
+<h3 id="42-fonctionnel">4.2 Fonctionnel</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>runc</th>
+<th>Kata</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OOM sur dépassement de <code>limits.memory</code></td>
+<td><code>OOMKilled</code> en 1,5 s</td>
+<td>Rust : tué (137) mais motif <strong><code>Error</code></strong>, 26 s · Go : <code>OOMKilled</code>, 55 s</td>
+<td>FUN-17</td>
+</tr>
+<tr>
+<td><code>hostNetwork</code></td>
+<td>fonctionne</td>
+<td><strong>non supporté</strong>, mais <strong>admis</strong> par le cluster : le test n'est pas exécuté car il peut rendre le nœud indisponible</td>
+<td>FUN-30, POL-18</td>
+</tr>
+<tr>
+<td>Volume persistant local : montage, écriture, persistance</td>
+<td>oui (xfs)</td>
+<td>oui (via virtio-fs)</td>
+<td>VOL-01</td>
+</tr>
+<tr>
+<td>Secrets natifs : tous les modes de consommation</td>
+<td>oui</td>
+<td>oui</td>
+<td>SCR-01</td>
+</tr>
+<tr>
+<td>Rotation d'un secret monté</td>
+<td>2,3 s</td>
+<td>85,6 s</td>
+<td>SCR-02</td>
+</tr>
+<tr>
+<td>Rotation du token de ServiceAccount projeté</td>
+<td>après ~530 s, accepté</td>
+<td>après ~500 s, accepté</td>
+<td>SCR-03</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="43-performance-indicative">4.3 Performance (indicative)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Mesure</th>
+<th>runc</th>
+<th>Kata Rust</th>
+<th>Kata Go</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pod prêt (médiane, 30 runs)</td>
+<td>0,65 s</td>
+<td>20,6 s</td>
+<td>30,9 s (p95 60,7 s)</td>
+<td>PERF-01</td>
+</tr>
+<tr>
+<td>Pod prêt avec PVC</td>
+<td>2,1 s</td>
+<td>19,5 s</td>
+<td>—</td>
+<td>VOL-01</td>
+</tr>
+<tr>
+<td>Écriture séquentielle + sync sur PVC local</td>
+<td>323 MB/s</td>
+<td>32 MB/s</td>
+<td>—</td>
+<td>VOL-01</td>
+</tr>
+<tr>
+<td>Exec d'outil p50 / p95</td>
+<td>61 / 75 ms</td>
+<td>237 / 318 ms</td>
+<td>287 / 489 ms</td>
+<td>AGT-08</td>
+</tr>
+<tr>
+<td>Moteur dind privilégié prêt</td>
+<td>quelques secondes</td>
+<td>99 à 164 s</td>
+<td>120 à 185 s</td>
+<td>DIND-01</td>
+</tr>
+<tr>
+<td>Build multi-étapes (froid / chaud), dind en mémoire</td>
+<td>—</td>
+<td>161–225 s / 64–88 s</td>
+<td>101–123 s / 16–34 s</td>
+<td>DIND-05 V5</td>
+</tr>
+<tr>
+<td>CPU consommé sous limite 0,5 cœur</td>
+<td>0,50</td>
+<td>0,50</td>
+<td>0,50</td>
+<td>POL-15</td>
+</tr>
+</tbody>
+</table></div>
+<p>En virtualisation imbriquée, chaque VM Kata est elle-même une VM dans une VM. Le facteur ×30 sur le démarrage ne doit <strong>pas</strong> être extrapolé : sur bare metal, l'ordre de grandeur publié est de 1 à 3 s. Le shim Go est plus lent et plus variable que le shim Rust sur ce poste.</p>
+<h3 id="44-exploitation-et-policies-dadmission">4.4 Exploitation et policies d'admission</h3>
+<ul>
+<li><strong>Kyverno s'applique à l'identique</strong> aux pods runc et Kata : les 18 policies testées admettent et refusent les mêmes pods (POL-01 à POL-14, POL-18). Les contournements par Job, CronJob et conteneur éphémère sont bloqués dans les deux cas (POL-14).</li>
+<li><strong>Kata est imposable par policy</strong> : une mutation force la RuntimeClass, l'overhead est bien ajouté, une autre RuntimeClass Kata est refusée (POL-12).</li>
+<li><strong>POL-11</strong> (« privilégié seulement avec Kata ») fonctionne comme prévu : le pod privilégié est refusé en runc et admis en Kata. Cette policy est la condition d'usage du §6.</li>
+<li><strong>Écarts à l'exécution</strong> : la limite CPU est respectée (POL-15) ; la limite <code>ephemeral-storage</code> ne l'est pas, faute d'éviction (POL-16) ; seccomp est absent (POL-17). La conformité à l'admission ne garantit donc pas la conformité à l'exécution en Kata.</li>
+<li><strong>Arrêt d'urgence</strong> : un processus qui ignore SIGTERM est arrêté plus vite en Kata (la VM est détruite) que runc (AGT-20).</li>
+</ul>
+<hr />
+<h2 id="5-comparaison-des-shims-rust-et-go">5. Comparaison des shims Rust et Go</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Point</th>
+<th>Rust (<code>kata</code>)</th>
+<th>Go (<code>kata-qemu</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isolation vers le nœud (SEC-04, SEC-09, DIND-14)</td>
+<td>identique</td>
+<td>identique</td>
+</tr>
+<tr>
+<td>seccomp, <code>ephemeral-storage</code>, hostNetwork, hostPath</td>
+<td>mêmes écarts</td>
+<td>mêmes écarts</td>
+</tr>
+<tr>
+<td>Échecs des variantes de build (DIND)</td>
+<td>identiques : V1, V3, V4 en échec, V2 non supporté</td>
+<td>identiques</td>
+</tr>
+<tr>
+<td>Motif d'OOM (FUN-17)</td>
+<td><strong><code>Error</code></strong></td>
+<td><code>OOMKilled</code></td>
+</tr>
+<tr>
+<td>Démarrage (PERF-01)</td>
+<td>20,6 s, stable</td>
+<td>30,9 s, très variable (p95 60,7 s)</td>
+</tr>
+<tr>
+<td>Mémoire visible dans la VM (SEC-03)</td>
+<td>257 Mi</td>
+<td>2 230 Mi</td>
+</tr>
+<tr>
+<td>Multiplication de processus (AGT-17)</td>
+<td>bornée par une limite de PID de la VM (336)</td>
+<td>exec bloqué sans limite constatée en 300 s (à analyser)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Les écarts de sécurité ne dépendent pas du shim. Le choix du shim porte sur la supervision (motif d'OOM), le démarrage et le comportement sous saturation de processus.</p>
+<hr />
+<h2 id="6-cas-dusage-cibles">6. Cas d'usage cibles</h2>
+<h3 id="61-ci-construction-dimages-dans-kata-dind">6.1 CI : construction d'images dans Kata (DIND)</h3>
+<p><strong>Verdict</strong> : runc = <strong>déconseillé</strong> pour les builds privilégiés · Kata = <strong>acceptable avec conditions</strong>, pour la seule variante qui fonctionne</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>runc</th>
+<th>Kata</th>
+<th>Tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fonctionnel</td>
+<td>5 variantes sur 5 fonctionnent</td>
+<td>dind privilégié avec stockage en mémoire (V5) seul fonctionnel ; dind privilégié sur disque (V1) et buildah (V3) échouent sur le montage overlay ; buildkit rootless (V4) ne démarre pas ; dind rootless (V2) non supporté</td>
+<td>DIND-01, DIND-05, DIND-06</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>référence</td>
+<td>moteur prêt en ~2 min, build froid 100 à 225 s (indicatif)</td>
+<td>DIND-01, DIND-05</td>
+</tr>
+<tr>
+<td>Sécurité</td>
+<td>une étape malveillante d'un job dind privilégié monte le disque du nœud</td>
+<td>elle ne voit que le disque de la VM</td>
+<td>DIND-14</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Conditions de mise en œuvre</strong> : policy « privilégié ⇒ Kata » (POL-11) sur les namespaces CI ; dind avec stockage en mémoire et taille de VM adaptée ; registre et secrets de push donnés par le pipeline, pas montés sur le nœud.</p>
+<p><strong>Risques résiduels non couverts par Kata</strong> : secrets de pipeline accessibles au code du build, egress du runner, administrateur du nœud.</p>
+<h3 id="62-agents-ia-autonomes">6.2 Agents IA autonomes</h3>
+<p><strong>Verdict</strong> : runc = <strong>acceptable avec conditions</strong> pour des outils relus · Kata = <strong>recommandé</strong> pour exécuter du code généré ou non relu</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>runc</th>
+<th>Kata</th>
+<th>Tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fonctionnel</td>
+<td>référence</td>
+<td>exec, API, arrêt d'urgence fonctionnent</td>
+<td>AGT-08, AGT-14, AGT-20</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>exec 61 ms</td>
+<td>exec ~240 ms : acceptable pour un appel d'outil, pas pour des milliers d'appels courts</td>
+<td>AGT-08</td>
+</tr>
+<tr>
+<td>Sécurité</td>
+<td>un code qui obtient des privilèges atteint le nœud</td>
+<td>il reste dans la VM</td>
+<td>SEC-04, SEC-09</td>
+</tr>
+<tr>
+<td>Saturation de processus</td>
+<td>bornée par la limite mémoire (conteneur tué en 2 s, aucune limite de PID)</td>
+<td>Rust : bornée par la limite de PID de la VM ; Go : à analyser</td>
+<td>AGT-17</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Ce que Kata apporte</strong> : la frontière entre le code de l'agent et le nœud ou les autres pods.</p>
+<p><strong>Ce qui relève d'autres contrôles</strong> : l'injection de prompt, l'egress (destinations autorisées), les droits sur l'API (AGT-14 : pas de token, API refusée), les secrets donnés à l'agent, l'audit. Kata ne protège pas contre un agent qui abuse des droits qu'on lui a donnés.</p>
+<h3 id="63-volumes-et-secrets">6.3 Volumes et secrets</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>runc</th>
+<th>Kata</th>
+<th>Tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Volumes</td>
+<td>fonctionnels</td>
+<td>fonctionnels (virtio-fs), écriture ~10× plus lente (indicatif)</td>
+<td>VOL-01</td>
+</tr>
+<tr>
+<td>Isolation des volumes d'autres pods</td>
+<td>atteints par un pod privilégié</td>
+<td>non atteints</td>
+<td>VOL-12</td>
+</tr>
+<tr>
+<td>Secrets : consommation, rotation</td>
+<td>rotation en 2 s</td>
+<td>rotation en ~85 s</td>
+<td>SCR-01, SCR-02, SCR-03</td>
+</tr>
+<tr>
+<td>Vol de secrets d'autres pods</td>
+<td>possible avec un hostPath kubelet</td>
+<td>impossible depuis un pod Kata</td>
+<td>SCR-05</td>
+</tr>
+<tr>
+<td>Secret lisible par l'administrateur du nœud</td>
+<td>oui</td>
+<td>oui</td>
+<td>SCR-04</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="7-matrice-avantages-inconvenients-et-limites">7. Matrice avantages, inconvénients et limites</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Modèle</th>
+<th>Avantages</th>
+<th>Inconvénients</th>
+<th>Limites</th>
+<th>Cas d'usage recommandés</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>runc</td>
+<td>démarrage &lt; 1 s (PERF-01) ; seccomp actif (SEC-08) ; OOM et éviction standard (FUN-17, POL-16) ; toutes les variantes de build (DIND-05) ; <code>hostNetwork</code> (FUN-30)</td>
+<td>un pod privilégié ou avec hostPath compromet le nœud et les autres pods (SEC-04, SEC-09, VOL-12, SCR-05, DIND-14)</td>
+<td>sécurité entièrement portée par l'admission et SELinux</td>
+<td>charges standard, de confiance, sans privilège</td>
+</tr>
+<tr>
+<td>Kata</td>
+<td>pod privilégié contenu dans la VM (SEC-04, SEC-09, VOL-12, SCR-05, DIND-14) ; noyau séparé (SEC-01) ; vue limitée des ressources (SEC-03) ; même comportement Kyverno (POL-*) ; imposable par policy (POL-12)</td>
+<td>démarrage ×30 et exec ×4 en imbriqué (PERF-01, AGT-08) ; overhead 250m / 320 Mi par pod (POL-12) ; pas de seccomp (SEC-08) ; pas d'éviction <code>ephemeral-storage</code> (POL-16) ; OOM mal qualifié en Rust (FUN-17) ; rotation des secrets lente (SCR-02)</td>
+<td><code>hostNetwork</code> non supporté et admis (FUN-30, POL-18) ; hostPath non privilégié refusé (SEC-05) ; 4 variantes de build sur 5 (DIND) ; ne protège pas le pod de l'hôte (SEC-18, SCR-04)</td>
+<td>builds privilégiés, code non relu (agents IA), multi-tenant non fiable</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="8-recommandations-dusage">8. Recommandations d'usage</h2>
+<p><strong>Arbre de décision</strong></p>
+<ol>
+<li>Le pod a-t-il besoin de privilèges (privileged, capacités larges, dind) ou exécute-t-il du code non relu ? <strong>Non</strong> → runc.</li>
+<li>A-t-il besoin de <code>hostNetwork</code>, <code>hostPID</code>, de hostPath ou d'une éviction sur <code>ephemeral-storage</code> ? <strong>Oui</strong> → runc, et le privilège doit être justifié et revu (Kata ne le supporte pas ou ne l'applique pas).</li>
+<li>Le démarrage doit-il prendre moins de 2 s (scale-out rapide, jobs très courts) ? <strong>Oui</strong> → runc, ou Kata avec un pool de pods préchauffés, à valider sur ENV-B.</li>
+<li>Sinon → <strong>Kata</strong>, imposé par policy.</li>
+</ol>
+<p><strong>Policies à déployer avec Kata</strong></p>
+<ul>
+<li>Mutation vers Kata pour les namespaces concernés, et refus de toute autre RuntimeClass (POL-12).</li>
+<li>« Privilégié seulement avec Kata » (POL-11).</li>
+<li>Refus de <code>hostNetwork</code> avec Kata (POL-18) : sans elle, un pod peut rendre le nœud indisponible.</li>
+<li>Interdiction des hostPath (POL-08), qui reste nécessaire même avec Kata.</li>
+<li>Quota d'<code>ephemeral-storage</code> au niveau du namespace et alerte sur l'usage disque, en compensation de POL-16.</li>
+</ul>
+<p><strong>Supervision</strong> : alerter sur le code de sortie 137, pas seulement sur le motif <code>OOMKilled</code> (FUN-17).</p>
+<hr />
+<h2 id="9-risques-prerequis-et-couts">9. Risques, prérequis et coûts</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Sujet</th>
+<th>Constat</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Matériel</td>
+<td>Kata exige la virtualisation matérielle : nœuds bare metal ou instances qui exposent la virtualisation imbriquée</td>
+<td>dédier un pool de nœuds Kata (label, taint)</td>
+</tr>
+<tr>
+<td>Capacité</td>
+<td>+250m CPU et +320 Mi par pod (overhead déclaré), plus la mémoire de la VM</td>
+<td>dimensionner le pool, mesurer la densité sur ENV-B (PERF)</td>
+</tr>
+<tr>
+<td>Support</td>
+<td>kata-deploy upstream n'est pas supporté par Red Hat</td>
+<td>cible : OpenShift Sandboxed Containers</td>
+</tr>
+<tr>
+<td>Supervision</td>
+<td>motif OOM différent (Rust), pas d'éviction disque</td>
+<td>adapter les alertes</td>
+</tr>
+<tr>
+<td>Compétences</td>
+<td>diagnostic dans la VM (agent, virtio-fs, QEMU)</td>
+<td>runbooks, formation de l'équipe plateforme</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="10-limites-de-letude">10. Limites de l'étude</h2>
+<ul>
+<li><strong>Virtualisation imbriquée</strong> (VM Kata dans la VM CRC sur Mac) : toutes les mesures de temps et de débit Kata sont pessimistes.</li>
+<li><strong>Nœud unique</strong> : pas de mesure inter-nœuds (réseau, migration), pas de densité multi-nœuds.</li>
+<li><strong>arm64</strong> : la cible de production est x86_64 ; certains comportements (QEMU, noyau invité, appels système) peuvent différer.</li>
+<li><strong>kata-deploy upstream</strong>, pas OpenShift Sandboxed Containers : la configuration du shim (seccomp notamment) peut changer avec OSC.</li>
+<li><strong>Agent Sandbox</strong> absent du cluster : les tests AGT qui en dépendent n'ont pas été exécutés.</li>
+<li><strong>Échantillons</strong> : 30 runs pour PERF-01, 3 à 5 pour les autres mesures, 1 à 2 pour les tests de sécurité (constats qualitatifs).</li>
+<li><strong>Incidents de campagne</strong> :</li>
+<li>mise en veille du Mac pendant la nuit : 21 tests rejoués ;</li>
+<li>expiration des identifiants du composant réseau Multus de CRC : la campagne Go a été arrêtée puis reprise.
+  Les runs affectés ont été rejoués, et seuls les runs rejoués sont comptés.</li>
+<li><strong>Kata Go et la version du banc</strong> : les tests SEC-05 et SEC-18 du shim Go ont été exécutés avec une version antérieure du banc, sans la variante <code>spc_t</code> (SEC-05) et avec un défaut de repérage du processus marqué sur la vue nœud (SEC-18). Les verdicts entre pods ne sont pas affectés.</li>
+<li><strong>Volumes et secrets</strong> : mesurés seulement avec le shim Rust et le backend local de CRC (pas de Ceph, NFS, Vault ni Conjur sur ENV-A).</li>
+</ul>
+<hr />
+<h2 id="11-prochaines-etapes">11. Prochaines étapes</h2>
+<ol>
+<li><strong>ENV-B</strong> : bare metal x86_64 avec OpenShift Sandboxed Containers. Remesurer la performance, vérifier seccomp, l'éviction et le motif d'OOM avec le shim supporté.</li>
+<li><strong>Compléter le catalogue</strong> : les 119 tests non automatisés (densité, réseau, IOPS, Jenkins et GitHub Actions de bout en bout, Agent Sandbox, Vault et Conjur).</li>
+<li><strong>Analyser AGT-17 avec le shim Go</strong> (exec bloqué sous saturation de processus) et les échecs de montage overlay des builds (DIND V1, V3).</li>
+<li><strong>Pilote</strong> : un namespace CI et un namespace d'agents IA sous policy « Kata obligatoire », avec la supervision adaptée.</li>
+<li><strong>Hors de ce périmètre</strong> : Confidential Containers (protection du pod contre l'hôte) et peer-pods.</li>
+</ol>
+<hr />
+<h2 id="12-annexes">12. Annexes</h2>
+<ul>
+<li><strong>Catalogue complet et statuts</strong> : <a href="donnees.html">donnees.md</a> (généré depuis les résultats bruts).</li>
+<li><strong>Plan de tests</strong> : <a href="plan.html">02-PLAN-DE-TESTS.md</a>. <strong>Format de retour</strong> : <a href="https://github.com/ffurlanetto/openshift-runc-vs-kata/blob/main/03-FORMAT-RAPPORT.md">03-FORMAT-RAPPORT.md</a>.</li>
+<li><strong>Versions exactes</strong> : OpenShift 4.22.1, noyau du nœud 5.14.0-687.13.1.el9_8.aarch64, Kata 4.4.0 (kata-deploy), QEMU, noyau invité 6.18.62, Kyverno 1.20.0, CRI-O (voir <code>campaign.json</code> de chaque campagne).</li>
+<li><strong>Campagnes retenues</strong> (une campagne plus récente remplace les runs d'un même test, d'une même variante et d'un même runtime) :</li>
+</ul>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Campagne</th>
+<th>Contenu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>20261123-205546-ENV-A-a20e314</code></td>
+<td>campagne complète runc + Kata Rust</td>
+</tr>
+<tr>
+<td><code>20261124-081741-ENV-A-47fc568</code></td>
+<td>Kata Go, partie 1 (arrêtée par la panne Multus)</td>
+</tr>
+<tr>
+<td><code>20261124-104157-ENV-A-8a85ad9</code></td>
+<td>Kata Go, partie 2 et runs rejoués après la panne</td>
+</tr>
+<tr>
+<td><code>20261124-141740-ENV-A-8a85ad9</code></td>
+<td>VOL et SCR, runc + Kata Rust</td>
+</tr>
+<tr>
+<td><code>20261124-144102-ENV-A-8a85ad9</code></td>
+<td>SEC-04 à SEC-19, runc + Kata Rust</td>
+</tr>
+<tr>
+<td><code>20261124-145018-ENV-A-8a85ad9</code></td>
+<td>rejeu des 21 tests affectés par la mise en veille</td>
+</tr>
+<tr>
+<td><code>20261124-194458-ENV-A-cf3e9e3</code>, <code>…-202717-…-e77b665</code>, <code>…-202906-…-eaf9681</code></td>
+<td>rejeux après correction du banc (SCR-03, VOL-12, SEC-05, SEC-18)</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Reproduction</strong> :</li>
+</ul>
+<pre><code class="language-sh">./precheck --context &lt;contexte&gt;
+./run --context &lt;contexte&gt;                                        # mode sûr, runc + kata
+./run --context &lt;contexte&gt; --kata-runtime-class kata-qemu --runtimes kata
+uv run scripts/report.py --campaign &lt;id&gt; [--campaign &lt;id&gt; …] --site docs
+</code></pre></main>
+<footer>Généré par <code>scripts/report.py</code> · <a href="https://github.com/ffurlanetto/openshift-runc-vs-kata">dépôt</a> · campagnes jusqu'au 2026-11-24</footer>
+</body></html>

@@ -1,0 +1,10 @@
+LAST SEEN   TYPE     REASON           OBJECT          MESSAGE
+26s         Normal   Scheduled        pod/nodecheck   Successfully assigned kvr-4afa6-sec-09-kata-1/nodecheck to crc
+26s         Normal   AddedInterface   pod/nodecheck   Add eth0 [192.0.2.171/23] from ovn-kubernetes
+26s         Normal   Pulled           pod/nodecheck   Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+26s         Normal   Created          pod/nodecheck   Container created
+26s         Normal   Started          pod/nodecheck   Container started
+25s         Normal   AddedInterface   pod/attacker    Add eth0 [192.0.2.170/23] from ovn-kubernetes
+6s          Normal   Pulled           pod/attacker    Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+6s          Normal   Created          pod/attacker    Container created
+5s          Normal   Started          pod/attacker    Container started

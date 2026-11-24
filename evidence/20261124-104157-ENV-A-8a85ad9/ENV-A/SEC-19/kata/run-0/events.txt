@@ -1,0 +1,14 @@
+LAST SEEN   TYPE     REASON           OBJECT           MESSAGE
+104s        Normal   Scheduled        pod/restreint    Successfully assigned kvr-a5b1b-sec-19-kata-0/restreint to crc
+104s        Normal   AddedInterface   pod/restreint    Add eth0 [192.0.2.123/23] from ovn-kubernetes
+80s         Normal   Pulled           pod/restreint    Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+78s         Normal   Created          pod/restreint    Container created
+78s         Normal   Started          pod/restreint    Container started
+75s         Normal   AddedInterface   pod/root-nnp     Add eth0 [192.0.2.125/23] from ovn-kubernetes
+41s         Normal   Pulled           pod/root-nnp     Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+39s         Normal   Created          pod/root-nnp     Container created
+39s         Normal   Started          pod/root-nnp     Container started
+31s         Normal   AddedInterface   pod/root-escal   Add eth0 [192.0.2.124/23] from ovn-kubernetes
+8s          Normal   Pulled           pod/root-escal   Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+7s          Normal   Created          pod/root-escal   Container created
+7s          Normal   Started          pod/root-escal   Container started

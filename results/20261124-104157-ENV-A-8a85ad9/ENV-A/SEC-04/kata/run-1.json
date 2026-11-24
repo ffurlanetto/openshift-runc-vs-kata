@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-04",
+  "category": "SEC",
+  "title": "Pod privilégié : évasion vers le nœud",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-104157-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T13:54:12Z",
+  "duration_s": 87.846,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "node_escapes_priv",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "node_escapes_privpid",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "node_settings_not_restored",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "kata : 0 technique(s) ont atteint le nœud (témoin trouvé par la sonde runc) ; priv [nsenter=tenté, disk-vda1=lecture-seule, release_agent=non-applicable, core_pattern=tenté] ; privpid [nsenter=tenté, disk-vda1=lecture-seule, release_agent=non-applicable, core_pattern=tenté] ; témoins restants après nettoyage : 0",
+  "evidence": [
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/manifest-1-sec-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/manifest-2-sec-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/manifest-3-sec-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/attack-priv.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/attack-privpid.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/node-check.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/pods.json",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-04/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "7dd0ccc31c5b957e1b695f14fbf94534863088fd8a79a203849a7ce3faa0d544"
+}

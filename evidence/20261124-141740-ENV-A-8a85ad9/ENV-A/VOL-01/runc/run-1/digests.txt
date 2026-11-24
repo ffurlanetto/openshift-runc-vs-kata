@@ -1,0 +1,10 @@
+storage_class={'name': 'crc-csi-hostpath-provisioner', 'provisioner': 'kubevirt.io.hostpath-provisioner', 'binding': 'WaitForFirstConsumer'}
+writer:
+7e015268426b25cd1f007cc949651b8ff6a0ba4856fa20f24e0879cf10ba3ae3
+owner=0:1001070000:2775 id=1001070000:0 groups=0,1001070000
+mount=/dev/vda4 xfs
+
+reader:
+7e015268426b25cd1f007cc949651b8ff6a0ba4856fa20f24e0879cf10ba3ae3
+owner=0:1001070000:2775 id=1001070000:0 groups=0,1001070000
+mount=/dev/vda4 xfs

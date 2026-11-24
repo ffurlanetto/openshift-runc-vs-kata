@@ -6,7 +6,7 @@
     "scripts/campaign.py",
     "run",
     "--context",
-    "crc-admin",
+    "contexte-1",
     "--phases",
     "DIND,AGT",
     "--runs",
@@ -16,7 +16,7 @@
     "--yes"
   ],
   "target": {
-    "context": "crc-admin",
+    "context": "contexte-1",
     "api_server": "https://api.crc.testing:6443",
     "platform": "openshift",
     "env_id": "ENV-A",

@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-05",
+  "category": "DIND",
+  "title": "Build Dockerfile multi-étapes (build-arg, secret, cache)",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-23T22:46:37Z",
+  "duration_s": 6.037,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "build_cold",
+      "value": 2.6,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "build_warm",
+      "value": 0.7,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "image_verified",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "V4-buildkit-rootless : build froid 2.6s, chaud 0.7s, image OK",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/runc/run-1-V4-buildkit-rootless/manifest-1-dind-pod.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/runc/run-1-V4-buildkit-rootless/build-froid.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/runc/run-1-V4-buildkit-rootless/build-chaud.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/runc/run-1-V4-buildkit-rootless/image.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/runc/run-1-V4-buildkit-rootless/pods.json",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-05/runc/run-1-V4-buildkit-rootless/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V4-buildkit-rootless",
+  "manifest_sha256": "272e434f9b2ee63cde5fa8fe02d88c12f16fd846ccc1700ea364dc034422aa83"
+}

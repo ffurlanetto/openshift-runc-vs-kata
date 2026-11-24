@@ -1,0 +1,227 @@
+{
+  "apiVersion": "v1",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "annotations": {
+          "k8s.ovn.org/pod-networks": "{\"default\":{\"ip_addresses\":[\"192.0.2.214/23\"],\"mac_address\":\"02:00:5e:00:00:ce\",\"gateway_ips\":[\"192.0.2.2\"],\"routes\":[{\"dest\":\"192.0.2.3/22\",\"nextHop\":\"192.0.2.2\"},{\"dest\":\"192.0.2.4/23\",\"nextHop\":\"192.0.2.2\"},{\"dest\":\"192.0.2.5/32\",\"nextHop\":\"192.0.2.2\"},{\"dest\":\"192.0.2.6/16\",\"nextHop\":\"192.0.2.2\"}],\"ip_address\":\"192.0.2.214/23\",\"gateway_ip\":\"192.0.2.2\",\"role\":\"primary\"}}",
+          "k8s.v1.cni.cncf.io/network-status": "[{\n    \"name\": \"ovn-kubernetes\",\n    \"interface\": \"eth0\",\n    \"ips\": [\n        \"192.0.2.214\"\n    ],\n    \"mac\": \"02:00:5e:00:00:ce\",\n    \"default\": true,\n    \"dns\": {}\n}]",
+          "openshift.io/scc": "privileged",
+          "security.openshift.io/validated-scc-subject-type": "serviceaccount"
+        },
+        "creationTimestamp": "2026-11-24T15:49:17Z",
+        "generation": 1,
+        "labels": {
+          "app.kubernetes.io/part-of": "kvr"
+        },
+        "name": "ci",
+        "namespace": "kvr-1738a-dind-05-kata-v4-3",
+        "resourceVersion": "991091",
+        "uid": "4d6f270e-6cb5-45b7-95e8-ed4d0a02a960"
+      },
+      "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+          {
+            "command": [
+              "sleep",
+              "infinity"
+            ],
+            "env": [
+              {
+                "name": "BUILDKITD_FLAGS",
+                "value": "--oci-worker-no-process-sandbox"
+              }
+            ],
+            "image": "docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be",
+            "imagePullPolicy": "IfNotPresent",
+            "name": "engine",
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "memory": "2Gi"
+              },
+              "requests": {
+                "cpu": "500m",
+                "memory": "512Mi"
+              }
+            },
+            "securityContext": {
+              "privileged": false,
+              "runAsGroup": 1000,
+              "runAsNonRoot": true,
+              "runAsUser": 1000,
+              "seLinuxOptions": {
+                "type": "spc_t"
+              },
+              "seccompProfile": {
+                "type": "Unconfined"
+              }
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "volumeMounts": [
+              {
+                "mountPath": "/home/user/.local/share/buildkit",
+                "name": "engine-storage"
+              },
+              {
+                "mountPath": "/work",
+                "name": "build-context"
+              }
+            ]
+          }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "imagePullSecrets": [
+          {
+            "name": "default-dockercfg-qcxh6"
+          }
+        ],
+        "nodeName": "crc",
+        "nodeSelector": {
+          "kata-deploy.katacontainers.io/default": "true",
+          "katacontainers.io/kata-runtime": "true"
+        },
+        "overhead": {
+          "cpu": "250m",
+          "memory": "320Mi"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Never",
+        "runtimeClassName": "kata",
+        "schedulerName": "default-scheduler",
+        "securityContext": {},
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "terminationGracePeriodSeconds": 0,
+        "tolerations": [
+          {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "tolerationSeconds": 300
+          },
+          {
+            "effect": "NoExecute",
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "tolerationSeconds": 300
+          },
+          {
+            "effect": "NoSchedule",
+            "key": "node.kubernetes.io/memory-pressure",
+            "operator": "Exists"
+          }
+        ],
+        "volumes": [
+          {
+            "emptyDir": {},
+            "name": "engine-storage"
+          },
+          {
+            "configMap": {
+              "defaultMode": 420,
+              "name": "build-context"
+            },
+            "name": "build-context"
+          }
+        ]
+      },
+      "status": {
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-24T15:49:43Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "PodReadyToStartContainers"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-24T15:49:17Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "Initialized"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-24T15:49:17Z",
+            "message": "containers with unready status: [engine]",
+            "observedGeneration": 1,
+            "reason": "ContainersNotReady",
+            "status": "False",
+            "type": "Ready"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-24T15:49:17Z",
+            "message": "containers with unready status: [engine]",
+            "observedGeneration": 1,
+            "reason": "ContainersNotReady",
+            "status": "False",
+            "type": "ContainersReady"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-11-24T15:49:17Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "PodScheduled"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "image": "docker.io/moby/buildkit@sha256:7d02292556e66feea6d2d89b7ec143503b57e4f59a4efc6b7ece8547e4d3e5be",
+            "imageID": "",
+            "lastState": {},
+            "name": "engine",
+            "ready": false,
+            "restartCount": 0,
+            "started": false,
+            "state": {
+              "waiting": {
+                "message": "CreateContainer failed: Others(\"failed to handle message create container\\n\\nCaused by:\\n    0: agent create container\\n    1: rpc status: Status { code: INTERNAL, message: \\\"Permission denied (os error 13)\\\\n\\\\nStack backtrace:\\\\n   0: <unknown>\\\\n   1: <unknown>\\\\n   2: <unknown>\\\\n   3: <unknown>\\\\n   4: <unknown>\\\\n   5: <unknown>\\\\n   6: <unknown>\\\\n   7: <unknown>\\\\n   8: <unknown>\\\\n   9: <unknown>\\\\n  10: <unknown>\\\\n  11: <unknown>\\\\n  12: __libc_start_main\\\\n  13: <unknown>\\\\n\\\\nStack backtrace:\\\\n   0: <unknown>\\\\n   1: <unknown>\\\\n   2: <unknown>\\\\n   3: <unknown>\\\\n   4: <unknown>\\\\n   5: <unknown>\\\\n   6: <unknown>\\\\n   7: <unknown>\\\\n   8: <unknown>\\\\n   9: <unknown>\\\\n  10: <unknown>\\\\n  11: <unknown>\\\\n  12: <unknown>\\\\n  13: <unknown>\\\\n  14: <unknown>\\\\n  15: <unknown>\\\\n  16: <unknown>\\\\n  17: <unknown>\\\\n  18: <unknown>\\\\n  19: <unknown>\\\\n  20: <unknown>\\\\n  21: <unknown>\\\\n  22: <unknown>\\\\n  23: <unknown>\\\\n  24: <unknown>\\\\n  25: <unknown>\\\", details: [], special_fields: SpecialFields { unknown_fields: UnknownFields { fields: None }, cached_size: CachedSize { size: 0 } } }\\n\\nStack backtrace:\\n   0: <anyhow::Error as core::convert::From<ttrpc::error::Error>>::from\\n   1: <agent::kata::KataAgent as agent::Agent>::create_container::{closure#0}::{closure#0}\\n   2: <agent::kata::KataAgent as agent::Agent>::create_container::{closure#0}\\n   3: <virt_container::container_manager::container::Container>::create::{closure#0}\\n   4: <virt_container::container_manager::manager::VirtContainerManager as common::container_manager::ContainerManager>::create_container::{closure#0}::{closure#0}\\n   5: <virt_container::container_manager::manager::VirtContainerManager as common::container_manager::ContainerManager>::create_container::{closure#0}\\n   6: <runtimes::manager::RuntimeHandlerManager>::handler_task_message::{closure#0}::{closure#0}\\n   7: <runtimes::manager::RuntimeHandlerManager>::handler_task_message::{closure#0}\\n   8: <service::task_service::TaskService as containerd_shim_protos::shim::shim_ttrpc_async::Task>::create::{closure#0}\\n   9: <containerd_shim_protos::shim::shim_ttrpc_async::CreateMethod as ttrpc::asynchronous::utils::MethodHandler>::handler::{closure#0}\\n  10: <ttrpc::asynchronous::server::HandlerContext>::handle_request::{closure#0}\\n  11: <ttrpc::asynchronous::server::ServerReader as ttrpc::asynchronous::connection::ReaderDelegate>::handle_msg::{closure#0}::{closure#0}\\n  12: tokio::runtime::task::raw::poll::<<ttrpc::asynchronous::server::ServerReader as ttrpc::asynchronous::connection::ReaderDelegate>::handle_msg::{closure#0}::{closure#0}, alloc::sync::Arc<tokio::runtime::scheduler::multi_thread::handle::Handle>>\\n  13: <tokio::runtime::scheduler::multi_thread::worker::Context>::run_task\\n  14: tokio::runtime::task::raw::poll::<tokio::runtime::blocking::task::BlockingTask<<tokio::runtime::scheduler::multi_thread::worker::Launch>::launch::{closure#0}>, tokio::runtime::blocking::schedule::BlockingSchedule>\\n  15: std::sys::backtrace::__rust_begin_short_backtrace::<<tokio::runtime::blocking::pool::Spawner>::spawn_thread::{closure#0}, ()>\\n  16: <std::thread::lifecycle::spawn_unchecked<<tokio::runtime::blocking::pool::Spawner>::spawn_thread::{closure#0}, ()>::{closure#1} as core::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}\\n  17: <std::sys::thread::unix::Thread>::new::thread_start\"): unknown",
+                "reason": "CreateContainerError"
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/home/user/.local/share/buildkit",
+                "name": "engine-storage"
+              },
+              {
+                "mountPath": "/work",
+                "name": "build-context"
+              }
+            ]
+          }
+        ],
+        "hostIP": "192.0.2.7",
+        "hostIPs": [
+          {
+            "ip": "192.0.2.7"
+          }
+        ],
+        "observedGeneration": 1,
+        "phase": "Pending",
+        "podIP": "192.0.2.214",
+        "podIPs": [
+          {
+            "ip": "192.0.2.214"
+          }
+        ],
+        "qosClass": "Burstable",
+        "startTime": "2026-11-24T15:49:17Z"
+      }
+    }
+  ],
+  "kind": "List",
+  "metadata": {
+    "resourceVersion": ""
+  }
+}

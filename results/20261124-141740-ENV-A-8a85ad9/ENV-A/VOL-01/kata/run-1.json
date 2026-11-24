@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "test_id": "VOL-01",
+  "category": "VOL",
+  "title": "Stockage : montage, écriture, persistance (backend local)",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-141740-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T14:39:01Z",
+  "duration_s": 49.818,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "pod_ready_with_pvc",
+      "value": 19.46,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "write_seq_with_sync",
+      "value": 32.0,
+      "unit": "MB/s",
+      "better": "higher"
+    },
+    {
+      "name": "data_persisted",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "kata : crc-csi-hostpath-provisioner (kubevirt.io.hostpath-provisioner), montage vu dans le conteneur « none virtiofs » ; écriture 64 MiB + sync 32.0 MB/s ; données identiques après recréation du pod ; 0:1001080000:2775 id=1001080000:0 groups=0,1001080000",
+  "evidence": [
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-01/kata/run-1/manifest-1-pvc-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-01/kata/run-1/manifest-2-pvc-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-01/kata/run-1/digests.txt",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-01/kata/run-1/pods.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/VOL-01/kata/run-1/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "1b442c7ef67e786a65bd3621b6c82df998600a2c1ba83b3cf5cb0c39957a1046"
+}

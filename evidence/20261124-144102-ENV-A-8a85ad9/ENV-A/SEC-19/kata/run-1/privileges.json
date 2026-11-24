@@ -1,0 +1,66 @@
+{
+  "restreint": {
+    "NNP": "1",
+    "SECCOMP": "0",
+    "CAPEFF": "0000000000000000",
+    "CAPBND": "0000000000000000",
+    "UIDMAP": "0 0 4294967295",
+    "UID": "1001",
+    "USERNS": "uid=0 capeff=000001ffffffffff",
+    "caps_eff": []
+  },
+  "root-nnp": {
+    "NNP": "1",
+    "SECCOMP": "0",
+    "CAPEFF": "00000000000005fb",
+    "CAPBND": "00000000000005fb",
+    "UIDMAP": "0 0 4294967295",
+    "UID": "0",
+    "SUIDMODE": "4755",
+    "SUIDFS": "fuseblk 0",
+    "SETUID_EUID": "1001",
+    "CAP_MKNOD": "non",
+    "CAP_RAW": "non",
+    "CAP_CHOWN": "oui",
+    "CAP_MOUNT": "non",
+    "CAP_HOSTNAME": "non",
+    "caps_eff": [
+      "chown",
+      "dac_override",
+      "fowner",
+      "fsetid",
+      "kill",
+      "setgid",
+      "setuid",
+      "setpcap",
+      "net_bind_service"
+    ]
+  },
+  "root-escal": {
+    "NNP": "0",
+    "SECCOMP": "0",
+    "CAPEFF": "00000000000005fb",
+    "CAPBND": "00000000000005fb",
+    "UIDMAP": "0 0 4294967295",
+    "UID": "0",
+    "SUIDMODE": "4755",
+    "SUIDFS": "fuseblk 0",
+    "SETUID_EUID": "1001",
+    "CAP_MKNOD": "non",
+    "CAP_RAW": "non",
+    "CAP_CHOWN": "oui",
+    "CAP_MOUNT": "non",
+    "CAP_HOSTNAME": "non",
+    "caps_eff": [
+      "chown",
+      "dac_override",
+      "fowner",
+      "fsetid",
+      "kill",
+      "setgid",
+      "setuid",
+      "setpcap",
+      "net_bind_service"
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+localhost/kvr/demo:latest                            112 MB

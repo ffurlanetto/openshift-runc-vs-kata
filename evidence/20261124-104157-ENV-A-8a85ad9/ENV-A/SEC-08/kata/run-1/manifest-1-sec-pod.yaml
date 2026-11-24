@@ -1,0 +1,30 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restricted
+  namespace: kvr-a5b1b-sec-08-kata-1
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+  runtimeClassName: kata-qemu
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: main
+      image: registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd
+      imagePullPolicy: IfNotPresent
+      command: ["bash", "-c", "exec sleep infinity"]
+      env:
+        - {name: KVR_NR, value: "{\"unshare\": [272, 97], \"setns\": [308, 268], \"keyctl\": [250, 219], \"add_key\": [248, 217], \"bpf\": [321, 280], \"userfaultfd\": [323, 282], \"io_uring_setup\": [425, 425], \"ptrace\": [101, 117], \"perf_event_open\": [298, 241], \"mount\": [165, 40], \"open_by_handle_at\": [304, 265], \"init_module\": [175, 105], \"delete_module\": [176, 106], \"kexec_load\": [246, 104], \"clock_settime\": [227, 112], \"pivot_root\": [155, 41], \"chroot\": [161, 51], \"swapon\": [167, 224], \"syslog\": [103, 116]}"}
+      resources:
+        requests: {cpu: 100m, memory: 64Mi}
+        limits: {cpu: "1", memory: 384Mi}
+      securityContext:
+        runAsUser: 1001
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        seccompProfile: {type: RuntimeDefault}

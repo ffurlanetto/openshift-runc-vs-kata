@@ -1,0 +1,14 @@
+LAST SEEN   TYPE     REASON           OBJECT            MESSAGE
+41s         Normal   Scheduled        pod/victim-kata   Successfully assigned kvr-4aca1-scr-05-kata-1/victim-kata to crc
+40s         Normal   AddedInterface   pod/victim-kata   Add eth0 [192.0.2.146/23] from ovn-kubernetes
+21s         Normal   Pulled           pod/victim-kata   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+20s         Normal   AddedInterface   pod/victim-runc   Add eth0 [192.0.2.147/23] from ovn-kubernetes
+20s         Normal   Created          pod/victim-kata   Container created
+20s         Normal   Started          pod/victim-kata   Container started
+20s         Normal   Pulled           pod/victim-runc   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+20s         Normal   Created          pod/victim-runc   Container created
+20s         Normal   Started          pod/victim-runc   Container started
+19s         Normal   AddedInterface   pod/attacker      Add eth0 [192.0.2.145/23] from ovn-kubernetes
+4s          Normal   Pulled           pod/attacker      Container image "registry.access.redhat.com/ubi9/ubi@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd" already present on machine and can be accessed by the pod
+3s          Normal   Started          pod/attacker      Container started
+3s          Normal   Created          pod/attacker      Container created

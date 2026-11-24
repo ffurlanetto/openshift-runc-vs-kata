@@ -1,0 +1,40 @@
+Traceback (most recent call last):
+  File "<repo>/scripts/kvr/cluster.py", line 64, in oc
+    r = subprocess.run(cmd, input=input, capture_output=True, text=True,
+                       env=self.env, timeout=timeout)
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 671, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 1395, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 2424, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        skip_check_and_raise=True)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 1434, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['/usr/local/bin/kubectl', '--context', 'contexte-1', 'exec', '-n', 'kvr-4d877-dind-14-kata-v5-1', 'ci', '-c', 'engine', '--', 'sh', '-c', 'docker info >/dev/null 2>&1 && echo ok']' timed out after 120 seconds
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<repo>/scripts/kvr/runner.py", line 237, in execute_step
+    status = t.module.run(ctx)
+  File "<repo>/tests/DIND-14/test.py", line 39, in run
+    dind.wait_engine(ctx)
+    ~~~~~~~~~~~~~~~~^^^^^
+  File "<repo>/scripts/kvr/dind.py", line 53, in wait_engine
+    rc, out, err = sh(ctx, probe + " && echo ok", timeout_s=120)
+                   ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/dind.py", line 38, in sh
+    return ctx.exec(POD, ["sh", "-c", script], container=CONTAINER, timeout_s=timeout_s)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/context.py", line 147, in exec
+    r = self.cluster.oc(*args, "--", *cmd, check=False, timeout=timeout_s)
+  File "<repo>/scripts/kvr/cluster.py", line 67, in oc
+    raise OcError(f"kubectl {' '.join(args)} : délai dépassé ({timeout}s)") from e
+kvr.cluster.OcError: kubectl exec -n kvr-4d877-dind-14-kata-v5-1 ci -c engine -- sh -c docker info >/dev/null 2>&1 && echo ok : délai dépassé (120s)

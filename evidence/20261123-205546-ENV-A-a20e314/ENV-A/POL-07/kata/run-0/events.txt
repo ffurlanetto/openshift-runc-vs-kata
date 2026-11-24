@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                                MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-host-namespaces   Pod kvr-4d877-pol-07-kata-0/policy-probe: [validation] fail (blocked); hostNetwork, hostPID et hostIPC interdits
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-host-namespaces   Pod kvr-4d877-pol-07-kata-0/policy-probe: [validation] fail (blocked); hostNetwork, hostPID et hostIPC interdits
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-host-namespaces   Deployment kvr-4d877-pol-07-kata-0/policy-probe-deploy: [validation] fail (blocked); hostNetwork, hostPID et hostIPC interdits

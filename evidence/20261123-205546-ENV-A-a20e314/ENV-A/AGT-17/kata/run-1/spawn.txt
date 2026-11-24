@@ -1,0 +1,6 @@
+exec rc=254 en 87.1s
+command terminated with exit code 254
+
+cgroup avant : {'pids.max': '336 ', 'memory.max': '268435456 '}
+cgroup après : {}
+conteneur : {'allocatedResources': {'cpu': '100m', 'memory': '64Mi'}, 'containerID': 'cri-o://8ddaba5f1c7a815fb9095fd75a3e2e6e6986e2757c5d66e1bc6e2ad556f08ff5', 'image': 'registry.access.redhat.com/ubi9/ubi-minimal:latest', 'imageID': 'registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352', 'lastState': {}, 'name': 'main', 'ready': True, 'resources': {'limits': {'cpu': '500m', 'memory': '256Mi'}, 'requests': {'cpu': '100m', 'memory': '64Mi'}}, 'restartCount': 0, 'started': True, 'state': {'running': {'startedAt': '2026-11-23T21:00:02Z'}}, 'user': {'linux': {'gid': 0, 'supplementalGroups': [0, 1004530000], 'uid': 1004530000}}}

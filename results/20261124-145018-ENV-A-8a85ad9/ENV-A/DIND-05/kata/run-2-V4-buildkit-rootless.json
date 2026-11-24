@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-05",
+  "category": "DIND",
+  "title": "Build Dockerfile multi-étapes (build-arg, secret, cache)",
+  "runtime": "kata",
+  "run": 2,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-145018-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T15:44:04Z",
+  "duration_s": 301.096,
+  "status": "FAIL",
+  "metrics": [],
+  "observations": "ERREUR : OcError: kubectl wait pod/ci --for=condition=Ready --timeout=300s -n kvr-1738a-dind-05-kata-v4-2 -> rc=1 : error: timed out waiting for the condition on pods/ci",
+  "evidence": [
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-05/kata/run-2-V4-buildkit-rootless/manifest-1-dind-pod.yaml",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-05/kata/run-2-V4-buildkit-rootless/traceback.txt",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-05/kata/run-2-V4-buildkit-rootless/pods.json",
+    "evidence/20261124-145018-ENV-A-8a85ad9/ENV-A/DIND-05/kata/run-2-V4-buildkit-rootless/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V4-buildkit-rootless",
+  "manifest_sha256": "272e434f9b2ee63cde5fa8fe02d88c12f16fd846ccc1700ea364dc034422aa83"
+}

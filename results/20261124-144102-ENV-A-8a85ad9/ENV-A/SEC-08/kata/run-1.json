@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-08",
+  "category": "SEC",
+  "title": "Surface noyau atteignable depuis un pod restreint",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-144102-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T14:46:42Z",
+  "duration_s": 24.234,
+  "status": "PARTIAL",
+  "metrics": [
+    {
+      "name": "syscalls_reached",
+      "value": 11,
+      "unit": "count",
+      "better": "lower"
+    },
+    {
+      "name": "syscalls_blocked",
+      "value": 7,
+      "unit": "count",
+      "better": "higher"
+    },
+    {
+      "name": "seccomp_filter_active",
+      "value": 0,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "kata : seccomp=0 (AUCUN filtre), NoNewPrivs=1, uid=1001, noyau 6.18.62 (de la VM) ; 11/18 appels atteignent le noyau de la VM : add_key(succès), bpf(EINVAL), clock_settime(EINVAL), io_uring_setup(succès), keyctl(succès), open_by_handle_at(EFAULT), perf_event_open(EFAULT), ptrace(succès), setns(EBADF), syslog(succès), unshare(succès) ; bloqués : chroot, init_module, kexec_load, mount, pivot_root, swapon, userfaultfd",
+  "evidence": [
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-08/kata/run-1/manifest-1-sec-pod.yaml",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-08/kata/run-1/syscalls.json",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-08/kata/run-1/pods.json",
+    "evidence/20261124-144102-ENV-A-8a85ad9/ENV-A/SEC-08/kata/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "e67c44ef3cc0afd01b434842f209cee63ff3e4a672cf0199c6761e780b8a65d7"
+}

@@ -6,13 +6,13 @@
     "scripts/campaign.py",
     "run",
     "--context",
-    "admin",
+    "contexte-3",
     "--phases",
     "FUN,PERF,SEC,POL",
     "--yes"
   ],
   "target": {
-    "context": "admin",
+    "context": "contexte-3",
     "api_server": "https://api.crc.testing:6443",
     "platform": "openshift",
     "env_id": "ENV-A",

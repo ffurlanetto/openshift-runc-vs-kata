@@ -1,0 +1,31 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: restrict-seccomp
+  namespace: kvr-4d877-pol-09-kata-0
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Profil seccomp RuntimeDefault ou Localhost obligatoire"
+spec:
+  validationActions: ["Deny"]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+    - name: workload
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : [])"
+    - name: containers
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : []) + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])"
+  validations:
+    - message: "seccompProfile.type doit être RuntimeDefault ou Localhost"
+      expression: "variables.containers.all(c,\n  (has(c.securityContext) && has(c.securityContext.seccompProfile))\n    ? c.securityContext.seccompProfile.type in ['RuntimeDefault', 'Localhost']\n    : (has(object.spec.securityContext) && has(object.spec.securityContext.seccompProfile)\n       && object.spec.securityContext.seccompProfile.type in ['RuntimeDefault', 'Localhost']))"

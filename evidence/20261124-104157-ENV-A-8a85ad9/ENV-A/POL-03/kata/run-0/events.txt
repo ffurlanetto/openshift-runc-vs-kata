@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                           MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/limit-max-resources   Pod kvr-a5b1b-pol-03-kata-0/policy-probe: [validation] fail (blocked); limits.memory au-delà du plafond autorisé
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/limit-max-resources   Pod kvr-a5b1b-pol-03-kata-0/policy-probe: [validation] fail (blocked); limits.memory au-delà du plafond autorisé
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/limit-max-resources   Deployment kvr-a5b1b-pol-03-kata-0/policy-probe-deploy: [validation] fail (blocked); limits.memory au-delà du plafond autorisé

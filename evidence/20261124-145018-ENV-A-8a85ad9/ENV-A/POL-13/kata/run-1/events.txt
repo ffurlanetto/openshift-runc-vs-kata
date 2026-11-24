@@ -1,0 +1,9 @@
+LAST SEEN   TYPE      REASON            OBJECT                                              MESSAGE
+16s         Warning   PolicyViolation   pod/policy-probe                                    policy require-run-as-nonroot/validation fail: runAsNonRoot doit être true (pod ou chaque conteneur)
+16s         Warning   PolicyViolation   pod/policy-probe                                    policy require-run-as-nonroot/validation fail: runAsNonRoot doit être true (pod ou chaque conteneur)
+10s         Warning   PolicyViolation   pod/policy-probe                                    policy require-run-as-nonroot/validation fail: runAsNonRoot doit être true (pod ou chaque conteneur)
+16s         Warning   PolicyViolation   namespacedvalidatingpolicy/require-run-as-nonroot   Pod kvr-1738a-pol-13-kata-1/policy-probe: [validation] fail; runAsNonRoot doit être true (pod ou chaque conteneur)
+16s         Warning   PolicyViolation   namespacedvalidatingpolicy/require-run-as-nonroot   Pod kvr-1738a-pol-13-kata-1/policy-probe: [validation] fail; runAsNonRoot doit être true (pod ou chaque conteneur)
+10s         Warning   PolicyViolation   namespacedvalidatingpolicy/require-run-as-nonroot   Pod kvr-1738a-pol-13-kata-1/policy-probe: [validation] fail; runAsNonRoot doit être true (pod ou chaque conteneur)
+16s         Normal    Scheduled         pod/policy-probe                                    Successfully assigned kvr-1738a-pol-13-kata-1/policy-probe to crc
+16s         Normal    AddedInterface    pod/policy-probe                                    Add eth0 [192.0.2.0/23] from ovn-kubernetes

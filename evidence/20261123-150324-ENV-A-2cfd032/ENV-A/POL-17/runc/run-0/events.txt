@@ -1,6 +1,6 @@
 LAST SEEN   TYPE     REASON           OBJECT     MESSAGE
 1s          Normal   Scheduled        pod/priv   Successfully assigned kvr-8ceb4-pol-17-runc-0/priv to crc
-1s          Normal   AddedInterface   pod/priv   Add eth0 [10.217.0.187/23] from ovn-kubernetes
+1s          Normal   AddedInterface   pod/priv   Add eth0 [192.0.2.0/23] from ovn-kubernetes
 1s          Normal   Pulled           pod/priv   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
 1s          Normal   Created          pod/priv   Container created
 1s          Normal   Started          pod/priv   Container started

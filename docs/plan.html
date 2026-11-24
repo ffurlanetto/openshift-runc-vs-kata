@@ -1,0 +1,2062 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>02 — Plan de tests : pods runc vs Kata Containers sur OpenShift</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#5f5d57;--line:#e3e0d8;--card:#ffffff;--accent:#1f5f8b;--code:#f2efe8;
+--ok:#2e7d32;--ko:#b3261e;--warn:#9a6700}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151514;--fg:#ecebe6;--muted:#a5a39b;
+--line:#33322e;--card:#1d1d1b;--accent:#7cb7e0;--code:#26251f;--ok:#81c784;--ko:#ef9a9a;--warn:#e6c35c}}
+:root[data-theme="dark"]{--bg:#151514;--fg:#ecebe6;--muted:#a5a39b;--line:#33322e;--card:#1d1d1b;--accent:#7cb7e0;
+--code:#26251f;--ok:#81c784;--ko:#ef9a9a;--warn:#e6c35c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",
+Roboto,"Helvetica Neue",Arial,sans-serif}
+header{border-bottom:1px solid var(--line);background:var(--card)}
+header .in,main{max-width:1100px;margin:0 auto;padding:0 16px}
+header .in{display:flex;gap:24px;align-items:center;min-height:56px;flex-wrap:wrap}
+header strong{font-size:15px}
+nav a{color:var(--muted);text-decoration:none;margin-right:16px;font-size:14px}
+nav a.on{color:var(--fg);font-weight:600}
+main{padding-top:24px;padding-bottom:64px}
+h1{font-size:30px;line-height:1.2;margin:8px 0 16px}
+h2{font-size:22px;margin-top:40px;padding-top:8px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin-top:28px}
+a{color:var(--accent)}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.88em}
+pre{background:var(--code);padding:12px;border-radius:6px;overflow-x:auto}
+pre code{padding:0}
+blockquote{margin:16px 0;padding:8px 16px;border-left:3px solid var(--accent);background:var(--card);color:var(--muted)}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-size:14px;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--card)}
+td sub{color:var(--muted);font-size:11px;display:block}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 16px;font-size:14px}
+.toc ul{margin:4px 0;padding-left:18px}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding:16px;text-align:center}
+</style></head><body>
+<header><div class="in"><strong>runc vs Kata · OpenShift</strong><nav><a href="index.html">Rapport</a><a href="donnees.html">Données par test</a><a href="plan.html" class=on>Plan de tests</a><a href="environnement.html">Environnement</a></nav></div></header>
+<main><h1 id="02-plan-de-tests-pods-runc-vs-kata-containers-sur-openshift">02 — Plan de tests : pods runc vs Kata Containers sur OpenShift</h1><div class="toc"><span class="toctitle">Sommaire</span><ul>
+<li><a href="#1-objectifs">1. Objectifs</a></li>
+<li><a href="#2-rappel-des-deux-modeles">2. Rappel des deux modèles</a></li>
+<li><a href="#3-environnements">3. Environnements</a></li>
+<li><a href="#4-methodologie">4. Méthodologie</a></li>
+<li><a href="#5-phase-0-preparation-prep">5. Phase 0 — Préparation (PREP)</a></li>
+<li><a href="#6-catalogue-de-tests">6. Catalogue de tests</a></li>
+<li><a href="#7-criteres-devaluation-et-ponderation-proposition-a-valider-par-le-comite">7. Critères d'évaluation et pondération (proposition à valider par le comité)</a></li>
+<li><a href="#8-criteres-dentree-de-sortie">8. Critères d'entrée / de sortie</a></li>
+<li><a href="#9-planning-indicatif">9. Planning indicatif</a></li>
+<li><a href="#10-risques">10. Risques</a></li>
+<li><a href="#11-arborescence-du-depot-de-campagne">11. Arborescence du dépôt de campagne</a></li>
+</ul>
+</div>
+
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Version</td>
+<td>0.2 (brouillon pour revue)</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>2026-11-23</td>
+</tr>
+<tr>
+<td>Périmètre</td>
+<td>OpenShift 4.22, runtime par défaut CRI-O/runc vs Kata Containers (OpenShift Sandboxed Containers ou kata-deploy upstream)</td>
+</tr>
+<tr>
+<td>Livrable final</td>
+<td>Rapport comité au format défini dans <code>03-FORMAT-RAPPORT.md</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="1-objectifs">1. Objectifs</h2>
+<ol>
+<li><strong>Valider</strong> que les workloads cibles fonctionnent avec Kata sans modification (ou identifier les modifications nécessaires).</li>
+<li><strong>Mesurer</strong> le coût de Kata (latence de démarrage, overhead mémoire/CPU, I/O, réseau, densité).</li>
+<li><strong>Démontrer</strong> le gain d'isolation de Kata (surface d'attaque noyau, évasion de conteneur, pods privilégiés, voisins bruyants).</li>
+<li><strong>Évaluer</strong> l'exploitabilité (installation, mise à jour, observabilité, debug, support).</li>
+<li><strong>Produire</strong> une matrice avantages / inconvénients / limites et une recommandation d'usage (quels workloads sur quel runtime).</li>
+<li><strong>Valider deux cas d'usage cibles</strong>, chacun sous les angles fonctionnel, performance et sécurité :
+   - <strong>CI dans Kata (DIND)</strong> : exécuter les pipelines Jenkins et GitHub Actions (compilation, tests, packaging, <code>docker build</code> sur Dockerfile, tests avec conteneurs) dans des pods Kata, sans que le pod privilégié requis menace le nœud.
+   - <strong>Agents IA autonomes (AGT)</strong> : exécuter des agents qui lancent du code non relu (shell, Python, installation de paquets, navigateur) dans des sandboxes isolées, à l'échelle.</li>
+</ol>
+<p>Hors périmètre : Confidential Containers (CoCo / TEE), peer-pods (Kata en VM cloud), gVisor. Ils peuvent faire l'objet d'une seconde phase.</p>
+<h2 id="2-rappel-des-deux-modeles">2. Rappel des deux modèles</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>runc (défaut)</th>
+<th>Kata Containers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Isolation</td>
+<td>Namespaces + cgroups + SELinux + seccomp, <strong>noyau de l'hôte partagé</strong></td>
+<td>Chaque pod dans une <strong>micro-VM</strong> (QEMU/KVM ou Cloud Hypervisor) avec son propre noyau invité</td>
+</tr>
+<tr>
+<td>Frontière de sécurité</td>
+<td>Noyau Linux de l'hôte</td>
+<td>Hyperviseur (KVM) + noyau invité + SELinux <code>container_kvm_t</code> sur le processus VMM</td>
+</tr>
+<tr>
+<td>Sélection</td>
+<td>Par défaut</td>
+<td><code>spec.runtimeClassName: kata</code> (RuntimeClass, handler CRI-O <code>kata</code>)</td>
+</tr>
+<tr>
+<td>Overhead déclaré</td>
+<td>Aucun</td>
+<td><code>RuntimeClass.overhead.podFixed</code> (OSC : ~350 Mi mémoire, 250 m CPU)</td>
+</tr>
+<tr>
+<td>Prérequis nœud</td>
+<td>Aucun</td>
+<td>Virtualisation matérielle (<code>/dev/kvm</code>) : bare metal ou nested</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="3-environnements">3. Environnements</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Description</th>
+<th>Usage</th>
+<th>Statut</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ENV-A</strong></td>
+<td>CRC 4.22.1 arm64 (Mac M5 Max), vfkit <code>--nested</code>, Kata via <code>kata-deploy</code> upstream, 12 vCPU / 24 Go</td>
+<td>Fonctionnel (FUN), sécurité (SEC), découverte des limites (LIM), perf <strong>indicative</strong></td>
+<td>À préparer (cf. <code>01-ENVIRONNEMENT.md</code> §3)</td>
+</tr>
+<tr>
+<td><strong>ENV-B</strong></td>
+<td>OCP 4.22 x86_64 bare metal (≥ 1 nœud worker metal), OSC 1.13 + <code>KataConfig</code></td>
+<td>Perf de référence (PERF), densité, exploitation (OPS), validation finale</td>
+<td>À provisionner</td>
+</tr>
+</tbody>
+</table></div>
+<p>Chaque résultat indique l'environnement. <strong>Un chiffre de performance issu d'ENV-A n'est jamais comparé à un chiffre d'ENV-B.</strong></p>
+<h2 id="4-methodologie">4. Méthodologie</h2>
+<h3 id="41-principe-de-comparaison-ab">4.1 Principe de comparaison A/B</h3>
+<ul>
+<li>Chaque test est exécuté <strong>deux fois avec le même manifeste</strong>, seule la ligne <code>runtimeClassName</code> change (<code>runc</code> = champ absent, <code>kata</code> = <code>runtimeClassName: kata</code>).</li>
+<li>Même image, même nœud, mêmes <code>requests/limits</code>, même namespace (ou deux namespaces jumeaux <code>bench-runc</code> / <code>bench-kata</code>).</li>
+<li>Les manifestes sont générés depuis un template unique (<code>tests/&lt;ID&gt;/pod.tmpl.yaml</code>) pour garantir l'équivalence.</li>
+</ul>
+<h3 id="42-rigueur-des-mesures">4.2 Rigueur des mesures</h3>
+<ul>
+<li><strong>Répétitions</strong> : ≥ 5 runs par mesure de perf (≥ 30 pour la latence de démarrage), on rapporte médiane, p95, min, max, écart-type.</li>
+<li><strong>Warm-up</strong> : 1 run écarté. Images pré-tirées sur le nœud (<code>imagePullPolicy: IfNotPresent</code> + pré-pull) pour ne pas mesurer le pull.</li>
+<li><strong>Bruit</strong> : nœud dédié (taint/label <code>bench=true</code> sur ENV-B), podman machine et autres charges arrêtées sur ENV-A, alternance runc/kata (ABAB) pour neutraliser la dérive thermique.</li>
+<li><strong>Écart significatif</strong> : on qualifie une différence de « significative » si l'écart des médianes dépasse 5 % <strong>et</strong> que les intervalles [p5 ; p95] ne se recouvrent pas.</li>
+<li><strong>Traçabilité</strong> : chaque run produit un fichier <code>results/&lt;campagne&gt;/&lt;ENV&gt;/&lt;ID&gt;/&lt;runtime&gt;/run-&lt;n&gt;.json</code> (schéma dans <code>03-FORMAT-RAPPORT.md</code>).</li>
+</ul>
+<h3 id="43-statuts-possibles-dun-test">4.3 Statuts possibles d'un test</h3>
+<p><code>PASS</code> · <code>FAIL</code> · <code>PARTIAL</code> (fonctionne avec contournement) · <code>NOT_SUPPORTED</code> (limite connue du runtime) · <code>BLOCKED</code> (environnement) · <code>N/A</code></p>
+<h3 id="44-outillage">4.4 Outillage</h3>
+<ul>
+<li>Image d'outillage <code>kata-bench</code> (UBI 9 + fio, iperf3, sysbench, stress-ng, netperf, redis, postgresql, amicontained, cdk, deepce), multi-arch amd64/arm64, construite avec podman.</li>
+<li>Charge HTTP : <code>k6</code> / <code>hey</code> depuis le poste ou depuis un pod runc « client » fixe.</li>
+<li>Collecte : <code>oc get pod -o json</code> (timestamps des conditions), Prometheus (<code>container_*</code>, <code>kata_*</code> via kata-monitor), <code>crictl stats</code> et <code>ps</code>/<code>smem</code> sur le nœud via <code>oc debug node</code>.</li>
+<li>Sécurité : <code>kube-bench</code>, <code>kubescape</code>, <code>trivy</code>, <code>compliance-operator</code>, Kyverno, scénarios d'évasion manuels.</li>
+<li><strong>Automatisation</strong> : <code>./precheck</code> et <code>./run</code> (voir README). Prérequis poste : <code>kubectl</code>, <code>uv</code>, <code>git</code> ; <code>helm</code> pour <code>./setup</code>.</li>
+</ul>
+<h2 id="5-phase-0-preparation-prep">5. Phase 0 — Préparation (PREP)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Action</th>
+<th>Critère de sortie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PREP-01</td>
+<td><code>./precheck</code> sans bloquant sur la cible</td>
+<td>Code retour 0</td>
+</tr>
+<tr>
+<td>PREP-02</td>
+<td><code>/dev/kvm</code> présent sur le(s) nœud(s)</td>
+<td><code>test -c /dev/kvm</code></td>
+</tr>
+<tr>
+<td>PREP-03</td>
+<td>Installation Kata (ENV-A : <code>helm install kata-deploy</code> ; ENV-B : operator OSC + <code>KataConfig</code>)</td>
+<td>RuntimeClass <code>kata</code> présente, nœud <code>Ready</code>, temps d'installation et nb de reboots notés</td>
+</tr>
+<tr>
+<td>PREP-04</td>
+<td>Smoke test : pod <code>runtimeClassName: kata</code>, <code>uname -r</code> ≠ noyau hôte</td>
+<td>Noyau invité visible</td>
+</tr>
+<tr>
+<td>PREP-05</td>
+<td>Image <code>kata-bench</code> construite et disponible pour le cluster</td>
+<td>Pull OK en runc et kata</td>
+</tr>
+<tr>
+<td>PREP-06</td>
+<td>Monitoring activé, kata-monitor scrappé</td>
+<td>Métriques <code>kata_*</code> dans Prometheus</td>
+</tr>
+<tr>
+<td>PREP-07</td>
+<td>Namespaces <code>bench-runc</code> / <code>bench-kata</code>, SCC et quotas identiques</td>
+<td><code>oc diff</code> vide hormis le runtime</td>
+</tr>
+<tr>
+<td>PREP-08</td>
+<td>Images de build disponibles en amd64/arm64 : <code>docker:dind</code>, <code>docker:dind-rootless</code>, <code>quay.io/buildah/stable</code>, <code>moby/buildkit:rootless</code>, <code>jenkins/inbound-agent</code>, <code>ghcr.io/actions/actions-runner</code></td>
+<td>Pull OK</td>
+</tr>
+<tr>
+<td>PREP-08b</td>
+<td>CI : controller Jenkins (Helm, plugin Kubernetes) et ARC (controller + runner scale set, GitHub App ou PAT) installés ; projets de référence P-JAVA / P-NODE disponibles ; registre de destination accessible</td>
+<td>Un pipeline trivial passe en runc</td>
+</tr>
+<tr>
+<td>PREP-09</td>
+<td>Agent Sandbox installé (ENV-A : manifests upstream <code>kubernetes-sigs/agent-sandbox</code> ; ENV-B : <code>agent-sandbox-operator</code> Red Hat, canal <em>preview</em>), <code>SandboxTemplate</code> runc et kata</td>
+<td><code>Sandbox</code> <code>Ready</code> dans les deux runtimes</td>
+</tr>
+<tr>
+<td>PREP-10</td>
+<td>Backend LLM pour les agents : API distante (ex. Claude API) via proxy d'egress, <strong>ou</strong> modèle local (Ollama/llama.cpp sur le Mac, joignable via <code>host.crc.testing</code>)</td>
+<td>Appel de complétion OK depuis un pod</td>
+</tr>
+<tr>
+<td>PREP-12</td>
+<td>Kyverno présent (existant sur le cluster, ou <code>./setup kyverno</code> sur un cluster de test)</td>
+<td>Détecté par <code>./precheck --phases POL</code></td>
+</tr>
+<tr>
+<td>PREP-13</td>
+<td>Site airgappé : images et charts disponibles dans le miroir (<code>./run --print-images</code>), règles de réécriture et secret de pull dans <code>campaign.yaml</code>, index PyPI miroir (<code>KVR_PYPI_INDEX</code>)</td>
+<td>Contrôle « images » du precheck OK</td>
+</tr>
+<tr>
+<td>PREP-11</td>
+<td>Harnais « agent rejoué » : script déterministe qui rejoue une séquence d'appels d'outils (y compris malveillants) sans LLM, pour des tests de sécurité reproductibles</td>
+<td>Séquence de référence exécutée en runc et kata</td>
+</tr>
+<tr>
+<td>PREP-14</td>
+<td>Backends de stockage (VOL) déclarés dans <code>campaign.yaml</code> (<code>backends.storage</code>) : StorageClass local, NFS, CIFS, S3 CSI ; endpoint et bucket S3 ; identifiants par <strong>référence</strong> à des Secrets existants. ENV-A : serveurs NFS, Samba et MinIO + drivers CSI déployés par <code>./setup storage</code> (cluster de test seulement)</td>
+<td><code>./precheck --phases VOL</code> : chaque backend monté par un pod de test</td>
+</tr>
+<tr>
+<td>PREP-15</td>
+<td>Fournisseurs de secrets (SCR) déclarés dans <code>campaign.yaml</code> (<code>backends.secrets</code>) : Vault (adresse, CA, méthode d'auth, rôle, chemin de test), Conjur (URL, compte, authentificateur, <em>host</em>), Secrets Store CSI Driver, injector et opérateurs présents. ENV-A : Vault dev et Conjur OSS par <code>./setup secrets</code></td>
+<td><code>./precheck --phases SCR</code> : lecture d'un secret de test par fournisseur</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="6-catalogue-de-tests">6. Catalogue de tests</h2>
+<p>Colonne <strong>Env</strong> : A = ENV-A suffit, B = ENV-B requis, A/B = indicatif sur A, référence sur B.
+Colonne <strong>Prio</strong> : P1 = obligatoire pour la décision, P2 = important, P3 = si le temps le permet.</p>
+<h3 id="61-fonctionnel-fun-est-ce-que-ca-marche-pareil">6.1 Fonctionnel (FUN) — « est-ce que ça marche pareil ? »</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Test</th>
+<th>Attendu</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FUN-01</td>
+<td>Pod simple, Deployment, ReplicaSet, scaling 0→N→0</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-02</td>
+<td>StatefulSet avec PVC RWO (Filesystem)</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-03</td>
+<td>PVC <code>volumeMode: Block</code></td>
+<td>À vérifier (device passthrough dans la VM)</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-04</td>
+<td>ConfigMap / Secret montés en volume + <strong>mise à jour à chaud</strong> propagée</td>
+<td>À vérifier (propagation via virtio-fs)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-05</td>
+<td><code>emptyDir</code> disque et <code>emptyDir</code> <code>medium: Memory</code> (+ <code>sizeLimit</code>)</td>
+<td>À vérifier (le tmpfs consomme la RAM de la VM)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-06</td>
+<td>Volume <code>hostPath</code></td>
+<td>À vérifier, limite attendue</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-07</td>
+<td>Downward API, projected volumes, ServiceAccount token</td>
+<td>Identique</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-08</td>
+<td>Init containers, sidecars natifs (<code>restartPolicy: Always</code>)</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-09</td>
+<td>Probes liveness / readiness / startup (exec, http, tcp, grpc)</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-10</td>
+<td><code>oc exec</code>, <code>oc logs -f</code>, <code>oc cp</code>, <code>oc port-forward</code>, <code>oc attach</code></td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-11</td>
+<td><code>oc debug pod/…</code> et <strong>ephemeral containers</strong></td>
+<td>Limite attendue côté Kata</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-12</td>
+<td>Service ClusterIP, NodePort, Route (edge/passthrough/reencrypt), DNS</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-13</td>
+<td>NetworkPolicy (deny-all, allow ciblé) appliquée au pod Kata</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-14</td>
+<td>Multus : interface secondaire (macvlan/bridge)</td>
+<td>À vérifier</td>
+<td>A/B</td>
+<td>P3</td>
+</tr>
+<tr>
+<td>FUN-15</td>
+<td>Job, CronJob, <code>activeDeadlineSeconds</code>, <code>backoffLimit</code></td>
+<td>Identique</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-16</td>
+<td>Arrêt gracieux : SIGTERM, <code>preStop</code>, <code>terminationGracePeriodSeconds</code></td>
+<td>Identique, mesurer le délai</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-17</td>
+<td>OOM : dépassement de <code>limits.memory</code></td>
+<td>Conteneur <code>OOMKilled</code> (et non la VM entière), raison correctement remontée</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-18</td>
+<td>Limites CPU (throttling) et <code>requests</code> : respect effectif</td>
+<td>À mesurer (vCPU de la VM vs quota cgroup)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-19</td>
+<td>HPA (CPU / mémoire) sur Deployment Kata</td>
+<td>Métriques remontées, scaling OK</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-20</td>
+<td>In-place pod resize (<code>resize</code> subresource)</td>
+<td>À vérifier (hotplug CPU/mémoire)</td>
+<td>A</td>
+<td>P3</td>
+</tr>
+<tr>
+<td>FUN-21</td>
+<td>Sysctls (safe et unsafe)</td>
+<td>Avec Kata, les sysctls s'appliquent au noyau invité</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-22</td>
+<td>Pod privilégié / capabilities ajoutées (<code>NET_ADMIN</code>, <code>SYS_ADMIN</code>)</td>
+<td>Effet limité à la VM</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-23</td>
+<td>Build in-cluster : BuildConfig / buildah / Tekton task dans un pod Kata</td>
+<td>Kata permet des builds plus isolés, à vérifier</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-24</td>
+<td>Images variées : UBI, UBI-minimal, distroless, Alpine (musl), image root vs non-root, <code>runAsUser</code> arbitraire (SCC <code>restricted-v2</code>)</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-25</td>
+<td>Workloads de référence de l'entreprise (2 à 3 applis réelles : web, base de données, batch)</td>
+<td>Identique, à confirmer</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>FUN-26</td>
+<td>Redémarrage du nœud, redémarrage de CRI-O</td>
+<td>Pods Kata recréés proprement</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-27</td>
+<td>Drain / cordon / PodDisruptionBudget, reschedule sur un autre nœud</td>
+<td>Identique</td>
+<td>B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>FUN-28</td>
+<td>GPU / device plugin (si cas d'usage)</td>
+<td>Limite attendue, nécessite configuration spécifique</td>
+<td>B</td>
+<td>P3</td>
+</tr>
+<tr>
+<td>FUN-29</td>
+<td>Horloge / timezone / NTP dans le pod (dérive de l'horloge invitée)</td>
+<td>Pas de dérive significative</td>
+<td>A</td>
+<td>P3</td>
+</tr>
+<tr>
+<td>FUN-30</td>
+<td><code>hostNetwork</code>, <code>hostPID</code>, <code>hostIPC</code></td>
+<td>Non supporté avec Kata. <strong>Constat ENV-A : le pod Kata en hostNetwork a rendu le nœud injoignable.</strong> Par défaut, Kata n'est vérifié que par dry-run d'admission ; pod réel seulement avec <code>--allow-destructive</code> (cluster jetable)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="62-performance-perf-combien-ca-coute">6.2 Performance (PERF) — « combien ça coûte ? »</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Mesure</th>
+<th>Outil / méthode</th>
+<th>Métriques</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PERF-01</td>
+<td>Latence de démarrage d'un pod (création → <code>Ready</code>)</td>
+<td>Script de création, timestamps <code>PodScheduled</code>→<code>ContainersReady</code></td>
+<td>ms : médiane, p95 (n=30)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-02</td>
+<td>Démarrage en rafale : 10 / 50 / 100 pods simultanés</td>
+<td>Deployment <code>replicas=N</code></td>
+<td>Temps jusqu'au dernier <code>Ready</code>, erreurs</td>
+<td>B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-03</td>
+<td>Durée de suppression d'un pod</td>
+<td><code>oc delete</code> horodaté</td>
+<td>ms</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>PERF-04</td>
+<td>Overhead mémoire par pod (pod « pause » / sleep)</td>
+<td>RSS du VMM + virtiofsd + shim sur le nœud vs RSS conteneur runc</td>
+<td>Mi par pod</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-05</td>
+<td>Densité maximale par nœud (mémoire fixe)</td>
+<td>Montée en charge jusqu'à refus de scheduling / OOM</td>
+<td>Nb de pods, comportement en saturation</td>
+<td>B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-06</td>
+<td>CPU calcul pur</td>
+<td><code>sysbench cpu</code>, <code>stress-ng --cpu</code></td>
+<td>events/s, bogo-ops/s</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-07</td>
+<td>Bande passante mémoire / latence</td>
+<td><code>sysbench memory</code>, <code>stress-ng --stream</code></td>
+<td>MiB/s</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>PERF-08</td>
+<td>Coût des appels système</td>
+<td><code>stress-ng --syscall</code>, <code>--getpid</code>, <code>--fork</code></td>
+<td>ops/s</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>PERF-09</td>
+<td>I/O disque : rootfs du conteneur</td>
+<td><code>fio</code> randread/randwrite 4k, seq 1M</td>
+<td>IOPS, MB/s, latence p99</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-10</td>
+<td>I/O disque : <code>emptyDir</code> et PVC</td>
+<td><code>fio</code> idem</td>
+<td>idem</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-11</td>
+<td>Réseau pod↔pod même nœud</td>
+<td><code>iperf3</code> TCP/UDP, <code>netperf TCP_RR</code></td>
+<td>Gbit/s, transactions/s, latence</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-12</td>
+<td>Réseau pod↔pod inter-nœuds, via Service</td>
+<td><code>iperf3</code></td>
+<td>Gbit/s</td>
+<td>B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>PERF-13</td>
+<td>Latence applicative HTTP (nginx / appli de réf.)</td>
+<td><code>k6</code> palier 10→500 VU</td>
+<td>RPS, latence p50/p95/p99, erreurs</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>PERF-14</td>
+<td>Base de données</td>
+<td><code>pgbench</code> (PostgreSQL), <code>redis-benchmark</code></td>
+<td>TPS, latence</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>PERF-15</td>
+<td>Overhead CPU hôte au repos (pods idle)</td>
+<td>CPU nœud avec 20 pods idle</td>
+<td>m CPU / pod</td>
+<td>B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>PERF-16</td>
+<td>Voisin bruyant : 1 pod victime + 1 pod <code>stress-ng</code> agressif (CPU, mémoire, I/O)</td>
+<td>Dégradation de la victime</td>
+<td>% de dégradation</td>
+<td>B</td>
+<td>P2</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="63-securite-sec-quest-ce-que-kata-apporte-vraiment">6.3 Sécurité (SEC) — « qu'est-ce que Kata apporte vraiment ? »</h3>
+<p>Tous les scénarios sont exécutés <strong>uniquement sur les environnements de test</strong>, dans le cadre de cette campagne.</p>
+<p>Principes de protection contre l'évasion couverts : noyau dédié (SEC-01), visibilité du nœud (SEC-03), évasion d'un pod privilégié (SEC-04), <code>hostPath</code> (SEC-05), surface noyau (SEC-08), modification du noyau du nœud (SEC-09), ressources (SEC-10, AGT-17), isolation entre pods (SEC-18), escalade de privilèges (SEC-19), lecture par l'administrateur du nœud (SCR-04). Les tests qui réalisent une évasion réelle ou lisent le nœud (SEC-04, 05, 09, et le volet nœud de SEC-18) ne s'exécutent qu'avec <code>./run --non-safe</code>. Les canaux auxiliaires (Spectre et apparentés) sont hors périmètre.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Scénario</th>
+<th>Attendu runc</th>
+<th>Attendu Kata</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEC-01</td>
+<td>Identification du noyau : <code>uname -a</code>, <code>/proc/version</code>, <code>dmesg</code></td>
+<td>Noyau de l'hôte</td>
+<td>Noyau invité dédié</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-02</td>
+<td>Inventaire de l'isolation : <code>amicontained</code> (namespaces, caps, seccomp, AppArmor/SELinux)</td>
+<td>Profil restreint</td>
+<td>Profil + frontière VM</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-03</td>
+<td>Visibilité de l'hôte : processus, montages, périphériques (<code>/proc</code>, <code>/sys</code>, <code>/dev</code>), interfaces réseau</td>
+<td>Partiellement masqué</td>
+<td>Seulement la VM</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-04</td>
+<td>Pod <strong>privilégié</strong> (SCC <code>privileged</code>) : accès aux disques hôte (<code>/dev/sda</code>, <code>/dev/vda</code>), <code>nsenter -t 1</code>, montage du FS hôte</td>
+<td><strong>Compromission de l'hôte</strong></td>
+<td>Confiné à la VM</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-05</td>
+<td><code>hostPath: /</code> monté en écriture</td>
+<td>Accès complet à l'hôte</td>
+<td>À mesurer (partage virtio-fs : accès toujours possible → limite à documenter)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-06</td>
+<td>Toolkit d'évasion automatisé (<code>cdk evaluate</code>, <code>deepce</code>) en pod restreint puis privilégié</td>
+<td>Liste des vecteurs exploitables</td>
+<td>Liste des vecteurs exploitables</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-07</td>
+<td>Classe de vulnérabilités « runtime » (type CVE-2019-5736, CVE-2024-21626 « Leaky Vessels ») : vérifier si le binaire runtime / les fd de l'hôte sont atteignables depuis le pod. <strong>Pas d'exploit réel</strong>, uniquement l'analyse de la surface</td>
+<td>Surface présente</td>
+<td>Surface déplacée dans la VM</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SEC-08</td>
+<td>Classe « exploit noyau » : appels système rares/dangereux (<code>unshare</code>, <code>keyctl</code>, <code>bpf</code>, <code>userfaultfd</code>, <code>io_uring</code>) acceptés ou refusés</td>
+<td>Noyau hôte exposé (filtré par seccomp)</td>
+<td>Noyau invité exposé ; l'hôte ne voit que les appels du VMM</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-09</td>
+<td>Sysctl unsafe / chargement de module noyau (<code>modprobe</code>, <code>insmod</code>) depuis un pod privilégié</td>
+<td>Impacte l'hôte</td>
+<td>Impacte la VM seulement</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SEC-10</td>
+<td>Isolation des ressources : fork bomb, épuisement mémoire, remplissage disque <code>emptyDir</code></td>
+<td>Contenu par cgroups/pids-limit</td>
+<td>Contenu par la VM + cgroups du sandbox</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-11</td>
+<td>Confinement SELinux du VMM sur l'hôte (<code>ps -Z</code> : <code>container_kvm_t</code>) et du conteneur runc (<code>container_t</code>, MCS)</td>
+<td><code>container_t</code></td>
+<td><code>container_kvm_t</code></td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SEC-12</td>
+<td>Secrets : un pod Kata voit-il les secrets/volumes d'un autre pod ? Accès au token SA, au metadata service</td>
+<td>Isolé</td>
+<td>Isolé</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SEC-13</td>
+<td>Réseau : NetworkPolicy contournable depuis un pod privilégié ? (manipulation iptables, ARP spoofing)</td>
+<td>Possible en privilégié + hostNetwork</td>
+<td>Confiné à la VM</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SEC-14</td>
+<td><strong>Détection runtime</strong> : Falco / RHACS / auditd détectent-ils un <code>exec</code> shell, une écriture dans <code>/etc</code>, une connexion sortante ?</td>
+<td>Détecté (eBPF sur l'hôte)</td>
+<td><strong>Risque d'angle mort</strong> : les syscalls internes à la VM ne sont pas vus par l'hôte</td>
+<td>B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-15</td>
+<td>Conformité : <code>compliance-operator</code> (profil CIS OCP), <code>kube-bench</code>, <code>kubescape</code> avant / après installation Kata</td>
+<td>Baseline</td>
+<td>Pas de régression</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SEC-16</td>
+<td>Scan des composants ajoutés (images operator / kata-deploy, QEMU, noyau invité) : <code>trivy</code>, CVE connues, fréquence de patch</td>
+<td>—</td>
+<td>Nouvelle surface à maintenir</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SEC-17</td>
+<td>Revue du modèle de menace : qui peut choisir <code>runtimeClassName</code> ? Imposer Kata par namespace (admission policy / Kyverno / ValidatingAdmissionPolicy)</td>
+<td>—</td>
+<td>Politique d'imposition testée</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-18</td>
+<td><strong>Isolation entre pods</strong> : une victime porte des marqueurs (processus, mémoire, fichier, paquet réseau). Observateurs : voisin runc, voisin du même runtime, et (mode non sûr) administrateur du nœud (<code>hostPID</code>, <code>hostNetwork</code>, racine en lecture)</td>
+<td>Voisins : rien. Nœud : tout</td>
+<td>Voisins : rien. Nœud : processus invisible (seul QEMU), mais <strong>mémoire, fichiers, réseau atteignables</strong> (Kata ne protège pas le pod du nœud ; rôle de CoCo)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SEC-19</td>
+<td><strong>Escalade de privilèges dans le pod</strong> : <code>no_new_privs</code>, capacités effectives, binaire setuid-root lancé par un non-root avec <code>allowPrivilegeEscalation</code> false / true, capacités utilisables en root, user namespaces</td>
+<td>Garde-fous appliqués</td>
+<td>Identiques à runc (root du pod = root de la VM, pas du nœud)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="64-exploitation-ops-peut-on-le-faire-tourner-au-quotidien">6.4 Exploitation (OPS) — « peut-on le faire tourner au quotidien ? »</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Sujet</th>
+<th>Mesure / critère</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OPS-01</td>
+<td>Installation : étapes, durée, reboots de nœud (MachineConfig)</td>
+<td>Durée, nb de reboots, automatisable GitOps ?</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>OPS-02</td>
+<td>Mise à jour OCP avec Kata installé, mise à jour de l'operator OSC</td>
+<td>Impact sur les pods Kata, durée</td>
+<td>B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>OPS-03</td>
+<td>Désinstallation propre</td>
+<td>Nœuds revenus à l'état initial</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>OPS-04</td>
+<td>Observabilité : métriques pod/conteneur dans la console, Prometheus, kata-monitor, dashboards</td>
+<td>Métriques manquantes listées</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>OPS-05</td>
+<td>Logs : collecte cluster-logging / Vector pour les pods Kata</td>
+<td>Identique ?</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>OPS-06</td>
+<td>Debug : <code>oc debug</code>, <code>crictl</code>, accès console de la VM, <code>must-gather</code> OSC</td>
+<td>Procédure documentée</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>OPS-07</td>
+<td>Capacity planning : prise en compte de <code>overhead.podFixed</code> par le scheduler et les quotas</td>
+<td>Quotas consommés = requests + overhead</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>OPS-08</td>
+<td>Hétérogénéité des nœuds : nœuds sans KVM, <code>scheduling.nodeSelector</code> de la RuntimeClass</td>
+<td>Pods Kata jamais schedulés sur un nœud non compatible</td>
+<td>B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>OPS-09</td>
+<td>Support et cycle de vie : matrice de support Red Hat, architectures, versions, licences</td>
+<td>Synthèse documentaire</td>
+<td>—</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>OPS-10</td>
+<td>Coût : surconsommation de ressources (PERF-04/05) traduite en nœuds supplémentaires</td>
+<td>€ / an estimé</td>
+<td>B</td>
+<td>P2</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="68-policies-dadmission-kyverno-pol">6.8 Policies d'admission Kyverno (POL)</h3>
+<p><strong>Enjeu</strong> : les bonnes pratiques (non-root, requests/limits, pas de privilège, pas d'accès à l'hôte, images épinglées) sont normalement imposées par des policies d'admission. Il faut vérifier trois choses :
+- qu'elles s'appliquent <strong>de la même façon</strong> aux pods runc et Kata ;
+- qu'on peut s'en servir pour <strong>forcer</strong> Kata (mutation + validation) ;
+- si un pod peut <strong>dépasser à l'exécution</strong> ce que l'admission a validé (limites CPU, stockage, privilèges effectifs).</p>
+<p><strong>Mise en œuvre</strong> :
+- Kyverno détecté automatiquement. Sur un cluster distant, <strong>l'installation existante est utilisée telle quelle</strong>.
+- Les policies du banc sont <strong>namespacées</strong> dans les namespaces de test, donc aucune modification des ClusterPolicies du cluster.
+- Catalogue unique <code>policies/kyverno/catalog.yaml</code>, rendu selon la version de Kyverno :
+  - <code>NamespacedValidatingPolicy</code> / <code>NamespacedMutatingPolicy</code> (CEL, Kyverno ≥ 1.14 environ) ;
+  - sinon <code>kyverno.io/v1 Policy</code> + <code>validate.cel</code>.
+- Tests d'admission par <strong>création à blanc côté serveur</strong> (<code>--dry-run=server</code>), qui traverse toute la chaîne d'admission sans créer de pod.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Aspect</th>
+<th>Test</th>
+<th>Attendu runc</th>
+<th>Attendu Kata</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POL-01</td>
+<td>SEC</td>
+<td>Non-root obligatoire : pod conforme admis, pod root refusé, Deployment root refusé (autogen)</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-02</td>
+<td>SEC</td>
+<td>Requests CPU/mémoire et limite mémoire obligatoires</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-03</td>
+<td>SEC</td>
+<td>Plafond des limits (mémoire, CPU)</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>POL-04</td>
+<td>SEC</td>
+<td>Conteneurs privilégiés interdits</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-05</td>
+<td>SEC</td>
+<td>Escalade de privilèges interdite</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-06</td>
+<td>SEC</td>
+<td>Capabilities restreintes (drop ALL, ajout NET_BIND_SERVICE seulement)</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-07</td>
+<td>SEC</td>
+<td>hostNetwork / hostPID / hostIPC interdits</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-08</td>
+<td>SEC</td>
+<td>hostPath interdit</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-09</td>
+<td>SEC</td>
+<td>seccomp RuntimeDefault/Localhost obligatoire</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>POL-10</td>
+<td>SEC</td>
+<td>Images par digest obligatoires</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>POL-11</td>
+<td>SEC</td>
+<td><strong>Pod privilégié autorisé seulement avec Kata</strong> (cas CI/DIND)</td>
+<td>Privilégié refusé</td>
+<td>Privilégié admis</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-12</td>
+<td>SEC</td>
+<td><strong>Forcer Kata</strong> : mutation qui ajoute <code>runtimeClassName</code>, validation qui refuse tout autre runtime ; l'<strong>overhead</strong> de la RuntimeClass est-il appliqué après mutation ?</td>
+<td>Muté vers Kata</td>
+<td>Inchangé</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-13</td>
+<td>SEC</td>
+<td>Mode <strong>Audit</strong> : pod non conforme admis, avertissement client, entrée dans le PolicyReport (délai mesuré)</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-14</td>
+<td>SEC</td>
+<td><strong>Contournements</strong> en Enforce : Job, CronJob, conteneur éphémère privilégié (<code>kubectl debug --profile=sysadmin</code>)</td>
+<td>Tous refusés</td>
+<td>Tous refusés</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-15</td>
+<td>FUN</td>
+<td><strong>Dépassement CPU à l'exécution</strong> : 4 threads actifs sous une limite de 500m, consommation réelle mesurée</td>
+<td>≤ limite</td>
+<td>≤ limite ? (cgroup de la VM, vCPU)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-16</td>
+<td>FUN</td>
+<td><strong>Dépassement ephemeral-storage</strong> : écriture de 300 Mi sous une limite de 100 Mi, éviction attendue</td>
+<td>Évincé</td>
+<td>Évincé ? (écritures via la VM)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-17</td>
+<td>SEC</td>
+<td><strong>Privilèges effectifs</strong> d'un pod conforme : UID ≠ 0, NoNewPrivs, CapEff = 0, seccomp actif, /etc en lecture seule</td>
+<td>PASS</td>
+<td>PASS (appliqués par l'agent Kata)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>POL-18</td>
+<td>SEC</td>
+<td><strong>Garde-fou hostNetwork</strong> (issu de FUN-30) : policy <code>disallow-hostnetwork-kata</code> ; un pod <code>hostNetwork</code> reste admis en runc, est refusé avec une RuntimeClass Kata (dry-run uniquement)</td>
+<td>Admis</td>
+<td>Refusé</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Le dépassement de la limite mémoire est couvert par FUN-17.</p>
+<h3 id="65-limites-lim-inventaire-consolide">6.5 Limites (LIM) — inventaire consolidé</h3>
+<p>Section alimentée par les statuts <code>NOT_SUPPORTED</code> / <code>PARTIAL</code> des catégories précédentes, à vérifier spécifiquement :
+<code>hostNetwork</code>, <code>hostPID/IPC</code>, ephemeral containers, <code>hostPath</code> et sous-chemins, volumes Block, devices/GPU, in-place resize, métriques cAdvisor par conteneur, profils seccomp/SELinux personnalisés appliqués à l'intérieur de la VM, <code>procMount: Unmasked</code>, user namespaces (<code>hostUsers: false</code>), checkpoint/restore, live migration, prise en charge arm64, pilote de stockage Docker (overlay2) sur virtio-fs, MTU des réseaux imbriqués, virtualisation imbriquée dans la VM Kata (micro-VM d'agent dans Kata), suspension/reprise de sandbox.</p>
+<h3 id="66-ci-dans-kata-jenkins-github-actions-avec-docker-dind">6.6 CI dans Kata : Jenkins / GitHub Actions avec Docker (DIND)</h3>
+<p><strong>Enjeu</strong> : faire tourner les pipelines CI (Jenkins et GitHub Actions) dans des pods Kata. Ces pipelines <strong>compilent, testent et packagent</strong> du code, y compris une <strong>étape <code>docker build</code> sur un Dockerfile</strong>. Ils lancent aussi souvent des conteneurs pendant les tests (Testcontainers, services). Avec runc, il faut un pod <strong>privilégié</strong>, donc un accès root au nœud, et ce pour du code venant potentiellement de n'importe quelle PR. Avec Kata, le privilège reste confiné à la VM du job.</p>
+<p><strong>Architecture testée</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Plateforme</th>
+<th>Mise en œuvre</th>
+<th>Point d'injection de Kata</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Jenkins</strong></td>
+<td>Controller Jenkins (chart Helm officiel, sur runc) + plugin <strong>Kubernetes</strong> : un pod agent éphémère par build (<code>jnlp</code> + conteneurs d'outils + sidecar <code>docker:dind</code>)</td>
+<td><code>runtimeClassName: kata</code> dans le <code>podTemplate</code></td>
+</tr>
+<tr>
+<td><strong>GitHub Actions</strong></td>
+<td><strong>Actions Runner Controller (ARC)</strong>, <em>runner scale sets</em> éphémères, un runner = un job</td>
+<td><code>runtimeClassName: kata</code> dans le template du runner. Deux modes : <code>containerMode: dind</code> (prioritaire) et <code>containerMode: kubernetes</code> (les pods de job créés par les container hooks doivent aussi être en Kata)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Variantes du moteur de build</strong> (pour chaque runtime) :
+- <strong>V1</strong> : <code>docker:dind</code> privilégié (le plus répandu, compatibilité maximale) ;
+- <strong>V2</strong> : <code>docker:dind-rootless</code> ;
+- <strong>V3</strong> : Buildah/Podman sans privilège (build sans démon, alternative OpenShift) ;
+- <strong>V4</strong> : BuildKit rootless (<code>buildctl</code>).</p>
+<p><strong>Projets de référence</strong> (au minimum 2, idéalement des projets réels de l'entreprise) :
+- <strong>P-JAVA</strong> : Maven/Gradle, tests unitaires, tests d'intégration <strong>Testcontainers</strong> (PostgreSQL), packaging jar, Dockerfile multi-étapes ;
+- <strong>P-NODE</strong> (ou Go/Python) : <code>npm ci</code>, lint, tests, build, Dockerfile multi-étapes, <code>docker compose</code> pour les tests e2e.</p>
+<p><strong>Pipeline type</strong> : checkout → restauration du cache → compilation → tests unitaires → tests d'intégration (conteneurs) → packaging → <code>docker build</code> (Dockerfile) → scan de l'image → <code>docker push</code> vers le registre → nettoyage.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Aspect</th>
+<th>Test</th>
+<th>Attendu runc</th>
+<th>Attendu Kata</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DIND-01</td>
+<td>FUN</td>
+<td>Démarrage du moteur de build (V1 à V4) dans le pod de CI : <code>docker info</code>, pilote de stockage, cgroups v2</td>
+<td>V1 OK en privilégié</td>
+<td>V1 OK ; vérifier le pilote (overlay2 sur virtio-fs → <code>/var/lib/docker</code> sur emptyDir ou PVC bloc)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-02</td>
+<td>FUN</td>
+<td><strong>Jenkins</strong> : pipeline complet P-JAVA et P-NODE sur un agent Kubernetes éphémère (<code>podTemplate</code> avec sidecar dind)</td>
+<td>PASS</td>
+<td>PASS, contournements notés</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-03</td>
+<td>FUN</td>
+<td><strong>GitHub Actions / ARC</strong> <code>dind</code> : workflow complet (<code>actions/checkout</code>, <code>setup-java</code>/<code>setup-node</code>, build, tests, <code>docker/build-push-action</code>)</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-04</td>
+<td>FUN</td>
+<td><strong>GitHub Actions / ARC</strong> <code>kubernetes</code> : jobs <code>container:</code> et <code>services:</code> (pods créés par les container hooks)</td>
+<td>PASS</td>
+<td>Pods de job aussi en Kata ? À vérifier</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>DIND-05</td>
+<td>FUN</td>
+<td>Étape <strong>Dockerfile</strong> : multi-étapes, <code>--build-arg</code>, secrets de build (<code>--secret</code>), cache de build (<code>--cache-from</code>/registre), <code>buildx</code> multi-arch (amd64 + arm64 via QEMU/binfmt)</td>
+<td>binfmt modifie le <strong>noyau du nœud</strong></td>
+<td>binfmt limité au noyau invité</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-06</td>
+<td>FUN</td>
+<td>Tests qui lancent des conteneurs : <strong>Testcontainers</strong>, <code>docker compose up</code> pour l'e2e, <code>services:</code> GitHub</td>
+<td>PASS</td>
+<td>PASS ; vérifier le réseau Docker interne et la <strong>MTU</strong> (OVN-K 1400 vs bridge Docker 1500)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-07</td>
+<td>FUN</td>
+<td>Caches de build : <code>~/.m2</code>, <code>~/.npm</code>, couches Docker, sur PVC partagé (RWX) ou cache distant ; persistance entre jobs</td>
+<td>PASS</td>
+<td>PASS ; perf I/O à mesurer</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-08</td>
+<td>FUN</td>
+<td>Push vers le registre (interne OpenShift, Quay, Artifactory) avec identifiants injectés ; scan de l'image produite</td>
+<td>PASS</td>
+<td>PASS</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>DIND-09</td>
+<td>FUN</td>
+<td>Limites CPU/mémoire du job et des conteneurs internes, OOM d'une compilation lourde, <code>ephemeral-storage</code></td>
+<td>Cgroups imbriqués</td>
+<td>Cgroups dans la VM, mémoire de la VM</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>DIND-10</td>
+<td>PERF</td>
+<td><strong>Durée totale du pipeline</strong> et par étape (compilation, tests, <code>docker build</code> froid/chaud, push), P-JAVA et P-NODE, n ≥ 5</td>
+<td>Référence</td>
+<td>Δ par étape</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-11</td>
+<td>PERF</td>
+<td><strong>Latence de prise en charge</strong> : job en file → runner/agent prêt (création du pod + démarrage dind)</td>
+<td>Référence</td>
+<td>Δ mesuré</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-12</td>
+<td>PERF</td>
+<td><code>docker pull</code> d'images de base volumineuses (≥ 1 Go) et extraction des couches</td>
+<td>Référence</td>
+<td>Δ (I/O virtio)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-13</td>
+<td>PERF</td>
+<td>Concurrence : 5 / 10 / 20 jobs simultanés par nœud, durée moyenne, saturation, empreinte RAM/disque par job</td>
+<td>Référence</td>
+<td>Moins de jobs par nœud attendu</td>
+<td>B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-14</td>
+<td>SEC</td>
+<td><strong>PR malveillante</strong> (harnais rejoué dans une étape du pipeline) : depuis le pod de job ou un conteneur lancé par le dind interne avec <code>--privileged</code>, accès aux disques du nœud, <code>nsenter -t 1</code>, montage du FS du nœud, chargement de module</td>
+<td><strong>Nœud compromis</strong></td>
+<td>Confiné à la VM</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-15</td>
+<td>SEC</td>
+<td>Isolation <strong>entre jobs</strong> : un job lit-il les secrets, le workspace, le cache ou les couches Docker d'un autre job (même nœud) ? Rémanence après un job éphémère</td>
+<td>Accessible via le nœud si le job est privilégié</td>
+<td>Isolé attendu</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-16</td>
+<td>SEC</td>
+<td>Vol de secrets CI : token du runner GitHub / secret JNLP Jenkins, identifiants du registre, <code>GITHUB_TOKEN</code>, token du ServiceAccount. Accès au controller Jenkins ou à l'API Kubernetes</td>
+<td>Dépend de la config</td>
+<td><strong>Identique</strong> : Kata ne protège pas les secrets donnés au pod ; RBAC et périmètre des tokens à vérifier</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-17</td>
+<td>SEC</td>
+<td><strong>Empoisonnement de cache</strong> : un job malveillant écrit dans le cache partagé (m2, npm, couches) utilisé par d'autres projets</td>
+<td>Possible</td>
+<td>Possible (indépendant du runtime) : cloisonnement des caches à prévoir</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>DIND-18</td>
+<td>SEC</td>
+<td>Politique d'admission : <code>privileged: true</code> autorisé <strong>seulement si</strong> <code>runtimeClassName: kata</code> (ValidatingAdmissionPolicy + SCC dédiée au namespace CI) ; tentative de contournement</td>
+<td>Refusé</td>
+<td>Accepté</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>DIND-19</td>
+<td>SEC</td>
+<td>Anti-pattern : socket du runtime du nœud (<code>/run/crio/crio.sock</code>) monté en hostPath</td>
+<td>Contrôle total du nœud</td>
+<td><strong>Reste un trou</strong> même avec Kata : à interdire par politique</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>DIND-20</td>
+<td>SEC</td>
+<td>Détection : un <code>docker run --privileged</code> ou un reverse shell lancé depuis un job est-il vu par Falco/RHACS ? Audit des builds</td>
+<td>Vu (syscalls sur le nœud)</td>
+<td>Angle mort probable</td>
+<td>B</td>
+<td>P2</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="67-agents-ia-autonomes-agt">6.7 Agents IA autonomes (AGT)</h3>
+<p><strong>Enjeu</strong> : un agent autonome exécute du code généré par un LLM, potentiellement influencé par des contenus non fiables (<em>prompt injection</em> via un dépôt, une page web ou un ticket). Il faut le traiter comme du <strong>code non fiable</strong> : isolation forte, egress contrôlé, secrets hors de portée, arrêt d'urgence.</p>
+<p><strong>Architecture de référence testée</strong> :
+- <strong>Agent Sandbox</strong> (<code>Sandbox</code>, <code>SandboxTemplate</code>, <code>SandboxWarmPool</code>, <code>SandboxClaim</code>) avec <code>runtimeClassName</code> runc ou kata.
+- <strong>Agent de référence</strong> : Claude Agent SDK ou Claude Code en mode non interactif, dans l'image de sandbox (shell, Python, Node, git, Chromium headless).
+- <strong>Egress</strong> : <code>EgressFirewall</code> OVN-K et <code>NetworkPolicy</code> <em>default deny</em>. Seules sorties autorisées : l'API du LLM et un miroir de paquets.
+- <strong>Secrets</strong> : la clé API du LLM est injectée par un proxy d'egress et <strong>n'est pas présente dans la sandbox</strong>. On compare avec le mode naïf où la clé est en variable d'environnement.
+- <strong>Deux modes d'exécution</strong> :
+  - (a) LLM réel, pour le fonctionnel et la perf de bout en bout ;
+  - (b) harnais rejoué (PREP-11), pour des tests de sécurité <strong>déterministes</strong>, qui ne dépendent pas de la bonne volonté du LLM.</p>
+<p>Note : la plupart des contrôles de sécurité AGT (egress, secrets, RBAC) <strong>ne dépendent pas du runtime</strong>. On les teste quand même dans les deux runtimes, parce que le comité doit voir la défense en profondeur complète. Kata apporte la couche « évasion vers le nœud ».</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Aspect</th>
+<th>Test</th>
+<th>Attendu runc</th>
+<th>Attendu Kata</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AGT-01</td>
+<td>FUN</td>
+<td>Cycle de vie : <code>Sandbox</code> → exécution d'outils → persistance (PVC) → arrêt/reprise → suppression</td>
+<td>OK</td>
+<td>OK</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-02</td>
+<td>FUN</td>
+<td><code>SandboxWarmPool</code> + <code>SandboxClaim</code> : attribution d'une sandbox préchauffée</td>
+<td>OK</td>
+<td>OK</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-03</td>
+<td>FUN</td>
+<td>Outils typiques : <code>git clone</code>, <code>pip/npm install</code>, compilation, <code>pytest</code>, écriture de fichiers, serveur de dev exposé en interne</td>
+<td>OK</td>
+<td>OK</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-04</td>
+<td>FUN</td>
+<td>Navigateur headless (Chromium/Playwright) : <code>/dev/shm</code>, sandbox seccomp de Chromium, captures</td>
+<td>OK (souvent <code>--no-sandbox</code>)</td>
+<td>À vérifier</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>AGT-05</td>
+<td>FUN</td>
+<td>Agent qui a besoin de conteneurs (build/test via Podman ou Docker dans la sandbox, lien avec DIND)</td>
+<td>Exige un pod privilégié</td>
+<td>Faisable confiné</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>AGT-06</td>
+<td>FUN</td>
+<td>Tâche de bout en bout avec LLM réel (ex. corriger un bug et faire passer les tests sur un dépôt de référence, n = 10) : taux de réussite</td>
+<td>Référence</td>
+<td>Identique attendu</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-07</td>
+<td>PERF</td>
+<td>Latence de création d'une sandbox à froid (création → <code>Ready</code>) et via warm pool (claim → prête)</td>
+<td>Référence</td>
+<td>Δ mesuré ; le warm pool doit masquer le surcoût</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-08</td>
+<td>PERF</td>
+<td>Latence d'un appel d'outil : 200 commandes courtes via <code>exec</code> (chemin API server → kubelet → CRI → agent Kata)</td>
+<td>Référence</td>
+<td>Δ mesuré</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-09</td>
+<td>PERF</td>
+<td>Durée des tâches outillées : <code>pip install</code> d'un projet lourd, <code>npm ci</code>, suite de tests</td>
+<td>Référence</td>
+<td>Δ mesuré (I/O)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-10</td>
+<td>PERF</td>
+<td>Densité : 10 / 25 / 50 sandboxes d'agents actives sur un nœud, mémoire par sandbox, saturation</td>
+<td>Référence</td>
+<td>Moins de sandboxes attendu (overhead VM)</td>
+<td>B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-11</td>
+<td>PERF</td>
+<td>Part du runtime dans la durée totale d'une tâche (temps LLM vs temps d'exécution des outils), pour relativiser l'overhead Kata</td>
+<td>—</td>
+<td>Calculée</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-12</td>
+<td>SEC</td>
+<td><em>Prompt injection</em> : un README piégé demande d'exfiltrer l'environnement et les fichiers vers un domaine externe (LLM réel + harnais)</td>
+<td>Egress bloqué</td>
+<td>Egress bloqué</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-13</td>
+<td>SEC</td>
+<td>Secrets : l'agent tente de lire la clé API (env, fichiers, mémoire du processus, proxy) ; comparaison clé en env vs proxy d'injection</td>
+<td>Clé lisible en mode naïf</td>
+<td>Idem : <strong>Kata ne protège pas les secrets donnés au pod</strong></td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-14</td>
+<td>SEC</td>
+<td>Accès à l'API Kubernetes : token de ServiceAccount (<code>automountServiceAccountToken: false</code>), RBAC, endpoints de métadonnées</td>
+<td>Bloqué</td>
+<td>Bloqué</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-15</td>
+<td>SEC</td>
+<td>Évasion depuis la sandbox, agent root dans le conteneur : scénarios SEC-03/04/06/08 rejoués par le harnais</td>
+<td>Surface = noyau du nœud</td>
+<td>Surface = noyau invité + hyperviseur</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-16</td>
+<td>SEC</td>
+<td>Mouvement latéral : scan du réseau du cluster, accès aux autres sandboxes, aux services internes, au nœud</td>
+<td>Bloqué par NetworkPolicy</td>
+<td>Idem</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-17</td>
+<td>SEC</td>
+<td>Abus de ressources : fork bomb, minage simulé (CPU 100 %), remplissage disque, fuite mémoire. Confinement et impact sur les autres sandboxes</td>
+<td>Contenu par cgroups</td>
+<td>Contenu par VM + cgroups</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-18</td>
+<td>SEC</td>
+<td>Fuite entre sessions : une sandbox recyclée par le warm pool contient-elle des données d'un utilisateur précédent ?</td>
+<td>Aucune donnée</td>
+<td>Aucune donnée</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-19</td>
+<td>SEC</td>
+<td>Traçabilité : les commandes de l'agent sont-elles auditées (audit log API pour <code>exec</code>, logs de l'agent, détection runtime Falco/RHACS) ?</td>
+<td>Visible</td>
+<td>Angle mort probable côté nœud</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>AGT-20</td>
+<td>SEC</td>
+<td>Arrêt d'urgence : délai entre <code>delete sandbox</code> et l'arrêt effectif de tous les processus de l'agent, y compris ceux qui ignorent SIGTERM</td>
+<td>Mesuré</td>
+<td>Mesuré (arrêt de la VM)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="69-volumes-et-stockage-vol">6.9 Volumes et stockage (VOL)</h3>
+<p><strong>Enjeu</strong> : avec runc, un volume monté par le kubelet est visible tel quel dans le conteneur. Avec Kata, le volume est monté <strong>sur le nœud</strong>, puis transmis à la VM. Le transport dépend du mode du volume :
+- <code>Filesystem</code> : partage <strong>virtio-fs</strong>. Chaque accès traverse le démon <code>virtiofsd</code> ; la sémantique POSIX peut changer (verrous, xattr, inotify, mmap). ENV-A a déjà montré la perte des xattr (DIND) et l'échec d'overlay.
+- <code>Block</code> : périphérique <strong>virtio-blk</strong> branché à chaud dans la VM ; le système de fichiers est monté par le noyau invité.
+- Volumes montés <strong>par le pod lui-même</strong> (NFS, CIFS, FUSE) : le montage a lieu dans le noyau invité. Il faut les modules dans ce noyau et <code>/dev/fuse</code> dans la VM (constat ENV-A : non fourni par défaut).</p>
+<p><strong>Backends testés</strong> :</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>Accès</th>
+<th>ENV-A (CRC, banc)</th>
+<th>Cluster distant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>local</strong></td>
+<td>PV <code>local</code> / hostpath-provisioner (Filesystem) ; LVMS / TopoLVM (Block et Filesystem)</td>
+<td><code>kubevirt-hostpath-provisioner</code> de CRC ; LVMS si un disque est disponible</td>
+<td>StorageClass locale existante</td>
+</tr>
+<tr>
+<td><strong>NFS</strong></td>
+<td>CSI <code>csi-driver-nfs</code> (RWX) ; montage NFS dans le pod</td>
+<td>Serveur NFS dans le cluster + CSI</td>
+<td>Serveur NFS d'entreprise + StorageClass existante</td>
+</tr>
+<tr>
+<td><strong>CIFS / SMB</strong></td>
+<td>CSI <code>csi-driver-smb</code> (RWX, identifiants dans un Secret) ; montage CIFS dans le pod</td>
+<td>Serveur Samba dans le cluster + CSI</td>
+<td>Partage SMB d'entreprise (AD) + StorageClass existante</td>
+</tr>
+<tr>
+<td><strong>S3</strong></td>
+<td>(a) SDK / API, sans volume ; (b) CSI FUSE (Mountpoint for S3 CSI ou <code>csi-s3</code>), FUSE <strong>sur le nœud</strong> ; (c) FUSE <strong>dans le pod</strong> (<code>s3fs</code>, <code>rclone mount</code>)</td>
+<td>MinIO dans le cluster</td>
+<td>Endpoint S3 d'entreprise (ou ODF/NooBaa)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Les identifiants des backends ne sont <strong>jamais</strong> dans le dépôt. <code>campaign.yaml</code> ne référence que des Secrets existants (voir PREP-14).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Aspect</th>
+<th>Test</th>
+<th>Attendu runc</th>
+<th>Attendu Kata</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VOL-01</td>
+<td>FUN</td>
+<td><strong>Matrice de base</strong>, pour chaque backend et chaque mode d'accès : provisionnement, montage, écriture et relecture (somme de contrôle), redémarrage du pod puis relecture</td>
+<td>OK</td>
+<td>À vérifier par backend</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-02</td>
+<td>FUN</td>
+<td><strong>Droits</strong> : <code>runAsUser</code> arbitraire (SCC <code>restricted-v2</code>), <code>fsGroup</code> + <code>fsGroupChangePolicy</code>, <code>root_squash</code> NFS, <code>uid</code>/<code>gid</code>/<code>file_mode</code> CIFS, contexte SELinux (<code>seLinuxMount</code>, <code>context=</code>)</td>
+<td>OK</td>
+<td>À vérifier (traduction des droits par virtio-fs)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-03</td>
+<td>FUN</td>
+<td><strong>Partage RWX simultané</strong> entre un pod runc et un pod Kata (NFS, CIFS, S3 CSI) : visibilité des écritures et délai, <code>inotify</code> sur des changements faits par l'autre pod</td>
+<td>Visibles</td>
+<td>Visibles ; <code>inotify</code> probablement aveugle aux écritures externes</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-04</td>
+<td>FUN</td>
+<td><strong>Verrous</strong> entre deux pods : <code>flock</code>, <code>fcntl</code> (POSIX), verrous d'octets ; SQLite sur volume partagé</td>
+<td>Conformes au backend</td>
+<td>À vérifier (verrous traversant virtio-fs)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-05</td>
+<td>FUN</td>
+<td><strong>Sémantique POSIX</strong> sur chaque backend : <code>fsync</code>, <code>O_DIRECT</code>, <code>mmap</code> partagé, <code>rename</code> atomique, liens durs et symboliques, xattr, fichiers creux, noms longs ou non ASCII</td>
+<td>Référence</td>
+<td>Écarts listés</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-06</td>
+<td>FUN</td>
+<td><strong>Cycle de vie CSI</strong> : extension en ligne, snapshot et clone (si le driver le permet), replanification sur un autre nœud, suppression du pod pendant des écritures</td>
+<td>OK</td>
+<td>À vérifier (extension visible dans la VM ?)</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>VOL-07</td>
+<td>FUN</td>
+<td><strong>Volume <code>Block</code></strong> (LVMS / TopoLVM, ou <code>local</code> en mode bloc) : <code>mkfs</code> et montage dans le pod, I/O directes</td>
+<td>OK</td>
+<td>Périphérique virtio-blk dans la VM</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>VOL-08</td>
+<td>FUN</td>
+<td><strong>Montage dans le pod</strong>, sans CSI : <code>mount -t nfs</code>, <code>mount -t cifs</code>, <code>s3fs</code> / <code>rclone mount</code> (FUSE) ; privilèges nécessaires dans chaque runtime</td>
+<td>Exige des privilèges sur le nœud</td>
+<td>Modules NFS/CIFS du noyau invité ? <code>/dev/fuse</code> absent (constat ENV-A)</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>VOL-09</td>
+<td>FUN</td>
+<td><strong>S3 par API</strong> (<code>aws s3</code>, <code>mc</code>) : envoi multipart d'un gros objet, CA d'entreprise, proxy ; référence indépendante du runtime</td>
+<td>OK</td>
+<td>Identique</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>VOL-10</td>
+<td>PERF</td>
+<td><strong>Débit et latence par backend</strong> (<code>fio</code>) : séquentiel 1M, aléatoire 4k, latence p99 ; <strong>métadonnées</strong> (création, <code>stat</code>, suppression de 10 000 petits fichiers) ; <code>git clone</code> et <code>npm ci</code> sur le volume</td>
+<td>Référence</td>
+<td>Δ par backend (surcoût de virtio-fs)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-11</td>
+<td>PERF</td>
+<td><strong>Démarrage</strong> : délai jusqu'à Ready avec 0, 1 et 5 volumes de chaque type</td>
+<td>Référence</td>
+<td>Δ mesuré</td>
+<td>A/B</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>VOL-12</td>
+<td>SEC</td>
+<td><strong>Visibilité des autres montages</strong> depuis un pod compromis (privilégié) : autres PVC du nœud, répertoires du kubelet, montages NFS/CIFS d'autres pods</td>
+<td>Tous accessibles</td>
+<td>Seulement les volumes du pod (vérifier)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-13</td>
+<td>SEC</td>
+<td><strong>Identifiants des backends</strong> : CIFS (Secret du CSI), clés S3, Kerberos. Où se trouvent-ils (nœud, pod), qui peut les lire, présence dans <code>oc describe</code>, dans les événements et dans <code>/proc/mounts</code></td>
+<td>Selon le mode</td>
+<td>Idem ; en montage dans le pod, les identifiants sont dans la VM</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>VOL-14</td>
+<td>FUN</td>
+<td><strong>Propagation de montage</strong> (<code>mountPropagation: HostToContainer</code> / <code>Bidirectional</code>), utilisée par certains agents de stockage et de sécurité</td>
+<td>OK</td>
+<td>Limite attendue</td>
+<td>A</td>
+<td>P3</td>
+</tr>
+<tr>
+<td>VOL-15</td>
+<td>OPS</td>
+<td><strong>Perte du serveur</strong> NFS / CIFS / S3 pendant des I/O (montage <code>hard</code>), puis retour : état du pod, suppression possible, impact sur la VM et sur le nœud, reprise</td>
+<td>Processus bloqués (état D)</td>
+<td>À mesurer (pod bloqué en <code>Terminating</code> ?)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Liens : FUN-02 à FUN-06 (volumes génériques), PERF-10 (I/O <code>emptyDir</code> et PVC). Les tests VOL les approfondissent par backend.</p>
+<h3 id="610-secrets-scr">6.10 Secrets (SCR)</h3>
+<p><strong>Enjeu</strong> : un secret natif monté en volume est stocké en <strong>tmpfs sur le nœud</strong>. Avec Kata, il est en plus <strong>copié dans la VM</strong> : l'agent Kata surveille ces montages et recopie les mises à jour. Cette copie a des limites (nombre et taille des fichiers, à vérifier selon la version) au-delà desquelles Kata revient à virtio-fs. Un gestionnaire externe (Vault, Conjur) ajoute ses propres chemins : sidecar qui écrit dans un <code>emptyDir</code>, driver CSI qui écrit <strong>sur le nœud</strong>, ou synchronisation vers un Secret natif. Le runtime peut changer leur comportement : propagation des rotations, mémoire de la VM consommée par le sidecar, <code>exec</code> dans le conteneur.</p>
+<p><strong>Kata ne protège pas les secrets contre l'administrateur du nœud</strong> : ils restent lisibles dans le tmpfs du nœud et dans la mémoire de la VM. Seuls les <em>confidential containers</em> (VM chiffrées) changent ce point. Les tests le vérifient au lieu de le supposer.</p>
+<p><strong>Fournisseurs testés</strong> :</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Fournisseur</th>
+<th>Modes d'intégration</th>
+<th>Authentification de la charge</th>
+<th>ENV-A (CRC, banc)</th>
+<th>Cluster distant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Secret Kubernetes natif</strong></td>
+<td>variable d'environnement, volume, volume projeté, <code>subPath</code>, secret immuable</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>HashiCorp Vault</strong></td>
+<td>Vault Agent Injector (init + sidecar) ; Vault CSI Provider (Secrets Store CSI Driver) ; Vault Secrets Operator ou External Secrets Operator (synchronisation vers un Secret natif)</td>
+<td>méthode <code>kubernetes</code> (token de ServiceAccount) ou <code>jwt</code></td>
+<td>Vault en mode dev (Helm) + injector + CSI provider</td>
+<td>Instance d'entreprise, <em>namespace</em> et rôle de test dédiés</td>
+</tr>
+<tr>
+<td><strong>CyberArk Conjur</strong></td>
+<td>Secrets Provider for Kubernetes : init, sidecar, modes « K8s Secrets » et « Push to File » ; Conjur CSI Provider ; External Secrets Operator ; Secretless Broker (P3)</td>
+<td><code>authn-jwt</code> (token de ServiceAccount) ; <code>authn-k8s</code> (certificat <strong>injecté dans le conteneur par <code>exec</code></strong>)</td>
+<td>Conjur OSS (Helm), si les images existent en arm64 (sinon ENV-B seulement)</td>
+<td>Conjur Enterprise ou Cloud, <em>host</em> et <em>policy</em> de test dédiés</td>
+</tr>
+</tbody>
+</table></div>
+<p>Chaque test SCR-10 à SCR-18 (aspect OPS = robustesse en cas de panne) est exécuté <strong>pour Vault et pour Conjur</strong> (variantes du plan), et pour chaque mode d'intégration supporté.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Aspect</th>
+<th>Test</th>
+<th>Attendu runc</th>
+<th>Attendu Kata</th>
+<th>Env</th>
+<th>Prio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SCR-01</td>
+<td>FUN</td>
+<td><strong>Secret natif, tous les modes</strong> : variable d'environnement, volume, projeté, <code>subPath</code>, <code>items</code>, <code>optional</code>, immuable ; contenu binaire et taille proche de 1 MiB ; contenu identique octet par octet</td>
+<td>OK</td>
+<td>OK, à vérifier pour les gros secrets</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-02</td>
+<td>FUN</td>
+<td><strong>Rotation d'un secret natif</strong> : délai de propagation dans le volume ; <code>subPath</code> et variables d'environnement non mis à jour (attendu dans les deux runtimes) ; secret avec beaucoup de clés ou volumineux (au-delà des limites de copie de l'agent Kata)</td>
+<td>Délai du kubelet (≤ 1–2 min)</td>
+<td>Délai du kubelet + copie de l'agent ; repli virtio-fs au-delà des limites</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-03</td>
+<td>FUN</td>
+<td><strong>Token de ServiceAccount projeté</strong> : audience, <code>expirationSeconds: 600</code>, rotation du fichier, utilisation par Vault et Conjur (<code>jwt</code>)</td>
+<td>Rotation OK</td>
+<td>Rotation propagée dans la VM ?</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-04</td>
+<td>SEC</td>
+<td><strong>Où vit le secret</strong> : tmpfs du nœud, mémoire de la VM, variables d'environnement visibles dans <code>/proc/&lt;pid&gt;/environ</code> depuis le nœud ; lisibilité par un administrateur du nœud</td>
+<td>Lisible depuis le nœud</td>
+<td><strong>Lisible aussi</strong> (tmpfs du nœud, mémoire de QEMU) : Kata ne protège pas contre le nœud</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-05</td>
+<td>SEC</td>
+<td><strong>Collecte depuis un pod privilégié</strong> du même nœud : lecture des secrets des autres pods (<code>/var/lib/kubelet/pods/*/volumes/kubernetes.io~secret</code>, <code>~csi</code>). Matrice attaquant runc / Kata × victime runc / Kata</td>
+<td>Attaquant runc : tous lus</td>
+<td>Attaquant Kata : aucun (frontière VM). Victime Kata attaquée depuis runc : lue</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-06</td>
+<td>SEC</td>
+<td><strong>Exposition dans le pod</strong> : un conteneur applicatif peut-il lire le token du sidecar (Vault Agent, Conjur) ; <code>shareProcessNamespace</code> ; fuite dans les logs, dans <code>oc describe</code> et dans les événements</td>
+<td>Selon la configuration</td>
+<td>Identique</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SCR-10</td>
+<td>FUN</td>
+<td><strong>Injection par sidecar / init</strong> : Vault Agent Injector (annotations, template) ; Conjur Secrets Provider en init et en sidecar (Push to File). Le webhook mute le pod Kata ; le fichier est rendu dans un <code>emptyDir</code> en mémoire</td>
+<td>OK</td>
+<td>OK attendu ; <strong>mémoire de la VM</strong> à prévoir pour le sidecar (constat ENV-A n° 2)</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-11</td>
+<td>FUN</td>
+<td><strong>Secrets Store CSI Driver</strong> (Vault CSI Provider, Conjur CSI Provider) : montage, synchronisation optionnelle vers un Secret natif, <strong>rotation</strong> (<code>enableSecretRotation</code>) : propagation jusqu'au processus</td>
+<td>OK</td>
+<td>Écriture sur le nœud, puis virtio-fs : propagation à mesurer</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-12</td>
+<td>FUN</td>
+<td><strong>Synchronisation vers un Secret natif</strong> : Vault Secrets Operator, External Secrets Operator, Conjur « K8s Secrets » ; redémarrage automatique du Deployment lors d'une rotation</td>
+<td>OK</td>
+<td>Identique (retour au cas natif SCR-02)</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SCR-13</td>
+<td>FUN</td>
+<td><strong>Authentification de la charge</strong> : Vault <code>kubernetes</code> et <code>jwt</code> ; Conjur <code>authn-jwt</code> et <strong><code>authn-k8s</code></strong>, dont le certificat est injecté par <code>exec</code> dans le conteneur (chemin <code>exec</code> différent avec Kata)</td>
+<td>OK</td>
+<td><code>authn-k8s</code> à vérifier en priorité</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-14</td>
+<td>FUN</td>
+<td><strong>Rotation et secrets dynamiques</strong> : secret KV modifié, identifiants de base de données dynamiques (Vault) ou rotation de mot de passe (Conjur), sur plus de 2 TTL ; renouvellement des baux</td>
+<td>Valeur à jour dans le délai configuré</td>
+<td>Idem, délai mesuré</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-15</td>
+<td>PERF</td>
+<td><strong>Coût au démarrage</strong> : délai jusqu'à Ready en natif, avec injector, avec CSI et avec synchronisation ; latence d'obtention du secret ; mémoire ajoutée par le sidecar</td>
+<td>Référence</td>
+<td>Δ mesuré (sidecar = mémoire de VM en plus)</td>
+<td>A/B</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-16</td>
+<td>SEC</td>
+<td><strong>Moindre privilège</strong> : un pod du rôle A ne lit pas les chemins du rôle B ; un ServiceAccount volé dans un autre namespace est refusé ; journal d'audit Vault / Conjur rattaché à l'identité du pod</td>
+<td>Refusé, audité</td>
+<td>Identique</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>SCR-17</td>
+<td>SEC</td>
+<td><strong>Rémanence</strong> : après suppression du pod, le secret reste-t-il sur le nœud (tmpfs, cache CSI, <code>emptyDir</code>) ou dans la mémoire libérée ?</td>
+<td>Nettoyé</td>
+<td>Nettoyé (arrêt de la VM)</td>
+<td>A</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>SCR-18</td>
+<td>OPS</td>
+<td><strong>Indisponibilité</strong> du fournisseur (Vault scellé ou arrêté, Conjur arrêté) au démarrage du pod et pendant son exécution : blocage de l'init, dernière valeur conservée par le sidecar, reprise</td>
+<td>Comportement documenté</td>
+<td>Identique attendu</td>
+<td>A</td>
+<td>P1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Liens : FUN-04 (mise à jour à chaud des ConfigMap et Secret), SEC-12 (isolation des secrets entre pods), AGT-13 (clé d'API de l'agent), DIND-16 (secrets de CI).</p>
+<h2 id="7-criteres-devaluation-et-ponderation-proposition-a-valider-par-le-comite">7. Critères d'évaluation et pondération (proposition à valider par le comité)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Domaine</th>
+<th>Poids</th>
+<th>Critères</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sécurité / isolation</td>
+<td>35 %</td>
+<td>SEC et POL P1 réussis, réduction de la surface d'attaque, angles morts de détection</td>
+</tr>
+<tr>
+<td>Compatibilité fonctionnelle</td>
+<td>25 %</td>
+<td>% de tests FUN P1 en PASS, workloads de réf. OK sans modification</td>
+</tr>
+<tr>
+<td>Performance / coût</td>
+<td>20 %</td>
+<td>Overhead de démarrage, mémoire, densité, I/O, réseau</td>
+</tr>
+<tr>
+<td>Exploitabilité</td>
+<td>15 %</td>
+<td>Installation, upgrade, observabilité, debug, compatibilité avec les policies d'admission (POL)</td>
+</tr>
+<tr>
+<td>Support / maturité</td>
+<td>5 %</td>
+<td>Support éditeur, roadmap, communauté</td>
+</tr>
+</tbody>
+</table></div>
+<p>Chaque domaine est noté de 1 à 5 pour chaque runtime (grille dans <code>03-FORMAT-RAPPORT.md</code> §5).</p>
+<p>Les cas d'usage <strong>DIND</strong> et <strong>AGT</strong> reçoivent en plus leur <strong>propre fiche de décision</strong> : un tableau Fonctionnel / Performance / Sécurité par runtime et un verdict « recommandé / acceptable avec conditions / déconseillé ». Le comité a besoin d'une réponse par cas d'usage, pas seulement d'un score global.</p>
+<h2 id="8-criteres-dentree-de-sortie">8. Critères d'entrée / de sortie</h2>
+<ul>
+<li><strong>Entrée</strong> : PREP-01 à PREP-07 validés sur l'environnement concerné.</li>
+<li><strong>Sortie</strong> : 100 % des tests P1 exécutés (statut ≠ <code>BLOCKED</code>), ≥ 80 % des P2, rapport généré et relu, limites consolidées, recommandation rédigée.</li>
+</ul>
+<h2 id="9-planning-indicatif">9. Planning indicatif</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Semaine</th>
+<th>Activité</th>
+<th>Env</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>PREP sur ENV-A (dont Agent Sandbox, backend LLM, harnais rejoué), image <code>kata-bench</code>, scripts</td>
+<td>A</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>FUN + SEC + LIM sur ENV-A</td>
+<td>A</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>CI (Jenkins, GitHub Actions) + AGT, fonctionnel et sécurité, sur ENV-A</td>
+<td>A</td>
+</tr>
+<tr>
+<td>S4</td>
+<td>Provisionnement ENV-B, PREP, PERF + OPS + perf DIND/AGT</td>
+<td>B</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>Rejeu des tests P1 sur ENV-B, agrégation, rédaction, revue</td>
+<td>B</td>
+</tr>
+<tr>
+<td>S6</td>
+<td>Présentation au comité</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="10-risques">10. Risques</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Risque</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nested virt instable / non activable sur CRC</td>
+<td>Pas de tests Kata sur A</td>
+<td>Option C (poste x86) ou accélérer ENV-B</td>
+</tr>
+<tr>
+<td>Chiffres de perf ENV-A non représentatifs</td>
+<td>Mauvaise décision</td>
+<td>Ne présenter que les chiffres ENV-B ; marquer A comme « indicatif »</td>
+</tr>
+<tr>
+<td>Kata upstream ≠ OSC</td>
+<td>Écarts de comportement</td>
+<td>Rejeu des P1 sur ENV-B avec OSC</td>
+</tr>
+<tr>
+<td>Ressources CRC insuffisantes</td>
+<td>Tests de densité impossibles</td>
+<td>Densité uniquement sur ENV-B</td>
+</tr>
+<tr>
+<td><code>agent-sandbox-operator</code> en <em>preview</em> (v0.9) et amd64 uniquement</td>
+<td>API instable, pas supporté en prod</td>
+<td>Upstream sur ENV-A ; statut de support documenté dans OPS-09</td>
+</tr>
+<tr>
+<td>Non-déterminisme du LLM</td>
+<td>Tests de sécurité AGT non reproductibles</td>
+<td>Harnais rejoué (PREP-11) pour SEC ; LLM réel seulement pour le fonctionnel et la perf de bout en bout</td>
+</tr>
+<tr>
+<td>Accès GitHub (App/PAT) et sortie Internet depuis CRC pour ARC</td>
+<td>Tests GitHub Actions bloqués</td>
+<td>Organisation/dépôt de test dédié ; à défaut GitHub Enterprise Server interne</td>
+</tr>
+<tr>
+<td>Coût et confidentialité des appels au LLM distant</td>
+<td>Budget, fuite de données de test</td>
+<td>Dépôts de test synthétiques, budget de tokens plafonné, ou modèle local</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="11-arborescence-du-depot-de-campagne">11. Arborescence du dépôt de campagne</h2>
+<pre><code>kata/
+├── 01-ENVIRONNEMENT.md
+├── 02-PLAN-DE-TESTS.md
+├── 03-FORMAT-RAPPORT.md
+├── pyproject.toml      # dépendances Python (uv sync / uv run)
+├── schemas/            # result.schema.json (format des résultats bruts)
+├── precheck, run, setup # points d'entrée (voir README)
+├── policies/kyverno/   # catalogue de policies Kyverno
+├── scripts/            # moteur kvr/, validate_results.py, (à venir) aggregate.py, render-report.py
+├── images/kata-bench/  # Containerfile de l'image d'outillage
+├── images/agent-sandbox/ # image de sandbox agent (shell, python, node, git, chromium, agent)
+├── ci/                 # values Helm Jenkins/ARC, podTemplates, workflows, Jenkinsfiles de référence
+├── harness/            # harnais « agent rejoué » + séquences d'appels d'outils (bénignes / malveillantes)
+├── tests/&lt;ID&gt;/         # pod.tmpl.yaml, run.sh, README (procédure + critère)
+├── results/&lt;campagne&gt;/&lt;ENV&gt;/&lt;ID&gt;/&lt;runtime&gt;/run-&lt;n&gt;.json
+└── report/             # rapport généré (md, html, pdf) + graphiques
+</code></pre></main>
+<footer>Généré par <code>scripts/report.py</code> · <a href="https://github.com/ffurlanetto/openshift-runc-vs-kata">dépôt</a> · campagnes jusqu'au 2026-11-24</footer>
+</body></html>

@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-12",
+  "category": "POL",
+  "title": "Kyverno : forcer Kata (mutation + validation)",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T07:54:22Z",
+  "duration_s": 1.105,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "mutated_to_kata",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "overhead_set_after_mutation",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "other_runtime_class_admitted",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "muté vers kata=True ; overhead après mutation={'cpu': '250m', 'memory': '320Mi'} (RuntimeClass : {'podFixed': {'cpu': '250m', 'memory': '320Mi'}}) ; autre RuntimeClass kata-qemu admise=False",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-12/runc/run-1/manifest-1-sans-runtimeclass.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-12/runc/run-1/policy-force-kata.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-12/runc/run-1/policy-require-kata.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-12/runc/run-1/mutated-pod.json",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-12/runc/run-1/manifest-2-runtimeclass-kata-qemu.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-12/runc/run-1/bypass.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/POL-12/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "c24f302e250530793831b218b632002f642f7de3d0110d495643e0183d7e0827"
+}

@@ -1,0 +1,10 @@
+$ buildah build -q --build-arg BASE=registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352 --build-arg GREETING=kvr --secret id=token,src=/work/secret.txt -t kvr/demo /work
+rc=1
+2026/11/24 15:30:35 WARN running newgidmap: exit status 1: newgidmap: write to gid_map failed: Operation not permitted
+2026/11/24 15:30:35 WARN Failed to check for setgid on /usr/bin/newgidmap: invalid argument
+2026/11/24 15:30:35 WARN Falling back to single mapping
+2026/11/24 15:30:35 WARN Error running newuidmap: exit status 1: newuidmap: write to uid_map failed: Operation not permitted
+2026/11/24 15:30:35 WARN Failed to check for setuid on /usr/bin/newuidmap: invalid argument
+2026/11/24 15:30:35 WARN Falling back to single mapping
+Error: mounting an overlay over build context directory: creating overlay scaffolding for build context directory: exec /usr/bin/fuse-overlayfs: exit status 1
+command terminated with exit code 1

@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON            OBJECT                                                     MESSAGE
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privilege-escalation   Pod kvr-4d877-pol-05-kata-0/policy-probe: [validation] fail (blocked); allowPrivilegeEscalation doit être false
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privilege-escalation   Pod kvr-4d877-pol-05-kata-0/policy-probe: [validation] fail (blocked); allowPrivilegeEscalation doit être false
+0s          Warning   PolicyViolation   namespacedvalidatingpolicy/disallow-privilege-escalation   Deployment kvr-4d877-pol-05-kata-0/policy-probe-deploy: [validation] fail (blocked); allowPrivilegeEscalation doit être false

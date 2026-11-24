@@ -1,0 +1,52 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-context
+  namespace: kvr-a47ff-dind-01-kata-v5-2
+data:
+  Dockerfile: |
+    ARG BASE
+    FROM ${BASE} AS build
+    ARG GREETING=default
+    RUN --mount=type=secret,id=token \
+        test -s /run/secrets/token \
+        && echo "greeting=${GREETING}" > /out.txt \
+        && sha256sum /run/secrets/token | cut -c1-12 >> /out.txt \
+        && dd if=/dev/urandom of=/blob bs=1M count=20 status=none
+    FROM ${BASE}
+    COPY --from=build /out.txt /out.txt
+    CMD ["cat", "/out.txt"]
+  secret.txt: "jeton-factice-du-banc-kvr"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ci
+  namespace: kvr-a47ff-dind-01-kata-v5-2
+  labels:
+    app.kubernetes.io/part-of: kvr
+spec:
+  runtimeClassName: kata-qemu
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 0
+  automountServiceAccountToken: false
+  containers:
+    - name: engine
+      image: docker.io/library/docker@sha256:4bbc7223f81db790097c6dea42fb93e05b8fead4f0431fbe6ccaba6e8473201c
+      env:
+        - {name: DOCKER_TLS_CERTDIR, value: ""}
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - {name: engine-storage, mountPath: /var/lib/docker}
+        - {name: build-context, mountPath: /work}
+      imagePullPolicy: IfNotPresent
+      resources:
+        requests: {cpu: 500m, memory: 512Mi}
+        limits: {cpu: "2", memory: 2Gi}
+  volumes:
+    - name: engine-storage
+      emptyDir: {medium: Memory, sizeLimit: 1Gi}   # compté dans la limite mémoire du pod (et de la VM Kata)
+    - name: build-context
+      configMap: {name: build-context}

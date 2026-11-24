@@ -1,0 +1,34 @@
+Traceback (most recent call last):
+  File "<repo>/scripts/kvr/cluster.py", line 64, in oc
+    r = subprocess.run(cmd, input=input, capture_output=True, text=True,
+                       env=self.env, timeout=timeout)
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 671, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 1395, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 2424, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        skip_check_and_raise=True)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/.local/share/uv/python/cpython-3.15.0-macos-aarch64-none/lib/python3.15/subprocess.py", line 1434, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['/usr/local/bin/kubectl', '--context', 'contexte-1', 'exec', '-n', 'kvr-a47ff-agt-17-kata-1', 'probe', '--', 'bash', '-c', 'pids=(); last=; i=0; for ((i=1; i<=6000; i++)); do sleep 600 & if [ "$!" = "$last" ] || (( SECONDS > 90 )); then break; fi; last=$!; pids+=($!); (( i % 25 == 0 )) && echo $i > /tmp/kvr-agt17; done 2>/dev/null; n=${#pids[@]}; echo $n > /tmp/kvr-agt17; read pe < /sys/fs/cgroup/pids.events; echo "DONE $n $SECONDS $pe"; kill -9 "${pids[@]}" 2>/dev/null; wait 2>/dev/null; exit 0']' timed out after 300 seconds
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<repo>/scripts/kvr/runner.py", line 237, in execute_step
+    status = t.module.run(ctx)
+  File "<repo>/tests/AGT-17/test.py", line 45, in run
+    rc, out, err = ctx.exec("probe", ["bash", "-c", script], timeout_s=300)
+                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/scripts/kvr/context.py", line 147, in exec
+    r = self.cluster.oc(*args, "--", *cmd, check=False, timeout=timeout_s)
+  File "<repo>/scripts/kvr/cluster.py", line 67, in oc
+    raise OcError(f"kubectl {' '.join(args)} : délai dépassé ({timeout}s)") from e
+kvr.cluster.OcError: kubectl exec -n kvr-a47ff-agt-17-kata-1 probe -- bash -c pids=(); last=; i=0; for ((i=1; i<=6000; i++)); do sleep 600 & if [ "$!" = "$last" ] || (( SECONDS > 90 )); then break; fi; last=$!; pids+=($!); (( i % 25 == 0 )) && echo $i > /tmp/kvr-agt17; done 2>/dev/null; n=${#pids[@]}; echo $n > /tmp/kvr-agt17; read pe < /sys/fs/cgroup/pids.events; echo "DONE $n $SECONDS $pe"; kill -9 "${pids[@]}" 2>/dev/null; wait 2>/dev/null; exit 0 : délai dépassé (300s)

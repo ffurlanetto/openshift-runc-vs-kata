@@ -1,0 +1,12 @@
+rc=125
+Unable to find image 'registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352' locally
+registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352: Pulling from ubi9/ubi-minimal
+aba77be659b3: Pulling fs layer
+aba77be659b3: Download complete
+aba77be659b3: Pull complete
+Digest: sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+Status: Downloaded newer image for registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352
+docker: Error response from daemon: failed to mount /tmp/containerd-mount3393965212: mount source: "overlay", target: "/tmp/containerd-mount3393965212", fstype: overlay, flags: 0, data: "workdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2/work,upperdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/2/fs,lowerdir=/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/1/fs,index=off", err: invalid argument
+
+Run 'docker run --help' for more information
+command terminated with exit code 125

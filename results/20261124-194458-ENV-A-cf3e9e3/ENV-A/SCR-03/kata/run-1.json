@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SCR-03",
+  "category": "SCR",
+  "title": "Token de ServiceAccount projeté : rotation",
+  "runtime": "kata",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-194458-ENV-A-cf3e9e3",
+    "git_commit": "cf3e9e3b3f6510585774dc13937fccac19c74ce1",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata",
+    "kata_shim": "rust",
+    "hypervisor": "kata-qemu-runtime-rs"
+  },
+  "started_at": "2026-11-24T19:53:53Z",
+  "duration_s": 506.636,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "api_accepts_initial_token",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "rotation_after",
+      "value": 499,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "api_accepts_rotated_token",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    }
+  ],
+  "observations": "kata : token initial (durée 600 s, aud ['https://kubernetes.default.svc']) → HTTP 200 ; nouveau token (émis 499 s après le premier) vu dans le conteneur (sondage toutes les 15 s), HTTP 200",
+  "evidence": [
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SCR-03/kata/run-1/manifest-1-secret-pod.yaml",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SCR-03/kata/run-1/claims.json",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SCR-03/kata/run-1/pods.json",
+    "evidence/20261124-194458-ENV-A-cf3e9e3/ENV-A/SCR-03/kata/run-1/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "adb63db89e7b3c6d1ba9941ecc513217a87dc10af5bf81c8d446a2cc8cf743b9"
+}

@@ -1,0 +1,19 @@
+{
+  "kind": "policyreports.wgpolicyk8s.io",
+  "result": {
+    "message": "runAsNonRoot doit être true (pod ou chaque conteneur)",
+    "policy": "kvr-a5b1b-pol-13-kata-1/require-run-as-nonroot",
+    "properties": {
+      "cel.validationIndex": "0",
+      "process": "background scan"
+    },
+    "result": "fail",
+    "rule": "validation",
+    "scored": true,
+    "source": "KyvernoValidatingPolicy",
+    "timestamp": {
+      "nanos": 110409192,
+      "seconds": 1795526999
+    }
+  }
+}

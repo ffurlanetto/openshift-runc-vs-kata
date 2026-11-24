@@ -1,0 +1,2 @@
+non privilégié admis=True
+privilégié admis=True

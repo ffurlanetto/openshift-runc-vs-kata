@@ -1,0 +1,19 @@
+{
+  "attacker_runtime": "runc",
+  "victims": {
+    "kata": {
+      "pod_dir_visible": true,
+      "read": true,
+      "error": ""
+    },
+    "runc": {
+      "pod_dir_visible": true,
+      "read": true,
+      "error": ""
+    }
+  },
+  "host_mounts": [
+    "251",
+    "xfs"
+  ]
+}

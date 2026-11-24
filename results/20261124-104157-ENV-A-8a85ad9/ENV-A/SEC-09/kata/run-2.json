@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-09",
+  "category": "SEC",
+  "title": "Pod privilégié : sysctl et module noyau du nœud",
+  "runtime": "kata",
+  "run": 2,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-104157-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T14:07:55Z",
+  "duration_s": 46.197,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "node_sysctl_modified",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_module_loaded",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_left_modified",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    }
+  ],
+  "observations": "kata : sysctl écrit dans le pod=oui, vu sur le NŒUD=non (restauré=oui) ; module tcp_htcp : refusé (Function not implemented) (noyau du pod 6.18.62, nœud 5.14.0-687.13.1.el9_8.aarch64), chargé sur le NŒUD=non ; nœud remis en l'état=oui",
+  "evidence": [
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-09/kata/run-2/manifest-1-sec-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-09/kata/run-2/manifest-2-sec-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-09/kata/run-2/states.json",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-09/kata/run-2/pods.json",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/SEC-09/kata/run-2/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "b391c11c249993fdbd5b1bdb275c95bd572c59d427dd0d68df105300a97c4b73"
+}

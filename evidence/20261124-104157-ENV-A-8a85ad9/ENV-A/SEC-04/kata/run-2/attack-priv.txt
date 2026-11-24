@@ -1,0 +1,8 @@
+rc=0
+TECH nsenter tenté pid1=sleep
+TECH disk-vda1 lecture-seule var/tmp présent
+TECH release_agent non-applicable aucun contrôleur cgroup v1 montable
+TECH core_pattern tenté restauré=oui
+FIN
+
+/tmp/kvr.sh: line 67:   210 Segmentation fault      (core dumped) bash -c 'ulimit -c unlimited; kill -SEGV $$' 2> /dev/null

@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SEC-05",
+  "category": "SEC",
+  "title": "hostPath : accès au nœud malgré Kata ?",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-202906-ENV-A-eaf9681",
+    "git_commit": "eaf96816c93c13c6fc7b1a367af7fefe957892a9",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T20:29:07Z",
+  "duration_s": 5.893,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "hostpath_read",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "hostpath_write_seen_on_node",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "hostpath_access_default_selinux",
+      "value": 0,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "hostpath_default_selinux_pod_started",
+      "value": 1,
+      "unit": "bool",
+      "better": "lower"
+    },
+    {
+      "name": "node_sensitive_files_readable",
+      "value": 2,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : hostPath avec spc_t : lu=oui, écriture vue par le nœud=oui (propriétaire côté nœud 0:0) ; avec le SELinux par défaut (system_u:system_r:container_t:s0:c34,c59) : lu=non, écrit=non ; type de montage xfs ; racine du nœud en lecture seule : fichiers sensibles lisibles ['shadow', 'kubelet.conf'], écriture refusée=NON ; résidus : 0",
+  "evidence": [
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/manifest-1-sec-pod.yaml",
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/manifest-2-sec-pod.yaml",
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/manifest-3-sec-pod.yaml",
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/manifest-4-sec-pod.yaml",
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/pod-side.txt",
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/node-side.txt",
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/pods.json",
+    "evidence/20261124-202906-ENV-A-eaf9681/ENV-A/SEC-05/runc/run-1/events.txt"
+  ],
+  "aspect": "SEC",
+  "manifest_sha256": "26d5a134089882cf65c906644d54e7da9971c0b676e19e6a7f71bcb9a8218c3d"
+}

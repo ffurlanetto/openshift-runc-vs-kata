@@ -1,0 +1,40 @@
+{
+  "before": {
+    "kernel": "5.14.0-687.13.1.el9_8.aarch64",
+    "stat_interval": "1",
+    "loaded": []
+  },
+  "during_sysctl": {
+    "kernel": "5.14.0-687.13.1.el9_8.aarch64",
+    "stat_interval": "2",
+    "loaded": []
+  },
+  "after_sysctl": {
+    "kernel": "5.14.0-687.13.1.el9_8.aarch64",
+    "stat_interval": "1",
+    "loaded": []
+  },
+  "after_load": {
+    "kernel": "5.14.0-687.13.1.el9_8.aarch64",
+    "stat_interval": "1",
+    "loaded": [
+      "tcp_htcp"
+    ]
+  },
+  "final": {
+    "kernel": "5.14.0-687.13.1.el9_8.aarch64",
+    "stat_interval": "1",
+    "loaded": []
+  },
+  "load": {
+    "guest_kernel": "5.14.0-687.13.1.el9_8.aarch64",
+    "module": "tcp_htcp",
+    "result": "chargé"
+  },
+  "unload": {
+    "guest_kernel": "5.14.0-687.13.1.el9_8.aarch64",
+    "module": "tcp_htcp",
+    "result": "déchargé"
+  },
+  "sysctl_written_in_pod": true
+}

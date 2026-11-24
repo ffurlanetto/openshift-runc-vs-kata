@@ -1,0 +1,6 @@
+LAST SEEN   TYPE     REASON           OBJECT    MESSAGE
+44s         Normal   Scheduled        pod/oom   Successfully assigned kvr-4d877-fun-17-kata-1/oom to crc
+44s         Normal   AddedInterface   pod/oom   Add eth0 [192.0.2.0/23] from ovn-kubernetes
+13s         Normal   Pulled           pod/oom   Container image "registry.access.redhat.com/ubi9/ubi-minimal@sha256:08d4c70f1baf6537a0728656cf7942d561e74a35916509d205b6519861266352" already present on machine and can be accessed by the pod
+12s         Normal   Created          pod/oom   Container created
+12s         Normal   Started          pod/oom   Container started

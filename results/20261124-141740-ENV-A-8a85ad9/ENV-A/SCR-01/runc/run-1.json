@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "test_id": "SCR-01",
+  "category": "SCR",
+  "title": "Secret natif : tous les modes de consommation",
+  "runtime": "runc",
+  "run": 1,
+  "warmup": false,
+  "campaign": {
+    "id": "20261124-141740-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T14:17:41Z",
+  "duration_s": 1.846,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "pod_ready",
+      "value": 0.91,
+      "unit": "s",
+      "better": "lower"
+    },
+    {
+      "name": "mismatched_paths",
+      "value": 0,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "runc : 8/8 contenus identiques ; downward API OK ; volume optional absent : pod démarré ; mode items 440 0 1000970000 ; types de montage ['tmpfs']",
+  "evidence": [
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-01/runc/run-1/secret-files-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-01/runc/run-1/secret-frozen-create.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-01/runc/run-1/manifest-1-secret-pod.yaml",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-01/runc/run-1/seen.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-01/runc/run-1/pods.json",
+    "evidence/20261124-141740-ENV-A-8a85ad9/ENV-A/SCR-01/runc/run-1/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "4fe496ea27a75f168b778f5daeb9cb4c3a5d1cb5a542cb7f41eb346dd28d6c82"
+}

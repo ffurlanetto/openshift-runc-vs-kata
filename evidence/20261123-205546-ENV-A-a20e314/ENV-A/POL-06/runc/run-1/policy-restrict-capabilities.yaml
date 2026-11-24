@@ -1,0 +1,33 @@
+
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedValidatingPolicy
+metadata:
+  name: restrict-capabilities
+  namespace: kvr-4d877-pol-06-runc-1
+  labels: {app.kubernetes.io/part-of: kvr}
+  annotations:
+    policies.kyverno.io/title: "Capabilities restreintes (drop ALL, ajout NET_BIND_SERVICE seulement)"
+spec:
+  validationActions: ["Deny"]
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "pods/ephemeralcontainers"]
+  autogen:
+    podControllers:
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets"]
+  variables:
+    - name: workload
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : [])"
+    - name: containers
+      expression: "object.spec.containers + (has(object.spec.initContainers) ? object.spec.initContainers : []) + (has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : [])"
+  validations:
+    - message: "capabilities.drop doit contenir ALL"
+      expression: "variables.containers.all(c, has(c.securityContext) && has(c.securityContext.capabilities)\n  && has(c.securityContext.capabilities.drop) && 'ALL' in c.securityContext.capabilities.drop)"
+    - message: "seule la capability NET_BIND_SERVICE peut être ajoutée"
+      expression: "variables.containers.all(c, !has(c.securityContext) || !has(c.securityContext.capabilities)\n  || !has(c.securityContext.capabilities.add)\n  || c.securityContext.capabilities.add.all(a, a == 'NET_BIND_SERVICE'))"

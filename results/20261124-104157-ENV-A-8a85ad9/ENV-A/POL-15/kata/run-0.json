@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "test_id": "POL-15",
+  "category": "POL",
+  "title": "Dépassement de la limite CPU à l'exécution",
+  "runtime": "kata",
+  "run": 0,
+  "warmup": true,
+  "campaign": {
+    "id": "20261124-104157-ENV-A-8a85ad9",
+    "git_commit": "8a85ad9fc74c3629a0f4dd8e1ce8d30692707ca8",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9",
+    "kata_version": "kata-deploy (upstream, Helm) 4.4.0",
+    "kata_runtime_class": "kata-qemu",
+    "kata_shim": "go",
+    "hypervisor": "kata-qemu"
+  },
+  "started_at": "2026-11-24T13:31:00Z",
+  "duration_s": 62.569,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "effective_cpu_cores",
+      "value": 0.513,
+      "unit": "cores",
+      "better": "lower"
+    },
+    {
+      "name": "cpu_limit_ratio",
+      "value": 1.026,
+      "unit": "ratio",
+      "better": "lower"
+    },
+    {
+      "name": "visible_cpus",
+      "value": 2,
+      "unit": "count",
+      "better": "lower"
+    }
+  ],
+  "observations": "limite 0.5 cœur(s), consommé 0.51 ; cpu.max=50000 ; nproc=2",
+  "evidence": [
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-15/kata/run-0/manifest-1-policy-pod.yaml",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-15/kata/run-0/cpu.txt",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-15/kata/run-0/pods.json",
+    "evidence/20261124-104157-ENV-A-8a85ad9/ENV-A/POL-15/kata/run-0/events.txt"
+  ],
+  "aspect": "FUN",
+  "manifest_sha256": "563270af96ced3b6ed83fd725ec5f170725d18305979ffbc93a8b9bd40b0fa0d"
+}

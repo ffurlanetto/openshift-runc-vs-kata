@@ -1,0 +1,11 @@
+## sans policy : conforme=True non-conforme=True
+
+
+## Enforce : conforme=True
+
+
+## Enforce : pod non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-bcec32d9" denied the request: Policy restrict-seccomp failed: seccompProfile.type doit être RuntimeDefault ou Localhost
+
+## Enforce : Deployment non conforme admis=False
+Error from server: error when creating "STDIN": admission webhook "nvpol.validate.kyverno.svc-fail-bcec32d9" denied the request: Policy restrict-seccomp failed: seccompProfile.type doit être RuntimeDefault ou Localhost

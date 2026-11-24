@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "test_id": "DIND-06",
+  "category": "DIND",
+  "title": "Conteneurs imbriqués : réseau et MTU",
+  "runtime": "runc",
+  "run": 3,
+  "warmup": false,
+  "campaign": {
+    "id": "20261123-205546-ENV-A-a20e314",
+    "git_commit": "a20e314875a7f6062ca5142f2404e9fb0135d7e7",
+    "git_dirty": false,
+    "replay_of": null
+  },
+  "env": {
+    "id": "ENV-A",
+    "context": "contexte-1",
+    "platform": "OpenShift 4.22.1",
+    "arch": "arm64",
+    "node": "crc",
+    "nested_virt": true,
+    "container_runtime": "cri-o://1.35.4-2.rhaos4.22.git6479b5e.el9"
+  },
+  "started_at": "2026-11-24T05:54:29Z",
+  "duration_s": 20.841,
+  "status": "PASS",
+  "metrics": [
+    {
+      "name": "nested_https_ok",
+      "value": 1,
+      "unit": "bool",
+      "better": "higher"
+    },
+    {
+      "name": "nested_https_time",
+      "value": 493,
+      "unit": "ms",
+      "better": "lower"
+    }
+  ],
+  "observations": "V1-dind-privileged : MTU pod=1400 bridge docker=1500 ; HTTPS depuis un conteneur imbriqué : OK (code 200)",
+  "evidence": [
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-06/runc/run-3-V1-dind-privileged/manifest-1-dind-pod.yaml",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-06/runc/run-3-V1-dind-privileged/nested-curl.txt",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-06/runc/run-3-V1-dind-privileged/pods.json",
+    "evidence/20261123-205546-ENV-A-a20e314/ENV-A/DIND-06/runc/run-3-V1-dind-privileged/events.txt"
+  ],
+  "aspect": "FUN",
+  "variant": "V1-dind-privileged",
+  "manifest_sha256": "d6dd2157cab25624fc1b32961aa49bce2457f373432ab600a0edaf559d6905ac"
+}

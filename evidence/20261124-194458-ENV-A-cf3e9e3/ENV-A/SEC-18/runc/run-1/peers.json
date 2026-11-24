@@ -1,0 +1,8 @@
+{
+  "voisin runc": {
+    "process": false,
+    "environ": false,
+    "visible_procs": 2,
+    "file": false
+  }
+}

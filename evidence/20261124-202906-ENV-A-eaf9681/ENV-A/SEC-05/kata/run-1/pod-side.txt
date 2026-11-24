@@ -1,0 +1,7 @@
+== defaut
+
+== spc
+
+== racine
+
+pod hostPath « / » non démarré : kubectl wait pod/hostroot --for=condition=Ready --timeout=150s -n kvr-84e5e-sec-05-kata-1 -> rc=1 : error: timed out waiting for the condition on pods/hostroot

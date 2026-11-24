@@ -2,49 +2,40 @@
 
 | | |
 |---|---|
-| Campagnes | `20261123-150324-ENV-A-2cfd032` (complète, 176 exécutions) + `20261123-160629-ENV-A-3996d56` (rejeu POL-14/15/17 après correction du banc) |
+| Rapport comité | [report/rapport-comite.md](report/rapport-comite.md) · site : <https://ffurlanetto.github.io/openshift-runc-vs-kata/> |
+| Données détaillées | [report/donnees.md](report/donnees.md) (généré par `scripts/report.py`) |
 | Plateforme | OpenShift 4.22.1, 1 nœud arm64 (12 vCPU, 24 Go), CRI-O, SELinux enforcing |
-| Kata | 4.4.0 via kata-deploy (pas OSC), runtime Rust `qemu-runtime-rs`, RuntimeClass `kata` (overhead 250m / 320Mi) |
-| Kyverno | 1.20.0, policies CEL namespacées |
-| Couverture | 23 tests automatisés sur 131 (FUN, PERF, SEC, POL) |
+| Kata | 4.4.0 via kata-deploy (pas OSC) ; RuntimeClass `kata` (shim Rust `qemu-runtime-rs`) et `kata-qemu` (shim Go) ; overhead 250m / 320 Mi |
+| Kyverno | 1.20.0 |
+| Couverture | 44 tests automatisés sur 163, tous exécutés en runc, Kata Rust et Kata Go (VOL et SCR : runc et Kata Rust) |
 
-> **Portée** : virtualisation imbriquée sur Mac. Les mesures de performance Kata sont **indicatives** et pessimistes ; elles seront refaites sur ENV-B (x86_64 bare metal + OSC). Les constats fonctionnels et de sécurité sont, eux, représentatifs du comportement de Kata.
+> **Portée** : les mesures de performance Kata sont **indicatives** (virtualisation imbriquée) et seront refaites sur ENV-B (x86_64 bare metal + OSC). Les constats fonctionnels et de sécurité sont représentatifs du comportement de Kata.
 
 ## Synthèse
 
-| Test | runc | Kata | Lecture |
-|---|---|---|---|
-| SEC-01 Noyau partagé avec le nœud | oui (5.14 RHCOS) | **non** (6.18 invité) | L'isolation par VM est effective |
-| SEC-03 Visibilité depuis le pod | 2 disques bloc, 16 nœuds /dev | 25 disques bloc (ceux de la VM), 15 nœuds /dev | Kata expose les périphériques de sa VM, pas ceux du nœud |
-| PERF-01 Pod Ready (médiane, 30 runs) | **0,9 s** | **19,4 s** | ×22 en imbriqué (indicatif) |
-| FUN-17 OOM (limite 128Mi) | `OOMKilled`, 1,3 s | tué (137) mais motif `Error`, 24 s | **PARTIAL** : la supervision basée sur `OOMKilled` ne voit rien en Kata |
-| FUN-30 `hostNetwork` | fonctionne | **non supporté, et dangereux** | Voir constat 1 |
-| POL-01 à POL-10 (bonnes pratiques Kyverno) | PASS | PASS | Policies identiques pour les deux runtimes, propagation 75–105 ms |
-| POL-11 Privilégié seulement avec Kata | refusé | admis | PASS |
-| POL-12 Kata imposé par mutation | PASS | PASS | Mutation + overhead appliqué ; autre RuntimeClass refusée |
-| POL-13 Mode Audit + PolicyReport | PASS (13 s) | PASS (16 s) | |
-| POL-14 Contournements (Job, CronJob, conteneur éphémère) | 0/3 admis | 0/3 admis | PASS |
-| POL-15 Dépassement limite CPU (500m) | 0,50 cœur, voit 12 CPU | 0,50 cœur, voit 1 CPU | PASS : limite respectée ; Kata ne montre que ses vCPU |
-| POL-16 Dépassement `ephemeral-storage` (100Mi, 300 MiB écrits) | **évincé** en 73 s | **non évincé** | **FAIL Kata** : voir constat 4 |
-| POL-17 Privilèges effectifs | conformes | **seccomp absent** | **FAIL Kata** : voir constat 3 |
-| POL-18 Pas de `hostNetwork` avec Kata | admis | refusé | PASS : garde-fou issu de FUN-30 |
+| Test | runc | Kata Rust | Kata Go | Lecture |
+|---|---|---|---|---|
+| SEC-01 Noyau partagé avec le nœud | oui | non (6.18 invité) | non | isolation par VM effective |
+| SEC-04 Pod privilégié : évasion vers le nœud | 5 techniques réussies | 0 | 0 | Kata contient le pod privilégié |
+| SEC-09 Pod privilégié : sysctl et module du nœud | modifiés (restaurés) | VM seulement | VM seulement | idem |
+| VOL-12 Pod privilégié : volume d'un autre pod | atteint | non atteint | — | idem |
+| SCR-05 Secrets des autres pods via hostPath kubelet | volés | aucun | — | idem |
+| DIND-14 Étape CI malveillante : disque du nœud | monté | disque de la VM seulement | idem | idem |
+| SEC-18 Voisin qui voit processus, mémoire, fichiers | non | non | non | isolation entre pods identique |
+| SEC-18 / SCR-04 Administrateur du nœud : mémoire, fichiers, réseau, secrets du pod | lisibles | lisibles | lisibles | Kata ne protège pas le pod de l'hôte (rôle de CoCo) |
+| SEC-19 Escalade setuid avec `allowPrivilegeEscalation: false` | bloquée | bloquée | bloquée | identique |
+| SEC-08 / POL-17 Filtre seccomp dans le conteneur | actif | **absent** | **absent** | défense en profondeur perdue |
+| SEC-05 hostPath, pod root non privilégié | accès si SELinux `spc_t`, refusé en `container_t` | pod non démarré | pod non démarré | à interdire à l'admission (POL-08) |
+| POL-16 Éviction sur `ephemeral-storage` | oui (80 s) | **non** | **non** | compenser par quota |
+| FUN-17 OOM (limite 128 Mi) | `OOMKilled`, 1,5 s | tué (137) mais motif **`Error`**, 26 s | `OOMKilled`, 55 s | supervision à adapter (Rust) |
+| FUN-30 / POL-18 `hostNetwork` | fonctionne | non supporté, admis sans policy | idem | policy POL-18 obligatoire |
+| PERF-01 Pod Ready (médiane, 30 runs) | 0,65 s | 20,6 s | 30,9 s | indicatif (imbriqué) |
+| AGT-08 Exec d'outil p50 / p95 | 61 / 75 ms | 237 / 318 ms | 287 / 489 ms | indicatif |
+| DIND-05 Build d'image : variantes fonctionnelles | 5/5 | 1/5 (dind privilégié, stockage en mémoire) | 1/5 | |
+| POL-01..18 Policies Kyverno à l'admission | 18/18 | identiques | identiques | Kata imposable par mutation (POL-12) |
 
-## Constats à présenter au comité
+## Incidents de campagne
 
-1. **Un pod Kata en `hostNetwork` peut faire tomber le nœud.** Sur ENV-A, le premier pod de ce type a rendu le nœud injoignable (API server, SSH) ; il a fallu redémarrer la VM. Kata ne supporte pas `hostNetwork`, mais rien ne l'empêche à l'admission. **Mesure** : policy Kyverno `disallow-hostnetwork-kata` (POL-18), validée.
-2. **La mémoire de la micro-VM est la limite mémoire du pod.** À 64Mi, le noyau invité ne démarre pas : le pod reste en `ContainerCreating` avec une erreur obscure (agent vsock injoignable). À 128Mi, il démarre. Un manifeste valide en runc peut donc ne jamais démarrer en Kata. **Mesure** : policy de limite mémoire minimale pour Kata, et documentation pour les équipes.
-3. **Le profil seccomp n'est pas appliqué dans la VM.** `seccompProfile: RuntimeDefault` est accepté mais sans effet à l'intérieur de l'invité (`Seccomp: 0`). La frontière principale reste la VM ; c'est une couche de défense en moins à l'intérieur. À vérifier sur OSC (option `disable_guest_seccomp`).
-4. **La limite `ephemeral-storage` n'a pas déclenché d'éviction en Kata.** Un pod limité à 100Mi a écrit 300 MiB sans être évincé, alors qu'il l'est en runc. Risque de saturation disque du nœud. À confirmer sur ENV-B avant d'en tirer une règle.
-5. **Les OOM ne sont pas remontés comme tels.** Le conteneur est bien tué, mais Kubernetes affiche `Error` au lieu de `OOMKilled`. Alertes et tableaux de bord à adapter.
-6. **Kata upstream sur OpenShift demande des adaptations SELinux** (labels des binaires, `virtiofsd --sandbox chroot`). OSC les apporte nativement : argument pour OSC en production (détail dans [01-ENVIRONNEMENT.md](01-ENVIRONNEMENT.md) §3.4).
-7. **Kyverno fonctionne à l'identique pour les deux runtimes** : mêmes refus, mêmes délais, aucun contournement constaté. Il permet aussi d'**imposer** Kata (mutation) et de **réserver** les pods privilégiés à Kata.
-
-## Incidents d'environnement (hors comparaison)
-
-- Disque de la VM CRC rempli (54 Go) par le pod `downloads` de la console OpenShift, qui recopie les binaires `oc` à chaque redémarrage. Console retirée pendant les campagnes ; le precheck alerte désormais au-delà de 70 % de disque.
-
-## Rejouer
-
-```bash
-./run --replay results/20261123-150324-ENV-A-2cfd032/campaign.json
-```
+- Mise en veille du Mac (nuit du 23 au 24 novembre) : 21 tests rejoués, la détection de veille est désormais intégrée au banc.
+- Identifiants expirés du démon Multus de CRC (24 novembre, environ 11 h 17) : plus de réseau pour les nouveaux pods ; pod Multus recréé, runs affectés rejoués.
+- Défauts du banc corrigés après les essais : SCR-03, VOL-12, SEC-05, SEC-18, AGT-17, DIND-06, DIND-14.
